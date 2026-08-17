@@ -2,7 +2,7 @@ import Link from "next/link";
 import { FiLogOut, FiExternalLink } from "react-icons/fi";
 import { currentUser } from "@/lib/auth";
 import { logOut } from "@/app/actions/auth";
-import { db } from "@/lib/db";
+import { one, num } from "@/lib/db";
 
 export const metadata = { title: "Settings" };
 
@@ -24,12 +24,10 @@ export default async function SettingsPage() {
     );
   }
 
-  const row = db()
-    .prepare(`SELECT created_at FROM users WHERE id = ?`)
-    .get(user.id) as { created_at: number } | undefined;
+  const row = await one(`SELECT created_at FROM users WHERE id = ?`, [user.id]);
 
   const joined = row
-    ? new Date(row.created_at).toLocaleDateString(undefined, {
+    ? new Date(num(row.created_at)).toLocaleDateString(undefined, {
         year: "numeric",
         month: "long",
         day: "numeric",

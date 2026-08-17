@@ -1,6 +1,6 @@
 import "server-only";
 
-import { db, uid } from "@/lib/db";
+import { all, batch, uid, num, str } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 
 /** Every page that produces something worth coming back to. */
@@ -72,30 +72,30 @@ export async function remember(
     const user = await currentUser();
     if (!user) return;
 
-    const d = db();
-
-    // Re-asking the same thing should move it up, not add a duplicate row.
-    d.prepare(`DELETE FROM recents WHERE user_id = ? AND kind = ? AND title = ?`).run(
-      user.id,
-      kind,
-      text,
-    );
-
-    d.prepare(
-      `INSERT INTO recents (id, user_id, kind, title, href, created_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-    ).run(uid("rec"), user.id, kind, text, href, Date.now());
-
-    d.prepare(
-      `DELETE FROM recents
-        WHERE user_id = ? AND kind = ?
-          AND id NOT IN (
-            SELECT id FROM recents
-             WHERE user_id = ? AND kind = ?
-             ORDER BY created_at DESC
-             LIMIT ?
-          )`,
-    ).run(user.id, kind, user.id, kind, KEEP);
+    // One atomic batch: de-duplicate, insert, then prune. Splitting these
+    // would let a concurrent read see the list briefly missing its newest row.
+    await batch([
+      {
+        sql: `DELETE FROM recents WHERE user_id = ? AND kind = ? AND title = ?`,
+        args: [user.id, kind, text],
+      },
+      {
+        sql: `INSERT INTO recents (id, user_id, kind, title, href, created_at)
+              VALUES (?, ?, ?, ?, ?, ?)`,
+        args: [uid("rec"), user.id, kind, text, href, Date.now()],
+      },
+      {
+        sql: `DELETE FROM recents
+                WHERE user_id = ? AND kind = ?
+                  AND id NOT IN (
+                    SELECT id FROM recents
+                     WHERE user_id = ? AND kind = ?
+                     ORDER BY created_at DESC
+                     LIMIT ?
+                  )`,
+        args: [user.id, kind, user.id, kind, KEEP],
+      },
+    ]);
   } catch (e) {
     rethrowFrameworkErrors(e);
     console.error("recents: could not record", e);
@@ -111,23 +111,21 @@ export async function listRecents(
     const user = await currentUser();
     if (!user) return [];
 
-    const rows = db()
-      .prepare(
-        `SELECT id, kind, title, href, created_at
-           FROM recents
-          WHERE user_id = ? AND kind = ?
-          ORDER BY created_at DESC
-          LIMIT ?`,
-      )
-      .all(user.id, kind, limit) as Array<Record<string, unknown>>;
+    const rows = await all(
+      `SELECT id, kind, title, href, created_at
+         FROM recents
+        WHERE user_id = ? AND kind = ?
+        ORDER BY created_at DESC
+        LIMIT ?`,
+      [user.id, kind, limit],
+    );
 
-    // node:sqlite hands back null-prototype objects; map to plain ones.
     return rows.map((r) => ({
-      id: String(r.id),
-      kind: String(r.kind) as RecentKind,
-      title: String(r.title),
-      href: String(r.href ?? ""),
-      createdAt: Number(r.created_at),
+      id: str(r.id),
+      kind: str(r.kind) as RecentKind,
+      title: str(r.title),
+      href: str(r.href),
+      createdAt: num(r.created_at),
     }));
   } catch (e) {
     rethrowFrameworkErrors(e);

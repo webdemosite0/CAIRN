@@ -1,6 +1,6 @@
 import "server-only";
 
-import { db, uid } from "@/lib/db";
+import { one, all, batch, uid, num, str } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import type { RecentKind } from "@/lib/recents";
 
@@ -71,53 +71,62 @@ export async function saveConversation({
 
   const text = clean(title || messages[0]?.text || "Untitled");
   const now = Date.now();
-  const d = db();
 
   let convoId = id ?? null;
 
   if (convoId) {
     // Scoped by user_id so an id from somewhere else cannot be written to.
-    const owned = d
-      .prepare(`SELECT id FROM conversations WHERE id = ? AND user_id = ?`)
-      .get(convoId, user.id);
+    const owned = await one(
+      `SELECT id FROM conversations WHERE id = ? AND user_id = ?`,
+      [convoId, user.id],
+    );
     if (!owned) convoId = null;
   }
 
+  const writes: { sql: string; args: (string | number)[] }[] = [];
+
   if (convoId) {
-    d.prepare(`UPDATE conversations SET title = ?, updated_at = ? WHERE id = ?`).run(
-      text,
-      now,
-      convoId,
-    );
-    d.prepare(`DELETE FROM messages WHERE conversation_id = ?`).run(convoId);
+    writes.push({
+      sql: `UPDATE conversations SET title = ?, updated_at = ? WHERE id = ?`,
+      args: [text, now, convoId],
+    });
+    writes.push({
+      sql: `DELETE FROM messages WHERE conversation_id = ?`,
+      args: [convoId],
+    });
   } else {
     convoId = uid("conv");
-    d.prepare(
-      `INSERT INTO conversations (id, user_id, kind, title, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-    ).run(convoId, user.id, kind, text, now, now);
+    writes.push({
+      sql: `INSERT INTO conversations (id, user_id, kind, title, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+      args: [convoId, user.id, kind, text, now, now],
+    });
   }
 
-  const insert = d.prepare(
-    `INSERT INTO messages (id, conversation_id, role, text, seq, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-  );
   messages.forEach((m, i) => {
-    insert.run(uid("msg"), convoId, m.role, m.text, i, now);
+    writes.push({
+      sql: `INSERT INTO messages (id, conversation_id, role, text, seq, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+      args: [uid("msg"), convoId as string, m.role, m.text, i, now],
+    });
   });
 
   // Keep Recents pointing at this conversation. Matching on href rather than
   // title means renaming a thread moves the row instead of adding a second one.
   const href = hrefFor(kind, convoId);
-  d.prepare(`DELETE FROM recents WHERE user_id = ? AND kind = ? AND href = ?`).run(
-    user.id,
-    kind,
-    href,
-  );
-  d.prepare(
-    `INSERT INTO recents (id, user_id, kind, title, href, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-  ).run(uid("rec"), user.id, kind, text, href, now);
+  writes.push({
+    sql: `DELETE FROM recents WHERE user_id = ? AND kind = ? AND href = ?`,
+    args: [user.id, kind, href],
+  });
+  writes.push({
+    sql: `INSERT INTO recents (id, user_id, kind, title, href, created_at)
+          VALUES (?, ?, ?, ?, ?, ?)`,
+    args: [uid("rec"), user.id, kind, text, href, now],
+  });
+
+  // Atomic: replacing the message set and rewriting the recents row must not
+  // be observable half-done, or a reader sees a thread with no messages.
+  await batch(writes);
 
   return convoId;
 }
@@ -127,29 +136,27 @@ export async function loadConversation(id: string): Promise<Conversation | null>
   const user = await currentUser();
   if (!user || !id) return null;
 
-  const head = db()
-    .prepare(
-      `SELECT id, kind, title, updated_at FROM conversations
-        WHERE id = ? AND user_id = ?`,
-    )
-    .get(id, user.id) as Record<string, unknown> | undefined;
+  const head = await one(
+    `SELECT id, kind, title, updated_at FROM conversations
+      WHERE id = ? AND user_id = ?`,
+    [id, user.id],
+  );
 
   if (!head) return null;
 
-  const rows = db()
-    .prepare(
-      `SELECT role, text FROM messages WHERE conversation_id = ? ORDER BY seq ASC`,
-    )
-    .all(id) as Array<Record<string, unknown>>;
+  const rows = await all(
+    `SELECT role, text FROM messages WHERE conversation_id = ? ORDER BY seq ASC`,
+    [id],
+  );
 
   return {
-    id: String(head.id),
-    kind: String(head.kind) as RecentKind,
-    title: String(head.title),
-    updatedAt: Number(head.updated_at),
+    id: str(head.id),
+    kind: str(head.kind) as RecentKind,
+    title: str(head.title),
+    updatedAt: num(head.updated_at),
     messages: rows.map((r) => ({
-      role: String(r.role) === "user" ? "user" : "model",
-      text: String(r.text),
+      role: str(r.role) === "user" ? "user" : "model",
+      text: str(r.text),
     })),
   };
 }

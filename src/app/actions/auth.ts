@@ -34,11 +34,11 @@ export async function signUp(
   if (password.length < 8) {
     return { error: "Password must be at least 8 characters." };
   }
-  if (findByEmail(email)) {
+  if (await findByEmail(email)) {
     return { error: "An account with that email already exists." };
   }
 
-  const user = createUser(email, name, password);
+  const user = await createUser(email, name, password);
   await startSession(user.id);
   redirect("/");
 }
@@ -49,7 +49,7 @@ export async function logIn(
 ): Promise<AuthState> {
   const { email, password } = readForm(form);
 
-  const row = findByEmail(email);
+  const row = await findByEmail(email);
   if (!row || !verifyPassword(password, row.password_hash)) {
     return { error: "That email and password do not match." };
   }

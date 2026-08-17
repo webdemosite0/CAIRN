@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { generateText } from "@/lib/gemini";
 import { currentUser } from "@/lib/auth";
-import { db, uid } from "@/lib/db";
+import { run, uid } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -66,12 +66,11 @@ export async function POST(req: NextRequest) {
     const user = await currentUser();
     if (user) {
       id = uid("site");
-      db()
-        .prepare(
-          `INSERT INTO sites (id, user_id, name, prompt, html, created_at)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-        )
-        .run(id, user.id, name || prompt.slice(0, 48), prompt, html, Date.now());
+      await run(
+        `INSERT INTO sites (id, user_id, name, prompt, html, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [id, user.id, name || prompt.slice(0, 48), prompt, html, Date.now()],
+      );
     }
 
     return Response.json({ id, html, saved: Boolean(id) });

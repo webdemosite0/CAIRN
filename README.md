@@ -24,7 +24,7 @@ name. Trademark and domain availability are not something I have checked.
 - **Tailwind CSS v4** — tokens in `src/app/globals.css`
 - **react-icons** — all iconography
 - **Gemini 2.5 Flash** — every AI feature
-- **node:sqlite** — built into Node 24, no database to install
+- **libSQL** — a local SQLite file in development, hosted Turso in production
 - No animation library; motion is CSS keyframes and inline SVG
 
 ## Setup
@@ -145,21 +145,41 @@ Enable billing on the key to lift it.
 
 Read this before picking a host — the storage layer decides where this can run.
 
-**`node:sqlite` writes to `.data/` on local disk.** That is fine on a server with
-a persistent filesystem and fatal on serverless. On Vercel, Netlify Functions,
-Cloudflare Workers or any platform with an ephemeral or read-only filesystem,
-every account, agent, reminder, saved conversation and credit ledger row is lost
-on redeploy — and on Vercel specifically, each lambda gets its own filesystem, so
-two requests can disagree about whether you exist.
+The storage layer decides where this can run, and it now runs almost anywhere.
 
-| Host | Works as-is |
+| Host | Works |
 | --- | --- |
-| A VPS / container with a mounted volume (Fly, Railway, Render, a droplet) | **Yes** |
-| Vercel / Netlify / Workers | **No** — swap `src/lib/db.ts` for a hosted Postgres or Turso first |
+| **Vercel / Netlify / Workers** | **Yes**, with `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` set |
+| A VPS / container with a mounted volume (Fly, Railway, a droplet) | **Yes**, no configuration — falls back to a local file |
 | **GitHub Pages, S3, any static host** | **No, and it never can be** — see below |
 
-Everything else is contained in that one file: it is the only module that opens
-the database, so porting it is a single rewrite rather than a sweep.
+## The database
+
+One client, two destinations. `src/lib/db.ts` uses libSQL, which speaks both a
+local SQLite file and hosted Turso over HTTP:
+
+- **No env vars** → a file under `.data/`. Zero setup for development, and
+  correct for a container with a volume.
+- **`TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN`** → hosted, which is what makes
+  serverless deployment possible at all.
+
+It is the same client and the same SQL either way, so what runs locally is what
+runs in production — which is the only reason the migration off `node:sqlite`
+could be verified without deploying.
+
+Turso's free tier is 5 GB, 500 M row reads and 10 M writes a month, with no card.
+CAIRN uses a few MB and a few thousand writes.
+
+```bash
+turso db create cairn
+turso db show cairn --url      # -> TURSO_DATABASE_URL
+turso db tokens create cairn   # -> TURSO_AUTH_TOKEN
+```
+
+**Why this was necessary.** The database used to be `node:sqlite`, which is
+synchronous and writes to disk. On a read-only filesystem it did not merely lose
+data — the shell layout reads the account and credit balance on every render, so
+**every page returned 500**. Measured, not assumed.
 
 ### Static hosting cannot work
 
@@ -199,8 +219,7 @@ served every route and created its database at the configured path.
   into the client bundle at **build** time, hence the `--build-arg`.
 - `GEMINI_API_KEY` with billing enabled. The free tier is 20 requests per day
   per model, which is a demo budget, not a product one.
-- Node 24 or newer, pinned in `engines`. `node:sqlite` does not exist unflagged
-  before 23.4.
+- Node 24 or newer, pinned in `engines`.
 - Rotate any key that has been pasted into a chat.
 
 ## Publishing
@@ -286,7 +305,7 @@ by us. Chrome and Edge support it; elsewhere the button says so plainly.
 
 ## Data
 
-SQLite at `.data/nexora.db` (gitignored), created on first use. Tables: `users`,
+SQLite at `.data/nexora.db` (gitignored) unless Turso is configured. Tables: `users`,
 `sessions`, `agents`, `sites`, `reminders`, `recents`, `integrations`.
 
 To reset everything, delete the `.data` directory.

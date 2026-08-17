@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { streamText, type Turn } from "@/lib/gemini";
 import { currentUser } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { one, str } from "@/lib/db";
 import { toParts, type Attachment } from "@/lib/attachments";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 
@@ -25,11 +25,18 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const agent = db()
-    .prepare(`SELECT * FROM agents WHERE id = ? AND user_id = ?`)
-    .get(agentId, user.id) as
-    | { name: string; role: string; instructions: string; tools: string }
-    | undefined;
+  const row = await one(`SELECT * FROM agents WHERE id = ? AND user_id = ?`, [
+    agentId,
+    user.id,
+  ]);
+  const agent = row
+    ? {
+        name: str(row.name),
+        role: str(row.role),
+        instructions: str(row.instructions),
+        tools: str(row.tools),
+      }
+    : undefined;
 
   if (!agent) {
     return Response.json({ error: "Agent not found." }, { status: 404 });

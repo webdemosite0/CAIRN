@@ -1,7 +1,7 @@
 import "server-only";
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
-import { db, uid } from "@/lib/db";
+import { one, run, uid, num, str } from "@/lib/db";
 
 const COOKIE = "nx_session";
 const SESSION_DAYS = 30;
@@ -32,27 +32,36 @@ export function verifyPassword(password: string, stored: string) {
 
 /* ---------------- users ---------------- */
 
-export function createUser(email: string, name: string, password: string): User {
+export async function createUser(
+  email: string,
+  name: string,
+  password: string,
+): Promise<User> {
   const id = uid("usr");
-  db()
-    .prepare(
-      `INSERT INTO users (id, email, name, password_hash, plan, created_at)
-       VALUES (?, ?, ?, ?, 'free', ?)`,
-    )
-    .run(id, email.toLowerCase(), name, hashPassword(password), Date.now());
+  await run(
+    `INSERT INTO users (id, email, name, password_hash, plan, created_at)
+     VALUES (?, ?, ?, ?, 'free', ?)`,
+    [id, email.toLowerCase(), name, hashPassword(password), Date.now()],
+  );
   return { id, email: email.toLowerCase(), name, plan: "free" };
 }
 
-export function findByEmail(email: string) {
-  return db()
-    .prepare(`SELECT * FROM users WHERE email = ?`)
-    .get(email.toLowerCase()) as
-    | { id: string; email: string; name: string; password_hash: string; plan: string }
-    | undefined;
+export async function findByEmail(email: string) {
+  const row = await one(`SELECT * FROM users WHERE email = ?`, [
+    email.toLowerCase(),
+  ]);
+  if (!row) return undefined;
+  return {
+    id: str(row.id),
+    email: str(row.email),
+    name: str(row.name),
+    password_hash: str(row.password_hash),
+    plan: str(row.plan),
+  };
 }
 
-export function setPlan(userId: string, plan: string) {
-  db().prepare(`UPDATE users SET plan = ? WHERE id = ?`).run(plan, userId);
+export async function setPlan(userId: string, plan: string) {
+  await run(`UPDATE users SET plan = ? WHERE id = ?`, [plan, userId]);
 }
 
 /* ---------------- sessions ---------------- */
@@ -61,9 +70,11 @@ export async function startSession(userId: string) {
   const token = randomBytes(32).toString("hex");
   const expires = Date.now() + SESSION_DAYS * 86_400_000;
 
-  db()
-    .prepare(`INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)`)
-    .run(token, userId, expires);
+  await run(`INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)`, [
+    token,
+    userId,
+    expires,
+  ]);
 
   const jar = await cookies();
   jar.set(COOKIE, token, {
@@ -79,34 +90,36 @@ export async function endSession() {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
   if (token) {
-    db().prepare(`DELETE FROM sessions WHERE token = ?`).run(token);
+    await run(`DELETE FROM sessions WHERE token = ?`, [token]);
     jar.delete(COOKIE);
   }
 }
 
 /** Resolves the guest cookie into a real row, creating it on first use. */
-function guestUser(guestId: string): User {
-  const existing = db()
-    .prepare(`SELECT id, email, name, plan FROM users WHERE id = ?`)
-    .get(guestId) as User | undefined;
+async function guestUser(guestId: string): Promise<User> {
+  const existing = await one(
+    `SELECT id, email, name, plan FROM users WHERE id = ?`,
+    [guestId],
+  );
 
   if (existing) {
     return {
-      id: String(existing.id),
-      email: String(existing.email),
-      name: String(existing.name),
-      plan: String(existing.plan),
+      id: str(existing.id),
+      email: str(existing.email),
+      name: str(existing.name),
+      plan: str(existing.plan),
     };
   }
 
   const email = `guest-${guestId.slice(0, 8)}@local`;
 
-  db()
-    .prepare(
-      `INSERT INTO users (id, email, name, password_hash, plan, created_at)
-       VALUES (?, ?, ?, '', 'free', ?)`,
-    )
-    .run(guestId, email, "You", Date.now());
+  // OR IGNORE because two concurrent first requests carry the same cookie and
+  // would otherwise race on the primary key.
+  await run(
+    `INSERT OR IGNORE INTO users (id, email, name, password_hash, plan, created_at)
+     VALUES (?, ?, ?, '', 'free', ?)`,
+    [guestId, email, "You", Date.now()],
+  );
 
   return { id: guestId, email, name: "You", plan: "free" };
 }
@@ -120,27 +133,29 @@ export async function currentUser(): Promise<User | null> {
     return guest ? guestUser(guest) : null;
   }
 
-  const row = db()
-    .prepare(
-      `SELECT u.id, u.email, u.name, u.plan, s.expires_at
-         FROM sessions s
-         JOIN users u ON u.id = s.user_id
-        WHERE s.token = ?`,
-    )
-    .get(token) as
-    | { id: string; email: string; name: string; plan: string; expires_at: number }
-    | undefined;
+  const row = await one(
+    `SELECT u.id, u.email, u.name, u.plan, s.expires_at
+       FROM sessions s
+       JOIN users u ON u.id = s.user_id
+      WHERE s.token = ?`,
+    [token],
+  );
 
   if (!row) {
     const guest = jar.get("nx_guest")?.value;
     return guest ? guestUser(guest) : null;
   }
-  if (row.expires_at < Date.now()) {
-    db().prepare(`DELETE FROM sessions WHERE token = ?`).run(token);
+  if (num(row.expires_at) < Date.now()) {
+    await run(`DELETE FROM sessions WHERE token = ?`, [token]);
     return null;
   }
 
-  return { id: row.id, email: row.email, name: row.name, plan: row.plan };
+  return {
+    id: str(row.id),
+    email: str(row.email),
+    name: str(row.name),
+    plan: str(row.plan),
+  };
 }
 
 /** Throws to the caller when a route needs a signed-in user. */

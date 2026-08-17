@@ -7,7 +7,7 @@ export const metadata = { title: "Credits and plans" };
 export default async function PricingPage() {
   const user = await currentUser();
   const balance = await myBalance();
-  const usage = user ? usageByKind(user.id) : [];
+  const usage = user ? await usageByKind(user.id) : [];
 
   return (
     <PlansView

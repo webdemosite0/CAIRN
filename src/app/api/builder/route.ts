@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { generateText } from "@/lib/gemini";
 import { currentUser } from "@/lib/auth";
-import { db, uid } from "@/lib/db";
+import { run, uid } from "@/lib/db";
 import { toParts, type Attachment } from "@/lib/attachments";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 
@@ -143,17 +143,17 @@ export async function POST(req: NextRequest) {
     if (user) {
       const payload = JSON.stringify(merged);
       if (id) {
-        db()
-          .prepare(`UPDATE sites SET html = ?, prompt = ? WHERE id = ? AND user_id = ?`)
-          .run(payload, instruction, id, user.id);
+        await run(
+          `UPDATE sites SET html = ?, prompt = ? WHERE id = ? AND user_id = ?`,
+          [payload, instruction, id, user.id],
+        );
       } else {
         id = uid("site");
-        db()
-          .prepare(
-            `INSERT INTO sites (id, user_id, name, prompt, html, created_at)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-          )
-          .run(id, user.id, instruction.slice(0, 60), instruction, payload, Date.now());
+        await run(
+          `INSERT INTO sites (id, user_id, name, prompt, html, created_at)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [id, user.id, instruction.slice(0, 60), instruction, payload, Date.now()],
+        );
       }
     }
 

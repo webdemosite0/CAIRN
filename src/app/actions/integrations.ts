@@ -2,15 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { currentUser } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { one, all, run } from "@/lib/db";
 import { serviceById } from "@/lib/services";
 
 export async function listConnected(): Promise<string[]> {
   const user = await currentUser();
   if (!user) return [];
-  const rows = db()
-    .prepare(`SELECT service FROM integrations WHERE user_id = ?`)
-    .all(user.id) as unknown as { service: string }[];
+  const rows = await all(`SELECT service FROM integrations WHERE user_id = ?`, [
+    user.id,
+  ]);
   return rows.map((r) => String(r.service));
 }
 
@@ -19,20 +19,21 @@ export async function toggleIntegration(serviceId: string) {
   if (!user) return { error: "Log in to manage integrations." };
   if (!serviceById(serviceId)) return { error: "Unknown service." };
 
-  const existing = db()
-    .prepare(`SELECT 1 FROM integrations WHERE user_id = ? AND service = ?`)
-    .get(user.id, serviceId);
+  const existing = await one(
+    `SELECT 1 AS present FROM integrations WHERE user_id = ? AND service = ?`,
+    [user.id, serviceId],
+  );
 
   if (existing) {
-    db()
-      .prepare(`DELETE FROM integrations WHERE user_id = ? AND service = ?`)
-      .run(user.id, serviceId);
+    await run(`DELETE FROM integrations WHERE user_id = ? AND service = ?`, [
+      user.id,
+      serviceId,
+    ]);
   } else {
-    db()
-      .prepare(
-        `INSERT INTO integrations (user_id, service, connected_at) VALUES (?, ?, ?)`,
-      )
-      .run(user.id, serviceId, Date.now());
+    await run(
+      `INSERT INTO integrations (user_id, service, connected_at) VALUES (?, ?, ?)`,
+      [user.id, serviceId, Date.now()],
+    );
   }
 
   revalidatePath("/integrations");

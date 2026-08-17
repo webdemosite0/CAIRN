@@ -2,14 +2,14 @@ import Link from "next/link";
 import { FiZap, FiGlobe, FiLink, FiArrowRight } from "react-icons/fi";
 import { HiOutlineSparkles } from "react-icons/hi2";
 import { currentUser } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { one, num } from "@/lib/db";
 import { Bot } from "@/components/agents/bot";
 
 export const metadata = { title: "Dashboard" };
 
-function count(sql: string, id: string) {
-  const row = db().prepare(sql).get(id) as { n: number } | undefined;
-  return row?.n ?? 0;
+async function count(sql: string, id: string) {
+  const row = await one(sql, [id]);
+  return num(row?.n);
 }
 
 export default async function MePage() {
@@ -33,12 +33,12 @@ export default async function MePage() {
     );
   }
 
-  const agents = count(`SELECT COUNT(*) AS n FROM agents WHERE user_id = ?`, user.id);
-  const sites = count(`SELECT COUNT(*) AS n FROM sites WHERE user_id = ?`, user.id);
-  const integrations = count(
-    `SELECT COUNT(*) AS n FROM integrations WHERE user_id = ?`,
-    user.id,
-  );
+  // One round trip each, so run them together rather than in series.
+  const [agents, sites, integrations] = await Promise.all([
+    count(`SELECT COUNT(*) AS n FROM agents WHERE user_id = ?`, user.id),
+    count(`SELECT COUNT(*) AS n FROM sites WHERE user_id = ?`, user.id),
+    count(`SELECT COUNT(*) AS n FROM integrations WHERE user_id = ?`, user.id),
+  ]);
 
   const cards = [
     { label: "Agents", value: agents, href: "/agents", icon: FiZap, accent: "#3b82f6" },

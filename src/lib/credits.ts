@@ -1,6 +1,6 @@
 import "server-only";
 
-import { db, uid } from "@/lib/db";
+import { one, all, run, uid, num } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 
 /**
@@ -93,50 +93,55 @@ export interface Balance {
  * The grant is topped up (never reduced) when the plan changed mid-month, so
  * upgrading takes effect immediately instead of next month.
  */
-function ensureGrant(userId: string, planId: string, period: string): number {
+async function ensureGrant(
+  userId: string,
+  planId: string,
+  period: string,
+): Promise<number> {
   const plan = planById(planId);
-  const d = db();
 
-  d.prepare(
+  await run(
     `INSERT OR IGNORE INTO credit_grants (user_id, period, plan, credits, created_at)
      VALUES (?, ?, ?, ?, ?)`,
-  ).run(userId, period, plan.id, plan.monthly, Date.now());
+    [userId, period, plan.id, plan.monthly, Date.now()],
+  );
 
-  const row = d
-    .prepare(`SELECT credits FROM credit_grants WHERE user_id = ? AND period = ?`)
-    .get(userId, period) as { credits?: number } | undefined;
+  const row = await one(
+    `SELECT credits FROM credit_grants WHERE user_id = ? AND period = ?`,
+    [userId, period],
+  );
 
-  const granted = Number(row?.credits ?? 0);
+  const granted = num(row?.credits);
 
   if (plan.monthly > granted) {
-    d.prepare(
+    await run(
       `UPDATE credit_grants SET credits = ?, plan = ? WHERE user_id = ? AND period = ?`,
-    ).run(plan.monthly, plan.id, userId, period);
+      [plan.monthly, plan.id, userId, period],
+    );
     return plan.monthly;
   }
 
   return granted;
 }
 
-export function balanceFor(userId: string, planId: string): Balance {
+export async function balanceFor(userId: string, planId: string): Promise<Balance> {
   const period = currentPeriod();
-  const granted = ensureGrant(userId, planId, period);
+  const granted = await ensureGrant(userId, planId, period);
 
-  const row = db()
-    .prepare(
-      `SELECT COALESCE(SUM(credits), 0) AS used, COALESCE(SUM(tokens), 0) AS tokens
-         FROM credit_spends WHERE user_id = ? AND period = ?`,
-    )
-    .get(userId, period) as { used?: number; tokens?: number } | undefined;
+  const row = await one(
+    `SELECT COALESCE(SUM(credits), 0) AS used, COALESCE(SUM(tokens), 0) AS tokens
+       FROM credit_spends WHERE user_id = ? AND period = ?`,
+    [userId, period],
+  );
 
-  const used = Number(row?.used ?? 0);
+  const used = num(row?.used);
 
   return {
     plan: planById(planId),
     granted,
     used,
     remaining: Math.max(0, granted - used),
-    tokensUsed: Number(row?.tokens ?? 0),
+    tokensUsed: num(row?.tokens),
     period,
   };
 }
@@ -145,22 +150,25 @@ export function balanceFor(userId: string, planId: string): Balance {
 export async function myBalance(): Promise<Balance | null> {
   const user = await currentUser();
   if (!user) return null;
-  return balanceFor(user.id, user.plan);
+  return await balanceFor(user.id, user.plan);
 }
 
 /**
  * Records real usage. Called after the model has responded, with the token
  * count Google reported — never before, and never with a guess.
  */
-export function spend(userId: string, kind: string, tokens: number): void {
+export async function spend(
+  userId: string,
+  kind: string,
+  tokens: number,
+): Promise<void> {
   try {
     const credits = creditsForTokens(tokens);
-    db()
-      .prepare(
-        `INSERT INTO credit_spends (id, user_id, kind, tokens, credits, period, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .run(uid("spend"), userId, kind, Math.max(0, tokens), credits, currentPeriod(), Date.now());
+    await run(
+      `INSERT INTO credit_spends (id, user_id, kind, tokens, credits, period, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [uid("spend"), userId, kind, Math.max(0, tokens), credits, currentPeriod(), Date.now()],
+    );
   } catch (e) {
     // Never fail a response the user already received over bookkeeping.
     console.error("credits: could not record spend", e);
@@ -189,7 +197,7 @@ export async function requireCredits(): Promise<{
   const user = await currentUser();
   if (!user) return null;
 
-  const balance = balanceFor(user.id, user.plan);
+  const balance = await balanceFor(user.id, user.plan);
   if (balance.remaining <= 0) throw new OutOfCredits(balance);
 
   return { userId: user.id, balance };
@@ -203,24 +211,23 @@ export interface UsageRow {
 }
 
 /** Per-tool breakdown for the current month, biggest consumer first. */
-export function usageByKind(userId: string): UsageRow[] {
-  const rows = db()
-    .prepare(
-      `SELECT kind,
-              COALESCE(SUM(credits), 0) AS credits,
-              COALESCE(SUM(tokens), 0)  AS tokens,
-              COUNT(*)                  AS calls
-         FROM credit_spends
-        WHERE user_id = ? AND period = ?
-        GROUP BY kind
-        ORDER BY credits DESC`,
-    )
-    .all(userId, currentPeriod()) as Array<Record<string, unknown>>;
+export async function usageByKind(userId: string): Promise<UsageRow[]> {
+  const rows = await all(
+    `SELECT kind,
+            COALESCE(SUM(credits), 0) AS credits,
+            COALESCE(SUM(tokens), 0)  AS tokens,
+            COUNT(*)                  AS calls
+       FROM credit_spends
+      WHERE user_id = ? AND period = ?
+      GROUP BY kind
+      ORDER BY credits DESC`,
+    [userId, currentPeriod()],
+  );
 
   return rows.map((r) => ({
     kind: String(r.kind),
-    credits: Number(r.credits),
-    tokens: Number(r.tokens),
-    calls: Number(r.calls),
+    credits: num(r.credits),
+    tokens: num(r.tokens),
+    calls: num(r.calls),
   }));
 }

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { currentUser } from "@/lib/auth";
-import { db, uid } from "@/lib/db";
+import { all, run, uid } from "@/lib/db";
 
 export interface AgentRow {
   id: string;
@@ -18,12 +18,12 @@ export async function listAgents(): Promise<AgentRow[]> {
   const user = await currentUser();
   if (!user) return [];
 
-  const rows = db()
-    .prepare(`SELECT * FROM agents WHERE user_id = ? ORDER BY created_at DESC`)
-    .all(user.id) as unknown as AgentRow[];
+  const rows = (await all(
+    `SELECT * FROM agents WHERE user_id = ? ORDER BY created_at DESC`,
+    [user.id],
+  )) as unknown as AgentRow[];
 
-  // node:sqlite hands back null-prototype objects; client components need
-  // plain ones.
+  // Client components need plain objects.
   return rows.map((r) => ({
     id: String(r.id),
     name: String(r.name),
@@ -59,12 +59,10 @@ export async function createAgent(
     return { error: "Instructions need at least 20 characters — be specific." };
   }
 
-  db()
-    .prepare(
-      `INSERT INTO agents (id, user_id, name, role, instructions, tools, accent, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .run(
+  await run(
+    `INSERT INTO agents (id, user_id, name, role, instructions, tools, accent, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
       uid("agt"),
       user.id,
       name,
@@ -73,7 +71,8 @@ export async function createAgent(
       JSON.stringify(tools),
       accent,
       Date.now(),
-    );
+    ],
+  );
 
   revalidatePath("/agents");
   return { ok: true };
@@ -82,8 +81,6 @@ export async function createAgent(
 export async function deleteAgent(id: string) {
   const user = await currentUser();
   if (!user) return;
-  db()
-    .prepare(`DELETE FROM agents WHERE id = ? AND user_id = ?`)
-    .run(id, user.id);
+  await run(`DELETE FROM agents WHERE id = ? AND user_id = ?`, [id, user.id]);
   revalidatePath("/agents");
 }
