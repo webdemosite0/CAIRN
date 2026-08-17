@@ -22,15 +22,23 @@ const nextConfig: NextConfig = {
   turbopack: { root: __dirname },
 
   /**
-   * Emits .next/standalone with a self-contained server.js and only the
-   * node_modules actually reached. That is what the Dockerfile ships, and it
-   * turns a ~700MB build directory into a small image.
+   * Standalone emits .next/standalone — a self-contained server.js with only
+   * the node_modules actually reached. That is what the Dockerfile ships, and
+   * it turns an ~860MB build directory into a 31MB image.
    *
-   * NOT compatible with `output: "export"` — CAIRN cannot be statically
-   * exported at all. It has API routes, server actions, middleware and a
-   * database, so it needs a running Node server.
+   * But it must be OFF on Vercel. Vercel runs its own file tracing and expects
+   * .next/next-server.js.nft.json where a default build puts it; standalone
+   * relocates that, and the deploy dies with:
+   *
+   *   ENOENT: no such file or directory, open '.next/next-server.js.nft.json'
+   *
+   * Vercel sets VERCEL=1 on every build, so each target gets what it needs
+   * with no flag to remember.
+   *
+   * Neither mode allows `output: "export"` — CAIRN has API routes, server
+   * actions, middleware and a database, so it cannot be a static site.
    */
-  output: "standalone",
+  output: process.env.VERCEL ? undefined : "standalone",
 
   poweredByHeader: false,
   compress: true,

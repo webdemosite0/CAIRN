@@ -155,7 +155,15 @@ export function db() {
       // server component, which is a miserable thing to debug from a deploy
       // log. Say what is actually wrong and how to fix it.
       const code = (e as NodeJS.ErrnoException)?.code;
-      if (code === "EROFS" || code === "EACCES" || code === "EPERM") {
+      // ENOTDIR belongs here too: a misconfigured CAIRN_DATA_DIR pointing at
+      // something that is not a directory threw a raw stack trace instead of
+      // this message.
+      if (
+        code === "EROFS" ||
+        code === "EACCES" ||
+        code === "EPERM" ||
+        code === "ENOTDIR"
+      ) {
         throw new Error(
           `CAIRN cannot write its database to ${DIR} (${code}). This host has a ` +
             `read-only filesystem, so it cannot run CAIRN as built — accounts, saved ` +
