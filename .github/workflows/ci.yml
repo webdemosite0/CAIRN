@@ -35,6 +35,18 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      # A blank NEXT_PUBLIC_SITE_URL once failed the whole build with
+      # ERR_INVALID_URL. Assert the resolver survives every shape of that var.
+      - name: Site URL resolver
+        run: node scripts/check-site-url.mjs
+
+      # And prove the build itself survives the case that broke it.
+      - name: Build with a blank site URL
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: ""
+          NEXT_TELEMETRY_DISABLED: "1"
+
       - name: Build
         run: npm run build
         env:

@@ -1,9 +1,49 @@
 /** Single source of truth for anything that ends up in a meta tag. */
 
+const FALLBACK_URL = "http://localhost:3100";
+
+/**
+ * Resolves the canonical origin, and never throws.
+ *
+ * This used to be `process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK`, which breaks
+ * the whole build: `??` only catches null and undefined, so declaring the
+ * variable and leaving it blank yields "", and `new URL("")` in metadataBase
+ * fails the build with ERR_INVALID_URL on /_not-found. An empty variable is a
+ * completely normal thing to have on a host dashboard, so treat it as absent.
+ */
+function resolveSiteUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+  if (raw) {
+    // People type "cairn.app" as often as "https://cairn.app".
+    const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+    try {
+      return new URL(withScheme).origin;
+    } catch {
+      // Fall through rather than take the build down over a typo.
+    }
+  }
+
+  // Vercel injects these, so a preview deploy gets correct canonical URLs
+  // without anyone configuring anything.
+  const auto =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim() ||
+    process.env.VERCEL_URL?.trim();
+  if (auto) {
+    try {
+      return new URL(`https://${auto.replace(/^https?:\/\//i, "")}`).origin;
+    } catch {
+      /* fall through */
+    }
+  }
+
+  return FALLBACK_URL;
+}
+
 export const site = {
   name: "CAIRN",
   /** Set NEXT_PUBLIC_SITE_URL in production — canonical URLs depend on it. */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3100",
+  url: resolveSiteUrl(),
   tagline: "Describe what you want. CAIRN builds it.",
   description:
     "CAIRN is an AI workspace that builds real things and keeps them. Generate a complete website from a sentence and keep editing it in chat, create your own AI agents, put a team of four on one task, and export documents to Word and spreadsheets to Excel. Every conversation is saved, so reopening it shows the same answer you left.",
