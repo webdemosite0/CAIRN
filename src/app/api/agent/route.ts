@@ -1,0 +1,100 @@
+import type { NextRequest } from "next/server";
+import { streamText, type Turn } from "@/lib/gemini";
+import { currentUser } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { toParts, type Attachment } from "@/lib/attachments";
+import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
+
+export const runtime = "nodejs";
+
+export async function POST(req: NextRequest) {
+  const user = await currentUser();
+  if (!user) {
+    return Response.json({ error: "Log in to talk to your agents." }, { status: 401 });
+  }
+
+  let agentId = "";
+  let turns: Turn[] = [];
+  let attachments: Attachment[] = [];
+  try {
+    const body = await req.json();
+    agentId = String(body?.agentId ?? "");
+    turns = Array.isArray(body?.messages) ? body.messages : [];
+    attachments = Array.isArray(body?.attachments) ? body.attachments : [];
+  } catch {
+    return Response.json({ error: "Invalid request body." }, { status: 400 });
+  }
+
+  const agent = db()
+    .prepare(`SELECT * FROM agents WHERE id = ? AND user_id = ?`)
+    .get(agentId, user.id) as
+    | { name: string; role: string; instructions: string; tools: string }
+    | undefined;
+
+  if (!agent) {
+    return Response.json({ error: "Agent not found." }, { status: 404 });
+  }
+  if (turns.length === 0) {
+    return Response.json({ error: "No messages provided." }, { status: 400 });
+  }
+
+  let tools: string[] = [];
+  try {
+    tools = JSON.parse(agent.tools);
+  } catch {
+    tools = [];
+  }
+
+  const system = `You are ${agent.name}, a specialist agent on a CAIRN engineering team.
+
+Your role: ${agent.role}
+
+Your operating instructions:
+${agent.instructions}
+
+${
+  tools.length
+    ? `Capabilities you were configured with: ${tools.join(", ")}. You cannot
+actually call these yet — if a request needs one, say precisely what you would
+run and what you would need, rather than pretending you executed it.`
+    : `You have no tool access. Do not claim to have run anything.`
+}
+
+Stay in role. Be concrete and brief. Never invent results you did not compute.`;
+
+  // Checked before the call; the debit below uses what Google actually
+  // reported, so a long answer costs more than a short one.
+  let account: Awaited<ReturnType<typeof requireCredits>> = null;
+  try {
+    account = await requireCredits();
+  } catch (e) {
+    if (e instanceof OutOfCredits) {
+      return Response.json(
+        { error: e.message, outOfCredits: true, balance: e.balance },
+        { status: 402 },
+      );
+    }
+    throw e;
+  }
+
+  try {
+    const stream = await streamText({
+      onUsage: (u) =>
+        account && spend(account.userId, "agent", u.totalTokens),
+      turns,
+      system,
+      temperature: 0.75,
+      extraParts: attachments.length ? toParts(attachments) : undefined,
+    });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Unknown error";
+    console.error("agent route", message);
+    return Response.json({ error: message }, { status: 502 });
+  }
+}

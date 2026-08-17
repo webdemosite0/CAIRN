@@ -1,0 +1,169 @@
+"use client";
+
+import { useMemo, useOptimistic, useState, useTransition } from "react";
+import {
+  FiSearch,
+  FiCheck,
+  FiPlus,
+} from "react-icons/fi";
+import { toggleIntegration } from "@/app/actions/integrations";
+import { CATEGORIES, SERVICES, type Category } from "@/lib/services";
+import { Ico } from "@/components/ui/ico";
+import { cn } from "@/lib/utils";
+
+export function IntegrationsView({
+  connected,
+  signedIn,
+}: {
+  connected: string[];
+  signedIn: boolean;
+}) {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<Category | "All">("All");
+  const [pending, startTransition] = useTransition();
+
+  const [optimistic, setOptimistic] = useOptimistic(
+    connected,
+    (state: string[], id: string) =>
+      state.includes(id) ? state.filter((s) => s !== id) : [...state, id],
+  );
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return SERVICES.filter((s) => {
+      if (category !== "All" && s.category !== category) return false;
+      if (!q) return true;
+      return (
+        s.name.toLowerCase().includes(q) ||
+        s.blurb.toLowerCase().includes(q) ||
+        s.category.toLowerCase().includes(q)
+      );
+    });
+  }, [query, category]);
+
+  function toggle(id: string) {
+    if (!signedIn) return;
+    startTransition(async () => {
+      setOptimistic(id);
+      await toggleIntegration(id);
+    });
+  }
+
+  return (
+    <div className="mx-auto min-h-screen max-w-[1120px] px-5 py-8 lg:px-8">
+      <header className="mb-6">
+        <h1 className="text-[24px] font-semibold text-ink">Integrations</h1>
+        <p className="mt-1.5 text-[13.5px] text-ink-3">
+          {SERVICES.length} services · {optimistic.length} connected
+        </p>
+      </header>
+
+      {/* search */}
+      <div className="relative mb-4">
+        <Ico icon={FiSearch} motion="scan" size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-4" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search integrations…"
+          aria-label="Search integrations"
+          className="h-11 w-full rounded-[11px] border border-line-strong bg-rail pl-10 pr-4 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent"
+        />
+      </div>
+
+      {/* categories */}
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {(["All", ...CATEGORIES] as const).map((c) => (
+          <button
+            key={c}
+            onClick={() => setCategory(c)}
+            className={cn(
+              "shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] transition-colors",
+              category === c
+                ? "border-accent bg-accent-soft text-accent"
+                : "border-line-strong text-ink-3 hover:bg-hover hover:text-ink",
+            )}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+
+      {results.length === 0 ? (
+        <p className="rounded-[13px] border border-dashed border-line-strong py-16 text-center text-[13.5px] text-ink-4">
+          Nothing matches “{query}”.
+        </p>
+      ) : (
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {results.map((s, i) => {
+            const on = optimistic.includes(s.id);
+            return (
+              <article
+                key={s.id}
+                className={cn(
+                  "nx-in flex flex-col rounded-[13px] border p-4 transition-all duration-200",
+                  on
+                    ? "border-positive/30 bg-positive/6"
+                    : "border-line bg-rail hover:border-line-strong",
+                )}
+                style={{
+                  animationDelay: `${Math.min(i, 18) * 22}ms`,
+                  animationFillMode: "backwards",
+                }}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className={cn(
+                        "grid h-9 w-9 shrink-0 place-items-center rounded-[9px] text-[13px] font-semibold",
+                        on
+                          ? "bg-positive/15 text-positive"
+                          : "bg-raised text-ink-3",
+                      )}
+                    >
+                      {s.name.slice(0, 2)}
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="text-[14px] font-medium text-ink">{s.name}</h3>
+                      <p className="text-[11.5px] text-ink-4">{s.category}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="mt-2.5 flex-1 text-[12.5px] leading-relaxed text-ink-3">
+                  {s.blurb}
+                </p>
+
+                {s.oauth ? (
+                  <span className="mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] border border-dashed border-line-strong py-2 text-[12.5px] text-ink-4">
+                    Coming soon
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => toggle(s.id)}
+                    disabled={pending}
+                    className={cn(
+                      "group mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] py-2 text-[13px] transition-colors disabled:opacity-50",
+                      on
+                        ? "border border-positive/35 text-positive hover:bg-positive/10"
+                        : "border border-line-strong text-ink-2 hover:bg-hover hover:text-ink",
+                    )}
+                  >
+                    {on ? (
+                      <>
+                        <Ico icon={FiCheck} motion="check" size={13} /> Connected
+                      </>
+                    ) : (
+                      <>
+                        <Ico icon={FiPlus} motion="open" size={13} /> Connect
+                      </>
+                    )}
+                  </button>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

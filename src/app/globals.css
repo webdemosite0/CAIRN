@@ -1,0 +1,968 @@
+@import "tailwindcss";
+
+/* ============================================================
+   CAIRN — dark tokens
+   ============================================================ */
+
+@theme {
+  --color-canvas: #0f0f0f;
+  --color-rail: #171717;
+  --color-sunk: #1e1e1e;
+  --color-raised: #242424;
+  --color-hover: #2a2a2a;
+
+  /* Raised from #ededed/#b4b4b4/#8a8a8a/#5c5c5c — the old ramp read as dull,
+     and ink-4 sat at ~2.9:1 on canvas, under the 4.5:1 minimum. */
+  --color-ink: #f2f2f3;
+  --color-ink-2: #c9ccd1;
+  --color-ink-3: #a1a6ae;
+  --color-ink-4: #7d838d;
+
+  --color-line: #262626;
+  --color-line-strong: #333333;
+
+  --color-accent: #3b82f6;
+  --color-accent-soft: #16233c;
+  --color-violet: #a78bfa;
+  --color-positive: #34d399;
+  --color-positive-soft: #10291f;
+  --color-caution: #fbbf24;
+  --color-critical: #f87171;
+  --color-critical-soft: #2a1616;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-code), ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Tailwind tree-shakes @theme vars that no utility happens to reference, so
+   every token is mirrored here too — the hand-written CSS further down reads
+   them directly. KEEP THIS BLOCK IN SYNC WITH @theme ABOVE.
+
+   Beyond colour, this block carries the two values that make theming work at
+   all: --shade, the direction elevation travels, and --ground, used by any
+   effect that needs to know what it is sitting on. */
+:root {
+  --color-canvas: #0f0f0f;
+  --color-rail: #171717;
+  --color-sunk: #1e1e1e;
+  --color-raised: #242424;
+  --color-hover: #2a2a2a;
+  --color-ink: #f2f2f3;
+  --color-ink-2: #c9ccd1;
+  --color-ink-3: #a1a6ae;
+  --color-ink-4: #7d838d;
+  --color-line: #262626;
+  --color-line-strong: #333333;
+  --color-accent: #3b82f6;
+  --color-accent-soft: #16233c;
+  --color-violet: #a78bfa;
+  --color-positive: #34d399;
+  --color-positive-soft: #10291f;
+  --color-caution: #fbbf24;
+  --color-critical: #f87171;
+  --color-critical-soft: #2a1616;
+
+  /* Raised surfaces are LIGHTER than the page in dark mode. */
+  --shade: #ffffff;
+  --ground: #000000;
+  --scrollbar: #333333;
+  --scrollbar-hover: #444444;
+  --selection: #1e3a8a;
+  --selection-ink: #ffffff;
+  --wordmark-from: #f5f5f5;
+  --wordmark-to: #9a9a9a;
+  --chip-hover-line: #4a4a4a;
+  --shimmer: rgb(255 255 255 / 0.07);
+  --grid-line: rgb(255 255 255 / 0.032);
+  --sky: rgb(120 150 220 / 0.1);
+  --grad-top: rgb(56 96 210 / 0.06);
+  --grad-left: rgb(78 62 208 / 0.04);
+  --grad-right: rgb(30 130 220 / 0.036);
+  --grad-sky: rgb(24 42 92 / 0.084);
+  --floor: rgb(0 0 0 / 0.55);
+  --aurora-a: rgb(59 130 246 / 0.32);
+  --aurora-b: rgb(167 139 250 / 0.26);
+  --aurora-c: rgb(34 211 238 / 0.22);
+  --tint-darken: 0%;
+  /* Syntax palette. Code blocks used to paint every token one dull grey. */
+  --sx-plain: #d6d9df;
+  --sx-comment: #7f8794;
+  --sx-string: #9ece6a;
+  --sx-number: #e8a86a;
+  --sx-keyword: #c792ea;
+  --sx-fn: #7aa2f7;
+  --sx-prop: #73daca;
+  --sx-punct: #9aa1ad;
+  /* Sheet label pills. Distinct hues at even luminance so no one tag
+     shouts louder than the others. */
+  --tag-a: #7aa2f7;
+  --tag-b: #bb9af7;
+  --tag-c: #7dcfff;
+  --tag-d: #9ece6a;
+  --tag-e: #e0af68;
+  --tag-f: #f7768e;
+  /* Callers hand us neon pastels tuned for a black ground; on white they drop
+     to ~1.6:1. This mixes black into any such tint, and is 0% on dark. */
+  /* Dark mode separates surfaces by lightness, so it needs no shadow. */
+  --bezel: rgb(255 255 255 / 0.055);
+  --elev: none;
+  --elev-lift: none;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-code), ui-monospace, monospace;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================================
+   LIGHT
+   ------------------------------------------------------------
+   Not the dark ramp with lighter hexes. The elevation scale runs
+   the OTHER WAY: in dark, canvas is darkest and hover lightest;
+   in light, canvas is lightest and hover darkest. Every
+   hover:bg-hover in the app means "step away from the page", and
+   only reversing the ramp keeps that true.
+   ============================================================ */
+:root[data-theme="light"] {
+  --color-canvas: #ffffff;
+  --color-rail: #f6f8fa;
+  --color-sunk: #f0f3f7;
+  --color-raised: #ffffff;
+  --color-hover: #eef1f6;
+
+  --color-ink: #1a1f36;
+  --color-ink-2: #3c4257;
+  --color-ink-3: #545a69;
+  --color-ink-4: #636b7b;
+
+  --color-line: #e6e9ef;
+  --color-line-strong: #d5dbe4;
+
+  /* Darker, saturated variants — the dark-mode hues are pastels tuned to glow
+     on black and go muddy on white. */
+  --color-accent: #5b51f5;
+  --color-accent-soft: #f0efff;
+  --color-violet: #6c47ff;
+  --color-positive: #0e7c66;
+  --color-positive-soft: #e8f7f3;
+  --color-caution: #9a6700;
+  --color-critical: #c2325a;
+  --color-critical-soft: #fdf0f3;
+
+  /* Raised surfaces are DARKER than the page here — the inversion. */
+  --shade: #1a1f36;
+  --ground: #ffffff;
+  --scrollbar: #cdd4e0;
+  --scrollbar-hover: #b4bdcd;
+  --selection: #d7d4ff;
+  --selection-ink: #1a1f36;
+  --wordmark-from: #1a1f36;
+  --wordmark-to: #635bff;
+  --chip-hover-line: #c3cad6;
+  --shimmer: rgb(26 31 54 / 0.05);
+  --grid-line: rgb(26 31 54 / 0.04);
+  --sky: rgb(99 91 255 / 0.07);
+  --grad-top: rgb(88 120 245 / 0.048);
+  --grad-left: rgb(120 100 250 / 0.03);
+  --grad-right: rgb(60 170 240 / 0.03);
+  --grad-sky: rgb(226 235 255 / 0.255);
+  --floor: rgb(26 31 54 / 0.04);
+  --aurora-a: rgb(99 91 255 / 0.13);
+  --aurora-b: rgb(122 90 248 / 0.11);
+  --aurora-c: rgb(0 191 191 / 0.08);
+  --tint-darken: 30%;
+  /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
+  --sx-plain: #1f2430;
+  --sx-comment: #636a78;
+  --sx-string: #0a7d55;
+  --sx-number: #a5540a;
+  --sx-keyword: #8250df;
+  --sx-fn: #0550ae;
+  --sx-prop: #0e7c66;
+  --sx-punct: #57606a;
+  --tag-a: #2a55bd;
+  --tag-b: #6636b8;
+  --tag-c: #0b6396;
+  --tag-d: #2a6e2f;
+  --tag-e: #875616;
+  --tag-f: #ad2b48;
+  --bezel: rgb(255 255 255 / 0.9);
+  /* raised == canvas == white here, so elevation has to come from shadow. */
+  --elev: 0 1px 2px rgb(26 31 54 / 0.06), 0 1px 3px rgb(26 31 54 / 0.05);
+  --elev-lift: 0 2px 5px rgb(26 31 54 / 0.08), 0 6px 16px rgb(26 31 54 / 0.07);
+
+  color-scheme: light;
+}
+
+/* Someone who has never touched the switch gets whatever their OS asks for.
+   The :not([data-theme="dark"]) guard is what makes an explicit choice stick:
+   picking dark on a light OS stops this block matching, so the base :root
+   palette — which is dark — applies again. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --color-canvas: #ffffff;
+    --color-rail: #f6f8fa;
+    --color-sunk: #f0f3f7;
+    --color-raised: #ffffff;
+    --color-hover: #eef1f6;
+    --color-ink: #1a1f36;
+    --color-ink-2: #3c4257;
+    --color-ink-3: #545a69;
+    --color-ink-4: #636b7b;
+    --color-line: #e6e9ef;
+    --color-line-strong: #d5dbe4;
+    --color-accent: #5b51f5;
+    --color-accent-soft: #f0efff;
+    --color-violet: #6c47ff;
+    --color-positive: #0e7c66;
+    --color-positive-soft: #e8f7f3;
+    --color-caution: #9a6700;
+    --color-critical: #c2325a;
+    --color-critical-soft: #fdf0f3;
+    --shade: #1a1f36;
+    --ground: #ffffff;
+    --scrollbar: #cdd4e0;
+    --scrollbar-hover: #b4bdcd;
+    --selection: #d7d4ff;
+    --selection-ink: #1a1f36;
+    --wordmark-from: #1a1f36;
+    --wordmark-to: #635bff;
+    --chip-hover-line: #c3cad6;
+    --shimmer: rgb(26 31 54 / 0.05);
+    --grid-line: rgb(26 31 54 / 0.04);
+    --sky: rgb(99 91 255 / 0.07);
+    --grad-top: rgb(88 120 245 / 0.048);
+    --grad-left: rgb(120 100 250 / 0.03);
+    --grad-right: rgb(60 170 240 / 0.03);
+    --grad-sky: rgb(226 235 255 / 0.255);
+    --floor: rgb(26 31 54 / 0.04);
+    --aurora-a: rgb(99 91 255 / 0.13);
+    --aurora-b: rgb(122 90 248 / 0.11);
+    --aurora-c: rgb(0 191 191 / 0.08);
+    --tint-darken: 30%;
+    /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
+    --sx-plain: #1f2430;
+    --sx-comment: #636a78;
+    --sx-string: #0a7d55;
+    --sx-number: #a5540a;
+    --sx-keyword: #8250df;
+    --sx-fn: #0550ae;
+    --sx-prop: #0e7c66;
+    --sx-punct: #57606a;
+    --tag-a: #2a55bd;
+    --tag-b: #6636b8;
+    --tag-c: #0b6396;
+    --tag-d: #2a6e2f;
+    --tag-e: #875616;
+    --tag-f: #ad2b48;
+    --bezel: rgb(255 255 255 / 0.9);
+    --elev: 0 1px 2px rgb(26 31 54 / 0.06), 0 1px 3px rgb(26 31 54 / 0.05);
+    --elev-lift: 0 2px 5px rgb(26 31 54 / 0.08), 0 6px 16px rgb(26 31 54 / 0.07);
+    color-scheme: light;
+  }
+}
+
+
+/* Must be layered. Unlayered rules outrank everything inside @layer, so as a
+   bare `*` selector this beat every border-* utility in the app — border-line-
+   strong, focus rings and error borders all silently rendered as flat #262626. */
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+}
+
+html {
+  color-scheme: dark light;
+  /* The base colour lives here so <body> can stay transparent and the fixed
+     backdrop at -z-10 is never painted over. */
+  background: var(--color-canvas);
+}
+
+body {
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.006em;
+}
+
+::selection {
+  background: var(--selection);
+  color: var(--selection-ink);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-hover);
+  background-clip: padding-box;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Text fields always match :focus-visible, even on a plain click — so the rule
+   above drew a second, offset ring around the caret box on top of whatever
+   focus state the surrounding container already shows. Every text field here
+   sits in a bordered shell that lights up via focus-within, so suppress it. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[contenteditable]:focus-visible {
+  outline: none;
+}
+
+/* The composer shell owns the focus state for the field inside it. Written as
+   a plain rule rather than Tailwind shadow utilities: those compose box-shadow
+   from five custom properties, and the arbitrary-value ring did not survive
+   that composition here. */
+.composer {
+  border-color: var(--color-line-strong);
+  transition:
+    border-color 0.18s var(--ease-out),
+    box-shadow 0.18s var(--ease-out),
+    background-color 0.18s var(--ease-out);
+}
+.composer:focus-within {
+  border-color: color-mix(in oklab, var(--color-accent) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 16%, transparent);
+}
+.composer[data-dragging="true"] {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 28%, transparent);
+}
+.composer[data-disabled="true"] {
+  border-color: var(--color-line);
+  opacity: 0.7;
+}
+
+/* ---------------------------------------------------------- */
+
+@utility wordmark {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: linear-gradient(180deg, var(--wordmark-from), var(--wordmark-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility rail-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border-radius: 8px;
+  padding: 7px 11px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--color-ink-2);
+  transition:
+    background-color 0.15s var(--ease-out),
+    color 0.15s var(--ease-out);
+
+  &:hover {
+    background: var(--color-hover);
+    color: var(--color-ink);
+  }
+}
+
+@utility rail-item-active {
+  background: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  color: var(--color-accent);
+
+  &:hover {
+    background: color-mix(in oklab, var(--color-accent) 14%, transparent);
+    color: var(--color-accent);
+  }
+}
+
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 999px;
+  padding: 8px 15px;
+  font-size: 13px;
+  color: var(--color-ink-2);
+  transition:
+    border-color 0.18s var(--ease-out),
+    background-color 0.18s var(--ease-out),
+    color 0.18s var(--ease-out),
+    transform 0.18s var(--ease-out);
+
+  &:hover {
+    border-color: var(--chip-hover-line);
+    background: var(--color-raised);
+    color: var(--color-ink);
+    transform: translateY(-1px);
+    box-shadow: var(--elev);
+  }
+}
+
+@utility panel {
+  background: var(--color-raised);
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  /* The bezel: a hairline of light along the top edge inside the border, so a
+     panel reads as a raised object catching light rather than a flat cut-out.
+     --bezel is a highlight on dark and a soft shadow on light, because the
+     light source has to stay above the surface in both. */
+  box-shadow:
+    inset 0 1px 0 0 var(--bezel),
+    var(--elev);
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ============================================================
+   MOTION
+   ============================================================ */
+
+@keyframes nx-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-in {
+  animation: nx-in 300ms var(--ease-out) forwards;
+}
+
+@keyframes nx-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes nx-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+.nx-pulse {
+  animation: nx-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes nx-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.nx-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--shimmer),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: nx-shimmer 1.8s linear infinite;
+}
+
+/* the little agent bots */
+@keyframes nx-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.nx-bob {
+  animation: nx-bob 2.4s ease-in-out infinite;
+}
+
+@keyframes nx-antenna {
+  0%,
+  100% {
+    transform: rotate(-9deg);
+  }
+  50% {
+    transform: rotate(9deg);
+  }
+}
+
+@keyframes nx-eye {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.12);
+  }
+}
+
+@keyframes nx-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes nx-orbit-rev {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes nx-core {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.76);
+    opacity: 0.72;
+  }
+}
+
+/* wordmark light sweep */
+@keyframes nx-sweep-text {
+  0% {
+    background-position: 180% 0;
+  }
+  55%,
+  100% {
+    background-position: -80% 0;
+  }
+}
+
+.nx-sweep-text {
+  background-image: linear-gradient(
+    100deg,
+    #6f6f6f 0%,
+    #6f6f6f 38%,
+    #ffffff 50%,
+    #6f6f6f 62%,
+    #6f6f6f 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: nx-sweep-text 5.5s ease-in-out infinite;
+}
+
+/* ambient aurora behind hero surfaces */
+@keyframes nx-aurora {
+  0%,
+  100% {
+    transform: translate3d(-6%, -4%, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(6%, 3%, 0) scale(1.12);
+  }
+  66% {
+    transform: translate3d(-3%, 6%, 0) scale(0.94);
+  }
+}
+
+.nx-aurora {
+  animation: nx-aurora 22s ease-in-out infinite;
+}
+
+/* page entrance for route changes */
+@keyframes nx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.nx-rise {
+  animation: nx-rise 420ms var(--ease-out) both;
+}
+
+@keyframes nx-sweep {
+  0% {
+    left: -35%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ============================================================
+   ICON MOTION
+   Each keyframe is matched to what the icon means. They run on
+   hover and while a nav item is active — never all at once.
+   ============================================================ */
+
+/* globe, loader, refresh — rotation */
+@keyframes ico-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* bell — rings */
+@keyframes ico-ring {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10%,
+  30%,
+  50% {
+    transform: rotate(11deg);
+  }
+  20%,
+  40% {
+    transform: rotate(-11deg);
+  }
+}
+
+/* robot, users — a curious tilt */
+@keyframes ico-tilt {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-9deg);
+  }
+  65% {
+    transform: rotate(7deg);
+  }
+}
+
+/* files, documents — lifts like a turning page */
+@keyframes ico-lift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-3px);
+  }
+}
+
+/* code, terminal — types */
+@keyframes ico-type {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-1.5px);
+  }
+  75% {
+    transform: translateX(1.5px);
+  }
+}
+
+/* search, research — scans */
+@keyframes ico-scan {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(2px, -2px);
+  }
+  70% {
+    transform: translate(-2px, 1px);
+  }
+}
+
+/* grids, tables, dashboards — settles into place */
+@keyframes ico-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.16);
+  }
+}
+
+/* palette, design — a slow hue drift */
+@keyframes ico-hue {
+  0%,
+  100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(38deg);
+  }
+}
+
+/* plus — opens */
+@keyframes ico-open {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(90deg);
+  }
+}
+
+/* send, arrows — launches */
+@keyframes ico-launch {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+}
+
+/* copy, share — nudges */
+@keyframes ico-nudge {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(2px, -2px);
+  }
+}
+
+/* trash — shakes its lid */
+@keyframes ico-shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}
+
+/* checks, success — settles in */
+@keyframes ico-check {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  60% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* presentation, slides — grows */
+@keyframes ico-grow {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.14);
+  }
+}
+
+.ico {
+  display: inline-flex;
+  transform-origin: center;
+}
+
+/* Layer promotion only while something is actually animating. */
+.group:hover .ico,
+.ico-live,
+.ico-active {
+  will-change: transform;
+}
+
+/* run once on hover of the nearest .group, and loop while active */
+.group:hover .ico-spin,
+.ico-live.ico-spin {
+  animation: ico-spin 1.6s linear infinite;
+}
+.group:hover .ico-ring,
+.ico-live.ico-ring {
+  animation: ico-ring 1s ease-in-out;
+}
+.group:hover .ico-tilt,
+.ico-live.ico-tilt {
+  animation: ico-tilt 0.9s ease-in-out;
+}
+.group:hover .ico-lift,
+.ico-live.ico-lift {
+  animation: ico-lift 0.7s ease-in-out;
+}
+.group:hover .ico-type,
+.ico-live.ico-type {
+  animation: ico-type 0.5s ease-in-out 2;
+}
+.group:hover .ico-scan,
+.ico-live.ico-scan {
+  animation: ico-scan 1.1s ease-in-out;
+}
+.group:hover .ico-pop,
+.ico-live.ico-pop {
+  animation: ico-pop 0.6s var(--ease-out);
+}
+.group:hover .ico-hue,
+.ico-live.ico-hue {
+  animation: ico-hue 2.4s ease-in-out infinite;
+}
+.group:hover .ico-open,
+.ico-live.ico-open {
+  animation: ico-open 0.35s var(--ease-out) forwards;
+}
+.group:hover .ico-launch,
+.ico-live.ico-launch {
+  animation: ico-launch 0.6s var(--ease-out);
+}
+.group:hover .ico-nudge,
+.ico-live.ico-nudge {
+  animation: ico-nudge 0.5s ease-in-out;
+}
+.group:hover .ico-shake,
+.ico-live.ico-shake {
+  animation: ico-shake 0.5s ease-in-out;
+}
+.ico-check {
+  animation: ico-check 0.4s var(--ease-out);
+}
+.group:hover .ico-grow,
+.ico-live.ico-grow {
+  animation: ico-grow 0.7s ease-in-out;
+}
+
+/* active nav items keep a gentle loop so the current page reads as live */
+.ico-active.ico-spin {
+  animation: ico-spin 9s linear infinite;
+}
+.ico-active.ico-ring,
+.ico-active.ico-tilt,
+.ico-active.ico-lift,
+.ico-active.ico-scan,
+.ico-active.ico-pop,
+.ico-active.ico-grow,
+.ico-active.ico-type {
+  animation: nx-bob 3.2s ease-in-out infinite;
+}
+
+@keyframes nx-dots {
+  0%,
+  20% {
+    content: "";
+  }
+  40% {
+    content: ".";
+  }
+  60% {
+    content: "..";
+  }
+  80%,
+  100% {
+    content: "...";
+  }
+}
+.nx-dots::after {
+  content: "";
+  animation: nx-dots 1.4s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================================================
+   DOCUMENT PAGE
+   ------------------------------------------------------------
+   The Documents view renders the same markdown the chat does, but it is a
+   page rather than a reply: a measured column, air above each heading, and a
+   first-line rule that stops the body running straight into the title.
+   ============================================================ */
+.nx-doc {
+  --doc-measure: 68ch;
+}
+.nx-doc p,
+.nx-doc ul,
+.nx-doc ol {
+  max-width: var(--doc-measure);
+  font-size: 15px;
+  line-height: 1.78;
+  color: var(--color-ink-2);
+}
+.nx-doc h1 {
+  margin-bottom: 0.35rem;
+}
+.nx-doc h1 + p {
+  color: var(--color-ink-3);
+}
+.nx-doc h2 {
+  margin-top: 2.1rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--color-line);
+}
+.nx-doc h3 {
+  margin-top: 1.5rem;
+}
+.nx-doc > * + * {
+  margin-top: 1rem;
+}
+.nx-doc li::marker {
+  color: var(--color-ink-4);
+}

@@ -1,0 +1,34 @@
+import { DocumentView } from "./document-view";
+import { listRecents, RECENT_LABEL } from "@/lib/recents";
+import { loadConversation } from "@/lib/conversations";
+
+export const metadata = { title: "Documents" };
+
+export default async function DocsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ c?: string }>;
+}) {
+  const { c } = await searchParams;
+  const [recents, saved] = await Promise.all([
+    listRecents("docs"),
+    c ? loadConversation(c) : Promise.resolve(null),
+  ]);
+
+  return (
+    <DocumentView
+      recents={recents}
+      recentsLabel={RECENT_LABEL.docs}
+      restored={
+        saved
+          ? {
+              id: saved.id,
+              title: saved.messages.find((m) => m.role === "user")?.text ?? saved.title,
+              output: saved.messages.find((m) => m.role === "model")?.text ?? "",
+            }
+          : null
+      }
+      key={saved?.id ?? "new"}
+    />
+  );
+}
