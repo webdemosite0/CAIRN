@@ -21,6 +21,17 @@ const nextConfig: NextConfig = {
   // so a stray lockfile above this folder cannot change the build.
   turbopack: { root: __dirname },
 
+  /**
+   * Emits .next/standalone with a self-contained server.js and only the
+   * node_modules actually reached. That is what the Dockerfile ships, and it
+   * turns a ~700MB build directory into a small image.
+   *
+   * NOT compatible with `output: "export"` — CAIRN cannot be statically
+   * exported at all. It has API routes, server actions, middleware and a
+   * database, so it needs a running Node server.
+   */
+  output: "standalone",
+
   poweredByHeader: false,
   compress: true,
 };

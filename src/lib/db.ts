@@ -3,11 +3,19 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 
 /**
- * Local SQLite store. Uses Node's built-in `node:sqlite`, so there is no
- * database dependency to install and no external service to run.
+ * SQLite store on the local filesystem, via Node's built-in `node:sqlite` —
+ * no database dependency to install and no external service to run.
+ *
+ * DEPLOYMENT: this needs a real, writable, PERSISTENT disk. On a host with a
+ * read-only or per-request filesystem (Vercel, Netlify, Cloudflare Workers)
+ * it will either throw EROFS or silently lose every account, saved
+ * conversation and credit balance between requests. Point CAIRN_DATA_DIR at a
+ * mounted volume; see the Deploying section of the README.
  */
 
-const DIR = path.join(process.cwd(), ".data");
+const DIR = process.env.CAIRN_DATA_DIR
+  ? path.resolve(process.env.CAIRN_DATA_DIR)
+  : path.join(process.cwd(), ".data");
 const FILE = path.join(DIR, "nexora.db");
 
 let instance: DatabaseSync | null = null;
@@ -139,8 +147,25 @@ function migrate(db: DatabaseSync) {
 
 export function db() {
   if (!instance) {
-    mkdirSync(DIR, { recursive: true });
-    instance = new DatabaseSync(FILE);
+    try {
+      mkdirSync(DIR, { recursive: true });
+      instance = new DatabaseSync(FILE);
+    } catch (e) {
+      // The raw failure here is an opaque EROFS/EACCES from deep inside a
+      // server component, which is a miserable thing to debug from a deploy
+      // log. Say what is actually wrong and how to fix it.
+      const code = (e as NodeJS.ErrnoException)?.code;
+      if (code === "EROFS" || code === "EACCES" || code === "EPERM") {
+        throw new Error(
+          `CAIRN cannot write its database to ${DIR} (${code}). This host has a ` +
+            `read-only filesystem, so it cannot run CAIRN as built — accounts, saved ` +
+            `conversations and credits all need a persistent disk. Deploy to a host ` +
+            `with a mounted volume and set CAIRN_DATA_DIR to it. See the Deploying ` +
+            `section of the README.`,
+        );
+      }
+      throw e;
+    }
     migrate(instance);
   }
   return instance;
