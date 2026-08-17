@@ -156,18 +156,51 @@ two requests can disagree about whether you exist.
 | --- | --- |
 | A VPS / container with a mounted volume (Fly, Railway, Render, a droplet) | **Yes** |
 | Vercel / Netlify / Workers | **No** — swap `src/lib/db.ts` for a hosted Postgres or Turso first |
+| **GitHub Pages, S3, any static host** | **No, and it never can be** — see below |
 
 Everything else is contained in that one file: it is the only module that opens
 the database, so porting it is a single rewrite rather than a sweep.
 
-Also required before going live:
+### Static hosting cannot work
+
+GitHub Pages serves files. CAIRN is not a set of files — it is a server. Setting
+`output: "export"` fails on the first server-dependent route, and there are a lot
+of them: **7 API routes** (`/api/chat`, `/api/tool`, `/api/builder`,
+`/api/conversations`, `/api/agent`, `/api/swarm`, `/api/build-site`), **5 server
+action modules** (auth, agents, reminders, billing, integrations), the middleware
+that issues guest identities, and the database behind all of it.
+
+There is no configuration that makes a static host run those. Use a host that
+runs Node.
+
+### Docker
+
+The included `Dockerfile` builds the `output: "standalone"` bundle — a
+self-contained `server.js` with only the modules actually reached, **31 MB**
+against an 863 MB `.next` directory.
+
+```bash
+docker build --build-arg NEXT_PUBLIC_SITE_URL=https://your-domain.com -t cairn .
+docker run -p 3000:3000 -e GEMINI_API_KEY=... -v cairn-data:/data cairn
+```
+
+The volume is not optional. `CAIRN_DATA_DIR` defaults to `/data` in the image;
+without a volume mounted there, every account and saved conversation disappears
+on redeploy. If the filesystem is read-only, startup fails with an explicit
+message naming the directory rather than a bare `EROFS`.
+
+Verified by running the standalone artifact exactly as the container does: it
+served every route and created its database at the configured path.
+
+### Also required before going live
 
 - `NEXT_PUBLIC_SITE_URL=https://your-domain.com` — canonical URLs, the sitemap
-  and the OG image URL all derive from it, and it still defaults to localhost.
+  and the OG image all derive from it, and it defaults to localhost. It is baked
+  into the client bundle at **build** time, hence the `--build-arg`.
 - `GEMINI_API_KEY` with billing enabled. The free tier is 20 requests per day
   per model, which is a demo budget, not a product one.
-- Node 24 or newer — `node:sqlite` does not exist before it. There is no
-  `engines` field pinning this yet.
+- Node 24 or newer, pinned in `engines`. `node:sqlite` does not exist unflagged
+  before 23.4.
 - Rotate any key that has been pasted into a chat.
 
 ## Publishing
