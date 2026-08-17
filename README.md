@@ -153,6 +153,24 @@ The storage layer decides where this can run, and it now runs almost anywhere.
 | A VPS / container with a mounted volume (Fly, Railway, a droplet) | **Yes**, no configuration — falls back to a local file |
 | **GitHub Pages, S3, any static host** | **No, and it never can be** — see below |
 
+## Diagnosing a broken deploy
+
+Next hides server errors in production and Vercel does not surface the message,
+so a misconfigured database looks exactly like a code bug: every page returns
+500. **`/api/health`** answers it without a dashboard login:
+
+```bash
+curl https://your-app.vercel.app/api/health
+```
+
+It reports which mode the database is in, whether it can be reached, and which
+environment variables are present — booleans only, never the values. A 503 with
+`"mode":"local-file"` on a serverless host means the Turso variables are missing.
+
+Static routes (`/robots.txt`, `/llms.txt`, `/login`) do not touch the database,
+so if those return 200 while pages return 500, the problem is the database and
+not the build.
+
 ## The database
 
 One client, two destinations. `src/lib/db.ts` uses libSQL, which speaks both a

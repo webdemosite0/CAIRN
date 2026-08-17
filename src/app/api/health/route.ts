@@ -1,0 +1,47 @@
+import { one, isRemote } from "@/lib/db";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/**
+ * Says why the app is unhappy, without a dashboard login.
+ *
+ * Next hides server errors in production and Vercel does not surface the
+ * message, so a misconfigured database looks identical to a code bug: every
+ * page just returns 500. This reports which mode the database is in and
+ * whether it can actually be reached.
+ *
+ * Deliberately leaks nothing: no connection string, no token, no row data —
+ * only booleans, and the error text if a query fails.
+ */
+export async function GET() {
+  const configured = {
+    gemini: Boolean(process.env.GEMINI_API_KEY?.trim()),
+    tursoUrl: Boolean(process.env.TURSO_DATABASE_URL?.trim()),
+    tursoToken: Boolean(process.env.TURSO_AUTH_TOKEN?.trim()),
+    siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL?.trim()),
+  };
+
+  const mode = isRemote ? "turso" : "local-file";
+
+  try {
+    // Cheapest possible round trip that still proves the schema applied.
+    await one(`SELECT COUNT(*) AS n FROM users`);
+    return Response.json({
+      ok: true,
+      database: { mode, reachable: true },
+      configured,
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+
+    const hint = isRemote
+      ? "TURSO_DATABASE_URL is set but the database could not be queried. Check the URL and that TURSO_AUTH_TOKEN matches it."
+      : "No Turso credentials are set, so CAIRN tried to write a SQLite file to local disk. That fails on Vercel and every other read-only host. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN.";
+
+    return Response.json(
+      { ok: false, database: { mode, reachable: false }, configured, error: message, hint },
+      { status: 503 },
+    );
+  }
+}
