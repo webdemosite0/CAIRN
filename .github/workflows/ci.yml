@@ -1,0 +1,44 @@
+# Checks that the app actually builds. This replaces the "Node.js Package"
+# template, which could never pass here: it ran `npm test` (no such script),
+# then `npm publish` on a package marked "private": true, on Node 20 — which
+# has no node:sqlite, so the database module cannot even load.
+#
+# CAIRN is a web app, not a library. There is nothing to publish to a registry.
+
+name: CI
+
+on:
+  push:
+    branches: [mains, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Not negotiable: node:sqlite is unflagged only from 23.4 onward,
+          # and src/lib/db.ts imports it at module scope.
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          # The build reads this to bake canonical URLs into the client bundle.
+          # A placeholder keeps the build honest without pinning a real domain.
+          NEXT_PUBLIC_SITE_URL: https://example.com
+          NEXT_TELEMETRY_DISABLED: "1"
