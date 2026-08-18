@@ -271,11 +271,25 @@ export function Message({
 
   return (
     <div className="nx-in flex gap-3.5">
-      <LogoMark size={26} animated={false} className="mt-0.5" />
+      {/* The mark orbits while the model is working and settles when it stops,
+          so the brand itself is the activity indicator. */}
+      <span className={cn("relative mt-0.5 shrink-0", pending && "nx-thinking")}>
+        {/* Boolean(), not the bare prop: pending is undefined on a finished
+            message, and LogoMark defaults animated to true — so passing it
+            through left completed replies orbiting forever. */}
+        <LogoMark size={26} animated={Boolean(pending)} />
+      </span>
       <div className="min-w-0 flex-1">
         <div className="space-y-3.5 text-[15px] text-ink-2">
           {text ? render(text) : null}
-          {pending ? (
+          {pending && !text ? (
+            /* Before the first token there is nothing to show, and a bare
+               blinking caret reads as broken rather than busy. */
+            <span className="nx-dots inline-block text-[14.5px] text-ink-3">
+              Thinking
+            </span>
+          ) : null}
+          {pending && text ? (
             <span className="inline-block h-[15px] w-[7px] translate-y-[2px] rounded-[1px] bg-ink-3 [animation:nx-blink_1s_step-end_infinite]" />
           ) : null}
         </div>

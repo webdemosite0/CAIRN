@@ -966,3 +966,40 @@ select:focus-visible,
 .nx-doc li::marker {
   color: var(--color-ink-4);
 }
+
+/* ============================================================
+   THINKING
+   ------------------------------------------------------------
+   While a reply streams, the CAIRN mark orbits (LogoMark's own
+   animation) and a soft halo breathes behind it, so the brand is
+   the activity indicator rather than a generic spinner.
+
+   The halo is a separate pseudo-element rather than a filter on
+   the mark: a filter on animated SVG re-rasterises every frame,
+   which was measurably expensive earlier in this project.
+   ============================================================ */
+.nx-thinking::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--color-accent) 26%, transparent),
+    transparent 68%
+  );
+  animation: nx-think 1.9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes nx-think {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.86);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.06);
+  }
+}
