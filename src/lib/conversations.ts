@@ -26,9 +26,31 @@ export interface Conversation {
   updatedAt: number;
 }
 
-/** Where a saved conversation of each kind is reopened. */
-export function hrefFor(kind: RecentKind, id: string): string {
-  const path: Partial<Record<RecentKind, string>> = {
+/**
+ * Only a same-origin app path is acceptable as a return link. Anything else —
+ * an absolute URL, a protocol-relative "//host", a traversal — is discarded
+ * rather than trusted, since this value comes from the browser and is later
+ * rendered as a link.
+ */
+function safePath(path: unknown): string | null {
+  if (typeof path !== "string") return null;
+  const p = path.trim();
+  if (!p.startsWith("/") || p.startsWith("//")) return null;
+  if (p.includes("..") || /[\s<>"']/.test(p)) return null;
+  if (p.length > 256) return null;
+  return p;
+}
+
+/**
+ * Where a saved conversation is reopened.
+ *
+ * The owning page reports its own path, because a central kind→path map here
+ * had no entry for `agent` or `site` and quietly fell back to "/" — so those
+ * threads pointed at the landing page and reopened as a blank session. The
+ * map remains only as a fallback for callers that cannot supply a path.
+ */
+export function hrefFor(kind: RecentKind, id: string, path?: unknown): string {
+  const known: Partial<Record<RecentKind, string>> = {
     chat: "/chat",
     docs: "/documents",
     sheets: "/spreadsheets",
@@ -38,7 +60,8 @@ export function hrefFor(kind: RecentKind, id: string): string {
     code: "/code",
     team: "/team",
   };
-  return `${path[kind] ?? "/"}?c=${encodeURIComponent(id)}`;
+  const base = safePath(path) ?? known[kind] ?? "/chat";
+  return `${base}?c=${encodeURIComponent(id)}`;
 }
 
 function clean(title: string) {
@@ -59,11 +82,14 @@ export async function saveConversation({
   kind,
   title,
   messages,
+  path,
 }: {
   id?: string | null;
   kind: RecentKind;
   title: string;
   messages: StoredMessage[];
+  /** Where the thread lives, as reported by the page that owns it. */
+  path?: string | null;
 }): Promise<string | null> {
   const user = await currentUser();
   if (!user) return null;
@@ -113,7 +139,7 @@ export async function saveConversation({
 
   // Keep Recents pointing at this conversation. Matching on href rather than
   // title means renaming a thread moves the row instead of adding a second one.
-  const href = hrefFor(kind, convoId);
+  const href = hrefFor(kind, convoId, path);
   writes.push({
     sql: `DELETE FROM recents WHERE user_id = ? AND kind = ? AND href = ?`,
     args: [user.id, kind, href],

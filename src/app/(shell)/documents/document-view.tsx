@@ -79,23 +79,40 @@ export function DocumentView({
     setOutline(found.filter((f) => f.text));
   }, [text]);
 
-  /* Highlight whichever heading is currently at the top of the viewport. */
+  /**
+   * Highlight the section currently being read: the last heading that has
+   * passed the top of the viewport.
+   *
+   * An IntersectionObserver was the obvious choice and was wrong. Its band has
+   * to exclude the area under the sticky header, which puts a heading jumped to
+   * via an anchor — landing exactly at the top — outside the band, so clicking
+   * a link highlighted nothing. Comparing positions always yields exactly one
+   * answer, including at the very top and bottom of the page.
+   */
   useEffect(() => {
     if (!outline.length) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]) setActiveId(visible[0].target.id);
-      },
-      { rootMargin: "-80px 0px -70% 0px" },
-    );
-    outline.forEach((o) => {
-      const el = document.getElementById(o.id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
+
+    const pick = () => {
+      // A little below the sticky header, so a heading counts as current once
+      // it reaches the point where it is actually readable.
+      const marker = 96;
+      let current = outline[0].id;
+      for (const o of outline) {
+        const el = document.getElementById(o.id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top > marker) break;
+        current = o.id;
+      }
+      setActiveId(current);
+    };
+
+    pick();
+    window.addEventListener("scroll", pick, { passive: true });
+    window.addEventListener("resize", pick);
+    return () => {
+      window.removeEventListener("scroll", pick);
+      window.removeEventListener("resize", pick);
+    };
   }, [outline]);
 
   async function run(value: string, attachments?: Attachment[]) {

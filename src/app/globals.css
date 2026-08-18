@@ -1091,6 +1091,14 @@ a[role="button"]:active {
   }
 }
 
+/* Anchored headings must clear the sticky document header, or jumping to
+   a section leaves its title hidden underneath. */
+.nx-doc h1,
+.nx-doc h2,
+.nx-doc h3 {
+  scroll-margin-top: 6rem;
+}
+
 /* ------------------------------------------------------------------ */
 /* Print                                                               */
 /* ------------------------------------------------------------------ */

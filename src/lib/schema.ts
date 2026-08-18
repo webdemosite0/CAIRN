@@ -144,3 +144,46 @@ PRAGMA journal_mode = WAL;
       PRIMARY KEY (user_id, service)
     );
 `;
+
+/**
+ * Data repairs, applied on every connection.
+ *
+ * These cannot live in SCHEMA: that block is skipped entirely once the tables
+ * exist, so anything added to it would never reach a database that already has
+ * them — which is every database that needs repairing.
+ *
+ * Each statement is written so that running it a second time matches nothing,
+ * making repeated execution free rather than merely harmless.
+ */
+export const REPAIRS = `
+    /* Chat moved from "/" to "/chat" when "/" became the landing page. Rows
+       written before that point send people to the marketing page, which
+       drops the ?c= and reopens a blank session instead of their thread. */
+    UPDATE recents
+       SET href = '/chat' || substr(href, 2)
+     WHERE kind = 'chat' AND href LIKE '/?c=%';
+
+    /* Agent threads never had a path at all: hrefFor had no 'agent' entry and
+       fell through to "/". The owning agent is recoverable because the title
+       is written as "<agent name>: <subject>". */
+    UPDATE recents
+       SET href = '/agents/' || (
+             SELECT a.id FROM agents a
+              WHERE a.user_id = recents.user_id
+                AND recents.title LIKE a.name || ':%'
+              LIMIT 1
+           ) || substr(href, 2)
+     WHERE kind = 'agent'
+       AND href LIKE '/?c=%'
+       AND EXISTS (
+             SELECT 1 FROM agents a
+              WHERE a.user_id = recents.user_id
+                AND recents.title LIKE a.name || ':%'
+           );
+
+    /* Anything still pointing at the landing page goes to the agent list —
+       not the thread, but a real page rather than a blank session. */
+    UPDATE recents
+       SET href = '/agents'
+     WHERE kind = 'agent' AND href LIKE '/?c=%';
+`;

@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
   let kind = "";
   let title = "";
   let messages: StoredMessage[] = [];
+  let path: string | null = null;
 
   try {
     const body = await req.json();
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
     kind = String(body?.kind ?? "");
     title = String(body?.title ?? "");
     messages = Array.isArray(body?.messages) ? body.messages : [];
+    path = body?.path ? String(body.path) : null;
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -50,6 +52,7 @@ export async function POST(req: NextRequest) {
       kind: kind as RecentKind,
       title,
       messages: clean,
+      path,
     });
     if (!saved) return Response.json({ error: "No identity." }, { status: 401 });
     return Response.json({ id: saved });

@@ -34,6 +34,11 @@ export function useSaved(kind: string, initialId?: string | null) {
             kind,
             title: title ?? usable[0].text,
             messages: usable,
+            // Where this thread lives. Reported by the page that owns it
+            // rather than derived from `kind` on the server: a central map
+            // silently produced "/?c=..." for kinds missing from it, which
+            // landed on the marketing page instead of the conversation.
+            path: window.location.pathname,
           }),
         });
         if (!res.ok) return;

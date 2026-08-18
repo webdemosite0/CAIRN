@@ -4,7 +4,7 @@ import { createClient, type Client, type InValue } from "@libsql/client";
 import { mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { SCHEMA } from "@/lib/schema";
+import { SCHEMA, REPAIRS } from "@/lib/schema";
 
 /**
  * The database, over libSQL.
@@ -153,6 +153,20 @@ function connect(): Promise<Client> {
 
       await client.executeMultiple(schema);
     }
+
+    // Repairs run even when the schema was skipped — a database that already
+    // has every table is precisely the one carrying rows that need fixing.
+    // They are cheap and match nothing once applied, but must never take the
+    // app down: a bad row is worth less than a working page.
+    try {
+      await client.executeMultiple(REPAIRS);
+    } catch (e) {
+      console.error(
+        "db: repairs skipped —",
+        e instanceof Error ? e.message : String(e),
+      );
+    }
+
     return client;
   })();
 
