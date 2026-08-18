@@ -1,4 +1,4 @@
-import { one, isRemote } from "@/lib/db";
+import { one, isRemote, ephemeral } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,15 +22,25 @@ export async function GET() {
     siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL?.trim()),
   };
 
-  const mode = isRemote ? "turso" : "local-file";
+  // "ephemeral" is the important one to surface: the app works, but every
+  // account and saved conversation disappears when the instance recycles.
+  const mode = isRemote ? "turso" : ephemeral ? "ephemeral-tmp" : "local-file";
 
   try {
     // Cheapest possible round trip that still proves the schema applied.
     await one(`SELECT COUNT(*) AS n FROM users`);
     return Response.json({
       ok: true,
-      database: { mode, reachable: true },
+      database: { mode, reachable: true, durable: isRemote || !ephemeral },
       configured,
+      ...(ephemeral
+        ? {
+            warning:
+              "Running on a temporary filesystem. The app works, but accounts, " +
+              "saved conversations and credits are lost whenever the instance " +
+              "recycles. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN to keep them.",
+          }
+        : {}),
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);

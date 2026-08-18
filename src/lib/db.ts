@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient, type Client, type InValue } from "@libsql/client";
 import { mkdirSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { SCHEMA } from "@/lib/schema";
 
@@ -26,34 +27,66 @@ const authToken = process.env.TURSO_AUTH_TOKEN?.trim();
 /** True when talking to a hosted database rather than a file on disk. */
 export const isRemote = Boolean(url);
 
-function localFileUrl() {
-  const dir = process.env.CAIRN_DATA_DIR
-    ? path.resolve(process.env.CAIRN_DATA_DIR)
-    : path.join(process.cwd(), ".data");
+/** Whether the database file lives somewhere that survives a restart. */
+export let ephemeral = false;
 
-  try {
-    mkdirSync(dir, { recursive: true });
-  } catch (e) {
-    const code = (e as NodeJS.ErrnoException)?.code;
-    // ENOENT belongs here: Vercel reports exactly that for mkdir under
-    // /var/task, and without it the user got a raw stack instead of this.
-    if (["EROFS", "EACCES", "EPERM", "ENOTDIR", "ENOENT"].includes(code ?? "")) {
-      throw new Error(
-        `CAIRN cannot write its database to ${dir} (${code}). This host has a ` +
-          `read-only filesystem. Either set TURSO_DATABASE_URL and ` +
-          `TURSO_AUTH_TOKEN to use a hosted database, or deploy somewhere with ` +
-          `a persistent volume and point CAIRN_DATA_DIR at it. See the ` +
-          `Deploying section of the README.`,
-      );
-    }
-    throw e;
-  }
-
+function fileUrlIn(dir: string) {
   // Still nexora.db despite the rename: libSQL reads the same SQLite file
   // format node:sqlite wrote, so keeping the name carries existing local data
   // across the migration instead of orphaning it.
   // libSQL wants a URL, and on Windows the path contains backslashes.
   return `file:${path.join(dir, "nexora.db").replace(/\\/g, "/")}`;
+}
+
+/**
+ * Picks a writable location for the SQLite file.
+ *
+ * Preferred is CAIRN_DATA_DIR or ./.data. On a serverless host neither exists
+ * — the bundle at /var/task is read-only — but /tmp IS writable, so rather
+ * than refusing to start we fall back to it and mark the store ephemeral.
+ *
+ * That trade is deliberate. A deploy with no configuration then WORKS: chat,
+ * documents, spreadsheets, credits, all of it. What it loses is durability —
+ * each serverless instance gets its own /tmp and they are recycled freely, so
+ * accounts and saved conversations come and go. Set TURSO_DATABASE_URL to
+ * make it permanent. A dead site teaches nobody anything; a working one that
+ * says it is temporary does.
+ */
+function localFileUrl() {
+  const preferred = process.env.CAIRN_DATA_DIR
+    ? path.resolve(process.env.CAIRN_DATA_DIR)
+    : path.join(process.cwd(), ".data");
+
+  try {
+    mkdirSync(preferred, { recursive: true });
+    return fileUrlIn(preferred);
+  } catch (e) {
+    const code = (e as NodeJS.ErrnoException)?.code;
+    // ENOENT belongs here: Vercel reports exactly that for mkdir under
+    // /var/task, and without it the raw stack surfaced instead of a message.
+    if (!["EROFS", "EACCES", "EPERM", "ENOTDIR", "ENOENT"].includes(code ?? "")) {
+      throw e;
+    }
+
+    const temp = path.join(tmpdir(), "cairn");
+    try {
+      mkdirSync(temp, { recursive: true });
+      ephemeral = true;
+      console.warn(
+        `CAIRN: ${preferred} is not writable (${code}), using ${temp}. ` +
+          `Data will NOT survive a restart — set TURSO_DATABASE_URL and ` +
+          `TURSO_AUTH_TOKEN to keep it.`,
+      );
+      return fileUrlIn(temp);
+    } catch {
+      throw new Error(
+        `CAIRN cannot write its database to ${preferred} (${code}) or to ` +
+          `${temp}. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN to use a ` +
+          `hosted database, or point CAIRN_DATA_DIR at a writable volume. ` +
+          `See the Deploying section of the README.`,
+      );
+    }
+  }
 }
 
 let client: Client | null = null;

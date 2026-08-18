@@ -143,14 +143,12 @@ Enable billing on the key to lift it.
 
 ## Deploying
 
-Read this before picking a host — the storage layer decides where this can run.
-
 The storage layer decides where this can run, and it now runs almost anywhere.
 
 | Host | Works |
 | --- | --- |
-| **Vercel / Netlify / Workers** | **Yes**, with `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` set |
-| A VPS / container with a mounted volume (Fly, Railway, a droplet) | **Yes**, no configuration — falls back to a local file |
+| **Vercel / Netlify / Workers** | **Yes, with no configuration.** Add Turso for durable data — see below |
+| A VPS / container with a mounted volume (Fly, Railway, a droplet) | **Yes**, durable out of the box |
 | **GitHub Pages, S3, any static host** | **No, and it never can be** — see below |
 
 ## Diagnosing a broken deploy
@@ -170,6 +168,23 @@ environment variables are present — booleans only, never the values. A 503 wit
 Static routes (`/robots.txt`, `/llms.txt`, `/login`) do not touch the database,
 so if those return 200 while pages return 500, the problem is the database and
 not the build.
+
+## Deploying with no configuration
+
+Push to Vercel, set `GEMINI_API_KEY`, done — the app runs. It does not need a
+database configured to start.
+
+When the data directory is not writable (Vercel's bundle is read-only), CAIRN
+falls back to the OS temp directory instead of refusing to boot. Everything
+works: chat, documents, spreadsheets, agents, credits.
+
+**What that costs you is durability.** Each serverless instance has its own
+`/tmp` and they are recycled freely, so accounts and saved conversations come
+and go. This is stated rather than hidden — `/api/health` reports
+`"mode":"ephemeral-tmp"`, `"durable":false` and a warning.
+
+Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` to make it permanent. No code
+change; the same client handles both.
 
 ## The database
 
