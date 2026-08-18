@@ -5,27 +5,45 @@ import {
   FiSearch,
   FiCheck,
   FiPlus,
+  FiLock,
 } from "react-icons/fi";
-import { toggleIntegration } from "@/app/actions/integrations";
+import { disconnect } from "@/app/actions/connections";
+import { ConnectDialog } from "@/components/integrations/connect-dialog";
 import { CATEGORIES, SERVICES, type Category } from "@/lib/services";
 import { Ico } from "@/components/ui/ico";
 import { cn } from "@/lib/utils";
 
+export interface ConnectedService {
+  service: string;
+  account: string;
+  hint: string;
+}
+
 export function IntegrationsView({
   connected,
+  connectable,
   signedIn,
 }: {
-  connected: string[];
+  connected: ConnectedService[];
+  /** Services CAIRN can actually authenticate, with what to ask for. */
+  connectable: Record<string, { label: string; help: string; docs?: string }>;
   signedIn: boolean;
 }) {
+  const [opening, setOpening] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category | "All">("All");
   const [pending, startTransition] = useTransition();
 
-  const [optimistic, setOptimistic] = useOptimistic(
+  // Disconnecting is instant and local; connecting cannot be optimistic
+  // because it depends on the provider accepting the credential.
+  const [optimistic, dropOne] = useOptimistic(
     connected,
-    (state: string[], id: string) =>
-      state.includes(id) ? state.filter((s) => s !== id) : [...state, id],
+    (state: ConnectedService[], id: string) => state.filter((s) => s.service !== id),
+  );
+
+  const byId = useMemo(
+    () => new Map(optimistic.map((c) => [c.service, c])),
+    [optimistic],
   );
 
   const results = useMemo(() => {
@@ -41,11 +59,10 @@ export function IntegrationsView({
     });
   }, [query, category]);
 
-  function toggle(id: string) {
-    if (!signedIn) return;
+  function remove(id: string) {
     startTransition(async () => {
-      setOptimistic(id);
-      await toggleIntegration(id);
+      dropOne(id);
+      await disconnect(id);
     });
   }
 
@@ -95,7 +112,9 @@ export function IntegrationsView({
       ) : (
         <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {results.map((s, i) => {
-            const on = optimistic.includes(s.id);
+            const conn = byId.get(s.id);
+            const on = Boolean(conn);
+            const spec = connectable[s.id];
             return (
               <article
                 key={s.id}
@@ -124,7 +143,9 @@ export function IntegrationsView({
                     </span>
                     <div className="min-w-0">
                       <h3 className="text-[14px] font-medium text-ink">{s.name}</h3>
-                      <p className="text-[11.5px] text-ink-4">{s.category}</p>
+                      <p className="truncate text-[11.5px] text-ink-4">
+                        {conn ? `${conn.account || "connected"} · ${conn.hint}` : s.category}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -133,37 +154,52 @@ export function IntegrationsView({
                   {s.blurb}
                 </p>
 
-                {s.oauth ? (
-                  <span className="mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] border border-dashed border-line-strong py-2 text-[12.5px] text-ink-4">
-                    Coming soon
-                  </span>
-                ) : (
+                {/* Three honest states. Connected means a credential this
+                    provider accepted; Connect means CAIRN can authenticate it
+                    here; the rest need an OAuth app only the account owner can
+                    register, and say so rather than offering a dead button. */}
+                {on ? (
                   <button
-                    onClick={() => toggle(s.id)}
+                    onClick={() => remove(s.id)}
                     disabled={pending}
-                    className={cn(
-                      "group mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] py-2 text-[13px] transition-colors disabled:opacity-50",
-                      on
-                        ? "border border-positive/35 text-positive hover:bg-positive/10"
-                        : "border border-line-strong text-ink-2 hover:bg-hover hover:text-ink",
-                    )}
+                    className="group mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] border border-positive/35 py-2 text-[13px] text-positive transition-colors hover:border-critical/40 hover:bg-critical/10 hover:text-critical disabled:opacity-50"
                   >
-                    {on ? (
-                      <>
-                        <Ico icon={FiCheck} motion="check" size={13} /> Connected
-                      </>
-                    ) : (
-                      <>
-                        <Ico icon={FiPlus} motion="open" size={13} /> Connect
-                      </>
-                    )}
+                    <Ico icon={FiCheck} motion="check" size={13} />
+                    <span className="group-hover:hidden">Connected</span>
+                    <span className="hidden group-hover:inline">Disconnect</span>
                   </button>
+                ) : spec ? (
+                  <button
+                    onClick={() => setOpening(s.id)}
+                    disabled={!signedIn || pending}
+                    className="group mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] border border-line-strong py-2 text-[13px] text-ink-2 transition-colors hover:bg-hover hover:text-ink disabled:opacity-50"
+                  >
+                    <Ico icon={FiPlus} motion="open" size={13} /> Connect
+                  </button>
+                ) : (
+                  <span
+                    title="This service authenticates through OAuth, which needs a client id and secret registered with the provider."
+                    className="mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] border border-dashed border-line-strong py-2 text-[12.5px] text-ink-4"
+                  >
+                    <FiLock size={11} /> Needs an OAuth app
+                  </span>
                 )}
               </article>
             );
           })}
         </div>
       )}
+
+      {opening && connectable[opening] ? (
+        <ConnectDialog
+          service={opening}
+          name={SERVICES.find((x) => x.id === opening)?.name ?? opening}
+          label={connectable[opening].label}
+          help={connectable[opening].help}
+          docs={connectable[opening].docs}
+          onClose={() => setOpening(null)}
+        />
+      ) : null}
     </div>
   );
 }

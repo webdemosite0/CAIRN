@@ -122,6 +122,21 @@ PRAGMA journal_mode = WAL;
     CREATE INDEX IF NOT EXISTS credit_spends_lookup
       ON credit_spends (user_id, period);
 
+    /* A real, verified connection to a third party. The secret is
+       AES-256-GCM ciphertext, never plaintext — see src/lib/secrets.ts.
+       Separate from the older integrations table, which only ever recorded
+       intent to connect. */
+    CREATE TABLE IF NOT EXISTS connections (
+      user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      service     TEXT NOT NULL,
+      kind        TEXT NOT NULL,
+      secret      TEXT NOT NULL,
+      account     TEXT NOT NULL DEFAULT '',
+      hint        TEXT NOT NULL DEFAULT '',
+      verified_at INTEGER NOT NULL,
+      PRIMARY KEY (user_id, service)
+    );
+
     CREATE TABLE IF NOT EXISTS integrations (
       user_id      TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       service      TEXT NOT NULL,

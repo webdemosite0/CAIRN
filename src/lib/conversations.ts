@@ -29,7 +29,7 @@ export interface Conversation {
 /** Where a saved conversation of each kind is reopened. */
 export function hrefFor(kind: RecentKind, id: string): string {
   const path: Partial<Record<RecentKind, string>> = {
-    chat: "/",
+    chat: "/chat",
     docs: "/documents",
     sheets: "/spreadsheets",
     slides: "/slides",

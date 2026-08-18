@@ -22,7 +22,7 @@ export function MobileBar() {
       >
         <Ico icon={FiMenu} motion="pop" size={18} />
       </button>
-      <Link href="/" aria-label="CAIRN home">
+      <Link href="/chat" aria-label="CAIRN home">
         <Lockup size={22} />
       </Link>
     </header>

@@ -116,7 +116,7 @@ function RailBody({
   return (
     <>
       <div className="flex items-center justify-between px-3.5 pt-3.5">
-        <Link href="/" onClick={onNavigate} aria-label="CAIRN home">
+        <Link href="/chat" onClick={onNavigate} aria-label="CAIRN home">
           <Lockup size={26} />
         </Link>
         {onCollapse ? (
@@ -132,7 +132,7 @@ function RailBody({
 
       <div className="px-3 pt-4">
         <Link
-          href="/"
+          href="/chat"
           onClick={onNavigate}
           className="group flex items-center justify-center gap-2 rounded-[8px] bg-accent px-3 py-2.5 text-[13.5px] font-medium text-white shadow-[var(--elev)] transition-[filter,transform] duration-150 hover:brightness-110 active:scale-[0.99]"
         >
@@ -238,7 +238,7 @@ export function Sidebar({
             >
               <Ico icon={FiSidebar} motion="nudge" size={17} />
             </button>
-            {[{ href: "/", label: "New chat", icon: FiPlus, motion: "open" as Motion }, ...main].map((i) => {
+            {[{ href: "/chat", label: "New chat", icon: FiPlus, motion: "open" as Motion }, ...main].map((i) => {
               const active =
                 i.href === "/" ? pathname === "/" : isActive(pathname, i.href);
               return (

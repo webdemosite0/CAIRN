@@ -67,7 +67,9 @@ export const site = {
 
 /** Pages worth indexing, with crawl hints. */
 export const publicRoutes = [
+  // "/" is now the landing page; the workspace itself lives at /chat.
   { path: "/", priority: 1.0, changeFrequency: "weekly" as const },
+  { path: "/chat", priority: 0.9, changeFrequency: "weekly" as const },
   // Low on purpose while ENABLED is false in (shell)/websites/page.tsx — that
   // route currently renders "Coming soon", and advertising a placeholder as a
   // headline page is both bad ranking and dishonest. Raise to 0.9 when the

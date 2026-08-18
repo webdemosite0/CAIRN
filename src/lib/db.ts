@@ -102,6 +102,7 @@ const TABLES = [
   "credit_grants",
   "credit_spends",
   "integrations",
+  "connections",
 ];
 
 /**
