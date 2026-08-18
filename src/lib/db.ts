@@ -89,6 +89,40 @@ function localFileUrl() {
   }
 }
 
+/** Tables the schema creates. A missing one means the schema must run. */
+const TABLES = [
+  "users",
+  "sessions",
+  "agents",
+  "sites",
+  "reminders",
+  "recents",
+  "conversations",
+  "messages",
+  "credit_grants",
+  "credit_spends",
+  "integrations",
+];
+
+/**
+ * True when every table already exists. Counting rather than assuming means
+ * adding a table later still triggers a migration on the next cold start.
+ */
+async function alreadyMigrated(c: Client): Promise<boolean> {
+  try {
+    const placeholders = TABLES.map(() => "?").join(",");
+    const res = await c.execute({
+      sql: `SELECT COUNT(*) AS n FROM sqlite_master
+             WHERE type = 'table' AND name IN (${placeholders})`,
+      args: TABLES,
+    });
+    return Number(res.rows[0]?.n ?? 0) === TABLES.length;
+  } catch {
+    // A brand new database has no sqlite_master rows to read yet.
+    return false;
+  }
+}
+
 let client: Client | null = null;
 let ready: Promise<Client> | null = null;
 
@@ -106,12 +140,18 @@ function connect(): Promise<Client> {
       url ? { url, authToken } : { url: localFileUrl() },
     );
 
-    // WAL is a local-file concept and a hosted database rejects it.
-    const schema = isRemote
-      ? SCHEMA.replace(/PRAGMA journal_mode = WAL;/i, "")
-      : SCHEMA;
+    // Skip the schema when it is already there. Every statement is IF NOT
+    // EXISTS so replaying is safe, but it is 14 statements on every cold
+    // start — against a hosted database that is 14 network round trips
+    // before the first page can render. One cheap probe replaces them.
+    if (!(await alreadyMigrated(client))) {
+      // WAL is a local-file concept and a hosted database rejects it.
+      const schema = isRemote
+        ? SCHEMA.replace(/PRAGMA journal_mode = WAL;/i, "")
+        : SCHEMA;
 
-    await client.executeMultiple(schema);
+      await client.executeMultiple(schema);
+    }
     return client;
   })();
 
