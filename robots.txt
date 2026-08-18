@@ -1,0 +1,6 @@
+# GitHub Pages only. The deployed application serves its own robots.txt from
+# src/app/robots.ts, which blocks /settings, /dashboard and /api/.
+User-agent: *
+Allow: /
+
+Sitemap: https://webdemosite0.github.io/cairnofficial/sitemap.xml

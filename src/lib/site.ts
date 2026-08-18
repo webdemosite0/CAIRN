@@ -68,7 +68,11 @@ export const site = {
 /** Pages worth indexing, with crawl hints. */
 export const publicRoutes = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" as const },
-  { path: "/websites", priority: 0.9, changeFrequency: "weekly" as const },
+  // Low on purpose while ENABLED is false in (shell)/websites/page.tsx — that
+  // route currently renders "Coming soon", and advertising a placeholder as a
+  // headline page is both bad ranking and dishonest. Raise to 0.9 when the
+  // builder is switched back on.
+  { path: "/websites", priority: 0.4, changeFrequency: "monthly" as const },
   { path: "/agents", priority: 0.9, changeFrequency: "weekly" as const },
   { path: "/team", priority: 0.8, changeFrequency: "weekly" as const },
   { path: "/code", priority: 0.7, changeFrequency: "monthly" as const },

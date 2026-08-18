@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sitemap for the GitHub Pages URL only.
+
+  Pages serves this repo's README as a static page and cannot run the app, so
+  there is exactly one indexable URL here. The real application has its own
+  sitemap generated at /sitemap.xml by src/app/sitemap.ts, covering all 15
+  routes — that one only exists wherever the app is actually deployed.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://webdemosite0.github.io/cairnofficial/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
