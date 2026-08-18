@@ -1,13 +1,10 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiPlus, FiTrash2, FiX, FiAlertCircle, FiLoader } from "react-icons/fi";
 import { Bot } from "@/components/agents/bot";
-import { Message } from "@/components/chat/message";
-import { Composer } from "@/components/chat/composer";
-import { strip, type Attachment } from "@/lib/attachments";
 import {
   createAgent,
   deleteAgent,
@@ -42,7 +39,6 @@ export function AgentsView({
   signedIn: boolean;
 }) {
   const [creating, setCreating] = useState(false);
-  const [chatting, setChatting] = useState<AgentRow | null>(null);
 
   if (!signedIn) {
     return (
@@ -122,21 +118,18 @@ export function AgentsView({
                 {a.instructions}
               </p>
 
-              <button
-                onClick={() => setChatting(a)}
-                className="mt-4 w-full rounded-[9px] border border-line-strong py-2 text-[13px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
+              <Link
+                href={`/agents/${a.id}`}
+                className="mt-4 block w-full rounded-[9px] border border-line-strong py-2 text-center text-[13px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
               >
                 Talk to {a.name.split(" ")[0]}
-              </button>
+              </Link>
             </article>
           ))}
         </div>
       )}
 
       {creating ? <CreateDialog onClose={() => setCreating(false)} /> : null}
-      {chatting ? (
-        <ChatDialog agent={chatting} onClose={() => setChatting(null)} />
-      ) : null}
     </div>
   );
 }
@@ -236,121 +229,6 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
 
 /* ------------------------------------------------------------------ */
 
-interface Turn {
-  id: number;
-  role: "user" | "model";
-  text: string;
-}
-
-function ChatDialog({
-  agent,
-  onClose,
-}: {
-  agent: AgentRow;
-  onClose: () => void;
-}) {
-  const [turns, setTurns] = useState<Turn[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const bottom = useRef<HTMLDivElement>(null);
-  const nextId = useRef(0);
-
-  useEffect(() => {
-    bottom.current?.scrollIntoView({ block: "end", behavior: "smooth" });
-  }, [turns]);
-
-  async function send(raw: string, attachments?: Attachment[]) {
-    const text = raw.trim() || (attachments?.length ? "See the attached files." : "");
-    if (!text || busy) return;
-    const history = [...turns, { id: nextId.current++, role: "user" as const, text }];
-    setTurns(history);
-    setBusy(true);
-    setError(null);
-
-    const replyId = nextId.current++;
-    setTurns((t) => [...t, { id: replyId, role: "model", text: "" }]);
-
-    try {
-      const res = await fetch("/api/agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          agentId: agent.id,
-          messages: history.map(({ role, text }) => ({ role, text })),
-          attachments: strip(attachments),
-        }),
-      });
-      if (!res.ok || !res.body) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error ?? `Failed (${res.status}).`);
-      }
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      for (;;) {
-        const { done, value: chunk } = await reader.read();
-        if (done) break;
-        const piece = decoder.decode(chunk, { stream: true });
-        setTurns((t) =>
-          t.map((x) => (x.id === replyId ? { ...x, text: x.text + piece } : x)),
-        );
-      }
-    } catch (e) {
-      setTurns((t) => t.filter((x) => x.id !== replyId));
-      setError(e instanceof Error ? e.message : "Something went wrong.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <Shell onClose={onClose} title="" wide>
-      <div className="flex items-center gap-3 border-b border-line pb-4">
-        <Bot size={42} accent={agent.accent} state={busy ? "working" : "idle"} />
-        <div className="min-w-0">
-          <h2 className="text-[15px] font-semibold text-ink">{agent.name}</h2>
-          <p className="truncate text-[12.5px]" style={{ color: agent.accent }}>
-            {busy ? "Working…" : agent.role}
-          </p>
-        </div>
-      </div>
-
-      <div className="max-h-[46vh] min-h-[220px] space-y-5 overflow-y-auto py-5">
-        {turns.length === 0 ? (
-          <p className="py-10 text-center text-[13.5px] text-ink-4">
-            Brief {agent.name.split(" ")[0]} on what you need.
-          </p>
-        ) : (
-          turns.map((t, i) => (
-            <Message
-              key={t.id}
-              role={t.role}
-              text={t.text}
-              pending={busy && i === turns.length - 1 && t.role === "model"}
-            />
-          ))
-        )}
-        {error ? (
-          <div className="flex items-start gap-2 rounded-[9px] border border-critical/30 bg-critical/10 px-3 py-2.5">
-            <Ico icon={FiAlertCircle} motion="pop" size={14} className="mt-0.5 shrink-0 text-critical" />
-            <p className="text-[13px] text-critical">{error}</p>
-          </div>
-        ) : null}
-        <div ref={bottom} />
-      </div>
-
-      <div className="border-t border-line pt-4">
-        <Composer
-          compact
-          onSend={send}
-          disabled={busy}
-          placeholder={`Message ${agent.name}…`}
-        />
-      </div>
-    </Shell>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 
 function Shell({
   title,
