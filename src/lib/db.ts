@@ -35,7 +35,9 @@ function localFileUrl() {
     mkdirSync(dir, { recursive: true });
   } catch (e) {
     const code = (e as NodeJS.ErrnoException)?.code;
-    if (["EROFS", "EACCES", "EPERM", "ENOTDIR"].includes(code ?? "")) {
+    // ENOENT belongs here: Vercel reports exactly that for mkdir under
+    // /var/task, and without it the user got a raw stack instead of this.
+    if (["EROFS", "EACCES", "EPERM", "ENOTDIR", "ENOENT"].includes(code ?? "")) {
       throw new Error(
         `CAIRN cannot write its database to ${dir} (${code}). This host has a ` +
           `read-only filesystem. Either set TURSO_DATABASE_URL and ` +

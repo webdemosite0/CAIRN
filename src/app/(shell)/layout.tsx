@@ -2,16 +2,45 @@ import { Sidebar } from "@/components/shell/sidebar";
 import { MobileBar } from "@/components/shell/mobile-bar";
 import { NavProvider } from "@/components/shell/nav-state";
 import { Backdrop } from "@/components/shell/backdrop";
-import { currentUser } from "@/lib/auth";
+import { SetupNeeded } from "@/components/shell/setup-needed";
+import { currentUser, type User } from "@/lib/auth";
 import { myBalance } from "@/lib/credits";
+import type { Balance } from "@/lib/credits";
 
 export default async function ShellLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await currentUser();
-  const balance = await myBalance();
+  let user: User | null = null;
+  let balance: Balance | null = null;
+
+  try {
+    user = await currentUser();
+    balance = await myBalance();
+  } catch (e) {
+    // Next signals redirect, notFound and dynamic-render bailout by THROWING.
+    // Swallowing those would silently break routing, so hand them back.
+    const digest = (e as { digest?: unknown })?.digest;
+    if (
+      typeof digest === "string" &&
+      (digest.startsWith("NEXT_") || digest === "DYNAMIC_SERVER_USAGE")
+    ) {
+      throw e;
+    }
+
+    // Every page here reads the account and credit balance, so an unreachable
+    // database took the entire site down as an unexplained 500. Say what is
+    // wrong instead — the cause otherwise only exists in the host's logs.
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("shell layout: database unavailable —", message);
+    return (
+      <>
+        <Backdrop />
+        <SetupNeeded detail={message} />
+      </>
+    );
+  }
 
   return (
     <NavProvider>
