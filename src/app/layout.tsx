@@ -57,6 +57,14 @@ export const metadata: Metadata = {
     creator: site.twitter,
   },
   formatDetection: { telephone: false, address: false, email: false },
+  // Google Search Console ownership. Emitted as
+  // <meta name="google-site-verification"> in <head> on every page.
+  // Hardcoded on purpose: it is a public token by design, and putting it in
+  // an env var only creates another variable that can go missing on deploy
+  // and silently un-verify the domain.
+  verification: {
+    google: "ToesbbZChUTU1HoKJbTHMKNjXwHACXL2d3Kb-GtuN7c",
+  },
 };
 
 export const viewport: Viewport = {
