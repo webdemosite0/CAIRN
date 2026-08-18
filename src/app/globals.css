@@ -16,7 +16,7 @@
   --color-ink: #f2f2f3;
   --color-ink-2: #c9ccd1;
   --color-ink-3: #a1a6ae;
-  --color-ink-4: #7d838d;
+  --color-ink-4: #878d97;
 
   --color-line: #262626;
   --color-line-strong: #333333;
@@ -52,7 +52,7 @@
   --color-ink: #f2f2f3;
   --color-ink-2: #c9ccd1;
   --color-ink-3: #a1a6ae;
-  --color-ink-4: #7d838d;
+  --color-ink-4: #878d97;
   --color-line: #262626;
   --color-line-strong: #333333;
   --color-accent: #3b82f6;
@@ -77,9 +77,11 @@
   --shimmer: rgb(255 255 255 / 0.07);
   --grid-line: rgb(255 255 255 / 0.032);
   --sky: rgb(120 150 220 / 0.1);
-  --grad-top: rgb(56 96 210 / 0.06);
-  --grad-left: rgb(78 62 208 / 0.04);
-  --grad-right: rgb(30 130 220 / 0.036);
+  --orb-a: rgb(56 104 235 / 0.21);
+  --orb-b: rgb(96 72 232 / 0.15);
+  --orb-c: rgb(28 150 235 / 0.13);
+  --sweep-base: #6f6f6f;
+  --sweep-hi: #ffffff;
   --grad-sky: rgb(24 42 92 / 0.084);
   --floor: rgb(0 0 0 / 0.55);
   --aurora-a: rgb(59 130 246 / 0.32);
@@ -134,7 +136,7 @@
   --color-ink: #1a1f36;
   --color-ink-2: #3c4257;
   --color-ink-3: #545a69;
-  --color-ink-4: #636b7b;
+  --color-ink-4: #5b6373;
 
   --color-line: #e6e9ef;
   --color-line-strong: #d5dbe4;
@@ -163,15 +165,17 @@
   --shimmer: rgb(26 31 54 / 0.05);
   --grid-line: rgb(26 31 54 / 0.04);
   --sky: rgb(99 91 255 / 0.07);
-  --grad-top: rgb(88 120 245 / 0.048);
-  --grad-left: rgb(120 100 250 / 0.03);
-  --grad-right: rgb(60 170 240 / 0.03);
-  --grad-sky: rgb(226 235 255 / 0.255);
+  --orb-a: rgb(96 128 250 / 0.14);
+  --orb-b: rgb(132 108 250 / 0.105);
+  --orb-c: rgb(70 176 245 / 0.09);
+  --sweep-base: #3c4257;
+  --sweep-hi: #635bff;
+  --grad-sky: rgb(226 235 255 / 0.35);
   --floor: rgb(26 31 54 / 0.04);
   --aurora-a: rgb(99 91 255 / 0.13);
   --aurora-b: rgb(122 90 248 / 0.11);
   --aurora-c: rgb(0 191 191 / 0.08);
-  --tint-darken: 30%;
+  --tint-darken: 36%;
   /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
   --sx-plain: #1f2430;
   --sx-comment: #636a78;
@@ -209,7 +213,7 @@
     --color-ink: #1a1f36;
     --color-ink-2: #3c4257;
     --color-ink-3: #545a69;
-    --color-ink-4: #636b7b;
+    --color-ink-4: #5b6373;
     --color-line: #e6e9ef;
     --color-line-strong: #d5dbe4;
     --color-accent: #5b51f5;
@@ -232,15 +236,17 @@
     --shimmer: rgb(26 31 54 / 0.05);
     --grid-line: rgb(26 31 54 / 0.04);
     --sky: rgb(99 91 255 / 0.07);
-    --grad-top: rgb(88 120 245 / 0.048);
-    --grad-left: rgb(120 100 250 / 0.03);
-    --grad-right: rgb(60 170 240 / 0.03);
-    --grad-sky: rgb(226 235 255 / 0.255);
+    --orb-a: rgb(96 128 250 / 0.14);
+    --orb-b: rgb(132 108 250 / 0.105);
+    --orb-c: rgb(70 176 245 / 0.09);
+    --sweep-base: #3c4257;
+    --sweep-hi: #635bff;
+    --grad-sky: rgb(226 235 255 / 0.35);
     --floor: rgb(26 31 54 / 0.04);
     --aurora-a: rgb(99 91 255 / 0.13);
     --aurora-b: rgb(122 90 248 / 0.11);
     --aurora-c: rgb(0 191 191 / 0.08);
-    --tint-darken: 30%;
+    --tint-darken: 36%;
     /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
     --sx-plain: #1f2430;
     --sx-comment: #636a78;
@@ -580,11 +586,11 @@ select:focus-visible,
 .nx-sweep-text {
   background-image: linear-gradient(
     100deg,
-    #6f6f6f 0%,
-    #6f6f6f 38%,
-    #ffffff 50%,
-    #6f6f6f 62%,
-    #6f6f6f 100%
+    var(--sweep-base) 0%,
+    var(--sweep-base) 38%,
+    var(--sweep-hi) 50%,
+    var(--sweep-base) 62%,
+    var(--sweep-base) 100%
   );
   background-size: 220% 100%;
   -webkit-background-clip: text;
@@ -1001,5 +1007,86 @@ select:focus-visible,
   50% {
     opacity: 0.7;
     transform: scale(1.06);
+  }
+}
+
+/* ============================================================
+   POLISH
+   ------------------------------------------------------------
+   Small, cheap motion. Everything here is transform or opacity
+   only — those composite on the GPU, so they do not force layout
+   or repaint the way animating width, top or box-shadow would.
+   ============================================================ */
+
+/* Chips and cards lift a hair and deepen their bezel on hover. */
+@utility chip {
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* The composer grows a soft ring as you focus it, rather than snapping. */
+.composer {
+  transition:
+    border-color 0.18s var(--ease-out),
+    box-shadow 0.22s var(--ease-out),
+    background-color 0.18s var(--ease-out);
+}
+
+/* Buttons that commit something get a press. */
+button:not(:disabled):active,
+a[role="button"]:active {
+  transform: translateY(0.5px);
+}
+
+/* Cards in a grid settle in one after another rather than all at once —
+   the delay is set inline per card so the stagger follows source order. */
+@keyframes nx-settle {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-settle {
+  animation: nx-settle 380ms var(--ease-out) forwards;
+}
+
+/* A quiet sheen that crosses a surface once, for something newly arrived. */
+@keyframes nx-sheen {
+  from {
+    background-position: -150% 0;
+  }
+  to {
+    background-position: 250% 0;
+  }
+}
+.nx-sheen {
+  background-image: linear-gradient(
+    100deg,
+    transparent 35%,
+    var(--shimmer) 50%,
+    transparent 65%
+  );
+  background-size: 200% 100%;
+  animation: nx-sheen 1.6s var(--ease-out);
+}
+
+/* Panels get a slightly stronger bezel and a lift on hover. */
+@utility panel-hover {
+  transition:
+    transform 0.2s var(--ease-out),
+    box-shadow 0.2s var(--ease-out),
+    border-color 0.2s var(--ease-out);
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-line-strong);
+    box-shadow:
+      inset 0 1px 0 0 var(--bezel),
+      var(--elev-lift);
   }
 }

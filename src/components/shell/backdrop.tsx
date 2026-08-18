@@ -1,27 +1,27 @@
 /**
- * The page ground: a deep blue field that falls away toward the bottom, a fine
- * grid, and a slow band of light across the top.
+ * The page ground: round pools of blue light, a fine grid, and a floor.
  *
- * Every colour is a token, so the whole thing inverts with the theme — on dark
- * it is midnight blue lit from above, on light it is a pale sky settling into
- * white. Painting one fixed gradient would leave the light theme looking like a
- * dark screenshot someone had brightened.
+ * These used to be viewport-wide washes at very low alpha, which is the worst
+ * of both — spread so thin they read as a faint grey haze rather than colour.
+ * Concentrated circles are visibly blue while touching less of the page, so
+ * the same amount of ink buys far more presence.
  *
- * Cheap by construction: three static layers, no blur, nothing animated. A
- * large filter: blur() re-rasterises every frame and was measurably costly here.
+ * Every colour is a token, so the whole thing inverts with the theme. Cheap by
+ * construction: static layers, no blur filter, nothing animated. A large
+ * `filter: blur()` re-rasterises every frame and measured expensive here.
  */
 export function Backdrop() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      {/* the blue field itself */}
+      {/* the orbs — circle, not ellipse, so the falloff reads as round */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 80% at 50% -20%, var(--grad-top), transparent 60%)," +
-            "radial-gradient(90% 60% at 12% 8%, var(--grad-left), transparent 55%)," +
-            "radial-gradient(90% 65% at 88% 4%, var(--grad-right), transparent 55%)," +
-            "linear-gradient(180deg, var(--grad-sky) 0%, transparent 45%)",
+            "radial-gradient(circle 40rem at 50% -8rem, var(--orb-a), transparent 70%)," +
+            "radial-gradient(circle 28rem at 12% 12%, var(--orb-b), transparent 70%)," +
+            "radial-gradient(circle 26rem at 88% 4%, var(--orb-c), transparent 70%)," +
+            "linear-gradient(180deg, var(--grad-sky) 0%, transparent 42%)",
         }}
       />
 
