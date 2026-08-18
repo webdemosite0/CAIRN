@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FiDownload,
   FiRotateCcw,
@@ -8,6 +8,7 @@ import {
   FiFileText,
   FiCopy,
   FiCheck,
+  FiPrinter,
 } from "react-icons/fi";
 import { Bot } from "@/components/agents/bot";
 import { Message } from "@/components/chat/message";
@@ -19,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useSaved } from "@/lib/use-saved";
 import { downloadDocx, downloadMarkdown } from "@/lib/export";
 import { Ico } from "@/components/ui/ico";
+import { cn } from "@/lib/utils";
 
 const EXAMPLES = [
   "An onboarding guide for a new backend engineer",
@@ -42,6 +44,59 @@ export function DocumentView({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const articleRef = useRef<HTMLElement>(null);
+  const [outline, setOutline] = useState<{ id: string; text: string; level: number }[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  /** Word count and a reading estimate, at a conventional 220 wpm. */
+  const stats = useMemo(() => {
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    return { words, minutes: Math.max(1, Math.round(words / 220)) };
+  }, [text]);
+
+  /* The markdown renderer owns the heading elements, so the outline is read
+     back off the DOM rather than re-parsing the markdown — that way it can
+     never disagree with what is actually on the page. */
+  useEffect(() => {
+    const el = articleRef.current;
+    if (!el || !text) {
+      setOutline([]);
+      return;
+    }
+    const found = [...el.querySelectorAll("h1, h2, h3")].map((h, i) => {
+      const label = (h.textContent || "").trim();
+      // Recomputed every pass rather than kept once set: while the answer is
+      // streaming a heading is briefly a fragment of itself, and reusing that
+      // first id left anchors named after half a word.
+      const id = `s-${i}-${label
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 40)}`;
+      h.id = id;
+      return { id, text: label, level: Number(h.tagName[1]) };
+    });
+    setOutline(found.filter((f) => f.text));
+  }, [text]);
+
+  /* Highlight whichever heading is currently at the top of the viewport. */
+  useEffect(() => {
+    if (!outline.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActiveId(visible[0].target.id);
+      },
+      { rootMargin: "-80px 0px -70% 0px" },
+    );
+    outline.forEach((o) => {
+      const el = document.getElementById(o.id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [outline]);
 
   async function run(value: string, attachments?: Attachment[]) {
     if (!value.trim() && !attachments?.length) return;
@@ -135,7 +190,7 @@ export function DocumentView({
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-20 flex flex-wrap items-center gap-3 border-b border-line bg-canvas/90 px-5 py-3 backdrop-blur-md lg:px-6">
+      <header className="nx-no-print sticky top-0 z-20 flex flex-wrap items-center gap-3 border-b border-line bg-canvas/90 px-5 py-3 backdrop-blur-md lg:px-6">
         <div className="min-w-0 flex-1">
           <p className="text-[11.5px] uppercase tracking-[0.08em] text-ink-4">Documents</p>
           <h1 className="truncate text-[15px] font-medium text-ink">{prompt}</h1>
@@ -155,6 +210,14 @@ export function DocumentView({
             className="chip group !px-3 !py-1.5 !text-[12.5px] disabled:opacity-40"
           >
             <Ico icon={FiDownload} motion="lift" size={13} /> Markdown
+          </button>
+          <button
+            onClick={() => window.print()}
+            disabled={!text || busy}
+            className="chip group !px-3 !py-1.5 !text-[12.5px] disabled:opacity-40"
+            title="Print, or save as PDF"
+          >
+            <Ico icon={FiPrinter} motion="lift" size={13} /> PDF
           </button>
           <button
             onClick={() => {
@@ -181,21 +244,64 @@ export function DocumentView({
         </div>
       </header>
 
-      <div className="mx-auto max-w-[860px] px-5 py-10">
-        {busy && !text ? (
-          <div className="panel flex items-center gap-3.5 px-5 py-4">
-            <Bot size={38} state="working" />
-            <span className="nx-dots text-[14px] text-ink-2">Writing</span>
-          </div>
-        ) : null}
+      <div className="mx-auto grid max-w-[1180px] gap-8 px-5 py-10 lg:grid-cols-[minmax(0,1fr)_216px]">
+        <div className="min-w-0">
+          {busy && !text ? (
+            <div className="panel flex items-center gap-3.5 px-5 py-4">
+              <Bot size={38} state="working" />
+              <span className="nx-dots text-[14px] text-ink-2">Writing</span>
+            </div>
+          ) : null}
 
-        {text ? (
-          /* A page, not a chat bubble: generous margins, a measured column and
-             a real typographic scale, so what comes out reads like the document
-             it will be exported as. */
-          <article className="nx-doc panel px-10 py-11 sm:px-14 sm:py-14">
-            <Message role="model" text={text} pending={busy} />
-          </article>
+          {text ? (
+            /* A page, not a chat bubble: generous margins, a measured column and
+               a real typographic scale, so what comes out reads like the document
+               it will be exported as. */
+            <article
+              ref={articleRef}
+              className="nx-doc panel mx-auto max-w-[860px] px-10 py-11 sm:px-14 sm:py-14"
+            >
+              <Message role="model" text={text} pending={busy} />
+            </article>
+          ) : null}
+        </div>
+
+        {/* Outline. Only earns its space once the document is long enough to
+            need one, and it is hidden entirely when printing. */}
+        {outline.length > 2 ? (
+          <aside className="nx-no-print order-first hidden lg:order-none lg:block">
+            <div className="sticky top-24">
+              <p className="mb-3 text-[11.5px] uppercase tracking-[0.08em] text-ink-4">
+                On this page
+              </p>
+              <nav className="space-y-0.5 border-l border-line">
+                {outline.map((o) => (
+                  <a
+                    key={o.id}
+                    href={`#${o.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document
+                        .getElementById(o.id)
+                        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                    className={cn(
+                      "-ml-px block border-l-2 py-1 text-[12.5px] leading-snug transition-colors",
+                      o.level === 3 ? "pl-6" : "pl-3.5",
+                      activeId === o.id
+                        ? "border-accent text-ink"
+                        : "border-transparent text-ink-3 hover:text-ink-2",
+                    )}
+                  >
+                    {o.text}
+                  </a>
+                ))}
+              </nav>
+              <p className="mt-4 border-t border-line pt-3 text-[12px] text-ink-4">
+                {stats.words.toLocaleString()} words · {stats.minutes} min read
+              </p>
+            </div>
+          </aside>
         ) : null}
 
         {error ? (

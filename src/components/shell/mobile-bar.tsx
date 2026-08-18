@@ -14,7 +14,7 @@ export function MobileBar() {
   const { setOpen } = useNav();
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-line bg-canvas/90 px-3 backdrop-blur-md lg:hidden">
+    <header className="nx-no-print sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-line bg-canvas/90 px-3 backdrop-blur-md lg:hidden">
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"

@@ -224,7 +224,7 @@ export function Sidebar({
     <>
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-line bg-rail transition-[width] duration-200 lg:flex",
+          "nx-no-print fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-line bg-rail transition-[width] duration-200 lg:flex",
           collapsed ? "w-[64px]" : "w-[250px]",
         )}
       >
@@ -286,9 +286,11 @@ export function Sidebar({
         </div>
       ) : null}
 
+      {/* Reserves the width the fixed rail occupies. It must carry the print
+          guard too, or printing leaves an empty gutter where the rail was. */}
       <div
         className={cn(
-          "hidden shrink-0 transition-[width] duration-200 lg:block",
+          "nx-no-print hidden shrink-0 transition-[width] duration-200 lg:block",
           collapsed ? "w-[64px]" : "w-[250px]",
         )}
       />

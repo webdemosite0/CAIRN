@@ -1090,3 +1090,79 @@ a[role="button"]:active {
       var(--elev-lift);
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Print                                                               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Documents offer a PDF button, which is just the browser's print dialog.
+ * The app chrome is marked .nx-no-print rather than hiding everything and
+ * re-showing the article, so printing any other page still works normally.
+ *
+ * Colours are forced back to black on white: the dark palette would otherwise
+ * either waste a cartridge or drop out entirely, depending on the printer.
+ */
+@media print {
+  .nx-no-print {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  /* The rail and its spacer are both hidden above, so content starts at
+     the page edge; the document supplies its own margins via @page. */
+  main,
+  .nx-doc {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .nx-doc,
+  .nx-doc * {
+    color: #000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .nx-doc {
+    max-width: none !important;
+    border: 0 !important;
+  }
+
+  /* Keep headings with the text they introduce, and never split a code block
+     or table across a page. */
+  .nx-doc h1,
+  .nx-doc h2,
+  .nx-doc h3 {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .nx-doc pre,
+  .nx-doc table,
+  .nx-doc blockquote,
+  .nx-doc li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .nx-doc pre {
+    border: 1px solid #ccc !important;
+    white-space: pre-wrap !important;
+  }
+
+  /* Print the destination of a link, since a printed page cannot be clicked. */
+  .nx-doc a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #444 !important;
+  }
+
+  @page {
+    margin: 18mm 16mm;
+  }
+}

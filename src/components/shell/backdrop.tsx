@@ -12,7 +12,7 @@
  */
 export function Backdrop() {
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div aria-hidden className="nx-no-print pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       {/* the orbs — circle, not ellipse, so the falloff reads as round */}
       <div
         className="absolute inset-0"

@@ -1,4 +1,4 @@
-import { ToolPage } from "@/components/tools/tool-page";
+import { SlidesView } from "./slides-view";
 import { listRecents, RECENT_LABEL } from "@/lib/recents";
 import { loadConversation } from "@/lib/conversations";
 
@@ -16,17 +16,7 @@ export default async function SlidesPage({
   ]);
 
   return (
-    <ToolPage
-      tool="slides"
-      title="Slides"
-      tagline="Turn an idea into a slide outline with speaker notes."
-      placeholder="Create a deck about…"
-      accent="#a78bfa"
-      examples={[
-        "A seed pitch for an AI devtools startup",
-        "An engineering all-hands on migrating to Postgres",
-        "A product launch deck for a mobile app",
-      ]}
+    <SlidesView
       recents={recents}
       recentsLabel={RECENT_LABEL.slides}
       restored={

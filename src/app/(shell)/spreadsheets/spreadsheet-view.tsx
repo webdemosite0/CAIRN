@@ -7,6 +7,8 @@ import {
   FiAlertCircle,
   FiPlus,
   FiLoader,
+  FiArrowUp,
+  FiArrowDown,
 } from "react-icons/fi";
 import { Bot } from "@/components/agents/bot";
 import {
@@ -37,6 +39,26 @@ function notesFrom(raw: string) {
     .filter((l) => !l.trim().startsWith("|"))
     .join("\n")
     .trim();
+}
+
+/**
+ * Reads a cell as a number, tolerating the formatting models emit: currency
+ * symbols, thousands separators, percentages and parenthesised negatives.
+ * Returns null when the cell is not really a number, so a column of "N/A"
+ * never gets summed.
+ */
+function numberOf(raw: string): number | null {
+  const s = raw.trim();
+  if (!s) return null;
+  const negative = /^\(.*\)$/.test(s);
+  const cleaned = s
+    .replace(/^\((.*)\)$/, "$1")
+    .replace(/[$£€¥₹,\s]/g, "")
+    .replace(/%$/, "");
+  if (!/^[+-]?(\d+\.?\d*|\.\d+)$/.test(cleaned)) return null;
+  const n = Number(cleaned);
+  if (Number.isNaN(n)) return null;
+  return negative ? -n : n;
 }
 
 function columnLabel(i: number) {
@@ -70,6 +92,7 @@ export function SpreadsheetView({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<{ r: number; c: number } | null>(null);
+  const [sort, setSort] = useState<{ col: number; dir: 1 | -1 } | null>(null);
 
   const cols = useMemo(
     () => rows.reduce((m, r) => Math.max(m, r.length), 0),
@@ -176,6 +199,73 @@ export function SpreadsheetView({
   function addRow() {
     setRows((prev) => [...prev, Array.from({ length: cols || 1 }, () => "")]);
   }
+
+  /**
+   * Sorts the body rows in place, leaving the header where it is.
+   *
+   * The order of `rows` itself changes rather than a derived view being sorted,
+   * so cell edits and the Excel/CSV export keep matching what is on screen —
+   * a sorted view over unsorted state would write the wrong cell.
+   */
+  function sortBy(c: number) {
+    const dir: 1 | -1 = sort?.col === c && sort.dir === 1 ? -1 : 1;
+    setSort({ col: c, dir });
+    setSelected(null);
+    setRows((prev) => {
+      if (prev.length < 2) return prev;
+      const [header, ...body] = prev;
+      const sorted = [...body].sort((a, b) => {
+        const av = (a[c] ?? "").trim();
+        const bv = (b[c] ?? "").trim();
+        // Blanks sink to the bottom regardless of direction.
+        if (!av && !bv) return 0;
+        if (!av) return 1;
+        if (!bv) return -1;
+        const an = numberOf(av);
+        const bn = numberOf(bv);
+        if (an !== null && bn !== null) return (an - bn) * dir;
+        return av.localeCompare(bv, undefined, { numeric: true }) * dir;
+      });
+      return [header, ...sorted];
+    });
+  }
+
+  /**
+   * Sums for columns that are mostly numeric; null elsewhere.
+   *
+   * A column can be numeric and still be nonsense to add up — years, IDs,
+   * postcodes. Those are excluded by what the header calls them and by the
+   * shape of the values, rather than by demanding a currency symbol, which
+   * would also have skipped plain quantity columns.
+   */
+  const totals = useMemo(() => {
+    const body = rows.slice(1);
+    if (body.length < 2) return [] as (number | null)[];
+
+    const IDENTIFIER =
+      /\b(year|yr|id|ids|no|num|number|code|rank|sku|zip|postcode|phone|age|quarter|week|month|day)\b/i;
+
+    return Array.from({ length: cols }, (_, c) => {
+      const vals = body.map((r) => (r[c] ?? "").trim()).filter(Boolean);
+      if (!vals.length) return null;
+
+      const header = (rows[0]?.[c] ?? "").trim();
+      if (IDENTIFIER.test(header)) return null;
+
+      const nums = vals.map(numberOf).filter((n): n is number => n !== null);
+      if (nums.length < vals.length * 0.8) return null;
+
+      // Unlabelled year columns: four-digit integers in a plausible range.
+      const yearish = nums.every(
+        (n) => Number.isInteger(n) && n >= 1900 && n <= 2100,
+      );
+      if (yearish) return null;
+
+      return nums.reduce((a, b) => a + b, 0);
+    });
+  }, [rows, cols]);
+
+  const hasTotals = totals.some((t) => t !== null);
 
   /* ---------------- idle ---------------- */
 
@@ -287,11 +377,37 @@ export function SpreadsheetView({
                   {Array.from({ length: cols }, (_, c) => (
                     <th
                       key={c}
-                      className="min-w-[150px] border-b border-line bg-sunk px-3 py-2 text-left text-[11px] font-medium uppercase tracking-[0.06em] text-ink-4"
+                      aria-sort={
+                        sort?.col === c
+                          ? sort.dir === 1
+                            ? "ascending"
+                            : "descending"
+                          : "none"
+                      }
+                      className="min-w-[150px] border-b border-line bg-sunk p-0 text-left"
                     >
-                      {/* The model's own header row is the useful label; the
-                          A/B/C spreadsheet letters are the fallback. */}
-                      {rows[0]?.[c]?.trim() || columnLabel(c)}
+                      <button
+                        onClick={() => sortBy(c)}
+                        className="flex w-full items-center gap-1.5 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-4 transition-colors hover:text-ink-2"
+                        title="Sort by this column"
+                      >
+                        {/* The model's own header row is the useful label; the
+                            A/B/C spreadsheet letters are the fallback. */}
+                        <span className="truncate">
+                          {rows[0]?.[c]?.trim() || columnLabel(c)}
+                        </span>
+                        <Ico
+                          icon={
+                            sort?.col === c && sort.dir === -1 ? FiArrowDown : FiArrowUp
+                          }
+                          motion="nudge"
+                          size={11}
+                          className={cn(
+                            "shrink-0 transition-opacity",
+                            sort?.col === c ? "opacity-100 text-accent" : "opacity-0",
+                          )}
+                        />
+                      </button>
                     </th>
                   ))}
                 </tr>
@@ -331,6 +447,28 @@ export function SpreadsheetView({
                   );
                 })}
               </tbody>
+
+              {hasTotals ? (
+                <tfoot>
+                  <tr>
+                    <td className="sticky left-0 z-10 border-t border-r border-line bg-sunk px-2 py-2 text-center text-[10.5px] uppercase tracking-[0.06em] text-ink-4">
+                      Σ
+                    </td>
+                    {Array.from({ length: cols }, (_, c) => (
+                      <td
+                        key={c}
+                        className="border-t border-line bg-sunk px-3 py-2 text-[12.5px] font-medium tabular-nums text-ink-2"
+                      >
+                        {totals[c] === null || totals[c] === undefined
+                          ? ""
+                          : totals[c]!.toLocaleString(undefined, {
+                              maximumFractionDigits: 2,
+                            })}
+                      </td>
+                    ))}
+                  </tr>
+                </tfoot>
+              ) : null}
             </table>
           </div>
 
@@ -353,8 +491,8 @@ export function SpreadsheetView({
           ) : null}
 
           <p className="mt-4 text-[12px] text-ink-4">
-            {rows.length} rows · {cols} columns · cells are editable, and edits are
-            included in the export.
+            {Math.max(0, rows.length - 1)} rows · {cols} columns · click a column
+            to sort, cells are editable, and both are reflected in the export.
           </p>
         </div>
       ) : null}
