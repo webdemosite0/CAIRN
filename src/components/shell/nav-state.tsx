@@ -9,6 +9,11 @@ import { createContext, useContext, useMemo, useState } from "react";
  * Sidebar so a page can narrow the chrome when it needs the room — the builder
  * collapses it the moment a build starts, because at that point the preview is
  * the thing worth looking at and the nav is not.
+ *
+ * The rail starts collapsed. It is a workspace, and the work is the page; the
+ * icon rail still names every destination, so nothing is hidden — it just does
+ * not take 248px until asked. Expanding lasts the session: this is React state,
+ * so a full page load starts collapsed again.
  */
 const NavContext = createContext<{
   open: boolean;
@@ -18,7 +23,7 @@ const NavContext = createContext<{
 }>({
   open: false,
   setOpen: () => {},
-  collapsed: false,
+  collapsed: true,
   setCollapsed: () => {},
 });
 
@@ -26,7 +31,7 @@ export const useNav = () => useContext(NavContext);
 
 export function NavProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const value = useMemo(
     () => ({ open, setOpen, collapsed, setCollapsed }),
