@@ -47,7 +47,7 @@ export async function GET() {
 
     const hint = isRemote
       ? "TURSO_DATABASE_URL is set but the database could not be queried. Check the URL and that TURSO_AUTH_TOKEN matches it."
-      : "No Turso credentials are set, so CAIRN tried to write a SQLite file to local disk. That fails on Vercel and every other read-only host. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN.";
+      : "No Turso credentials are set, so Trove tried to write a SQLite file to local disk. That fails on Vercel and every other read-only host. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN.";
 
     return Response.json(
       { ok: false, database: { mode, reachable: false }, configured, error: message, hint },

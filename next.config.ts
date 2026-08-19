@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
    * Vercel sets VERCEL=1 on every build, so each target gets what it needs
    * with no flag to remember.
    *
-   * Neither mode allows `output: "export"` — CAIRN has API routes, server
+   * Neither mode allows `output: "export"` — Trove has API routes, server
    * actions, middleware and a database, so it cannot be a static site.
    */
   output: process.env.VERCEL ? undefined : "standalone",

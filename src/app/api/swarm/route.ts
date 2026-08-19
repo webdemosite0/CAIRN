@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Describe the task." }, { status: 400 });
   }
 
-  const system = `You are the ${role.name} on a CAIRN swarm working one task together.
+  const system = `You are the ${role.name} on a Trove swarm working one task together.
 
 ${role.brief}
 

@@ -119,7 +119,7 @@ export function RemindersView({
     for (const r of due) {
       seen.current.add(r.id);
       if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-        const n = new Notification("CAIRN reminder", { body: r.title, tag: r.id });
+        const n = new Notification("Trove reminder", { body: r.title, tag: r.id });
         n.onclick = () => {
           window.focus();
           n.close();
@@ -135,7 +135,7 @@ export function RemindersView({
     const p = await Notification.requestPermission();
     if (p === "granted") {
       new Notification("Notifications on", {
-        body: "CAIRN will remind you here.",
+        body: "Trove will remind you here.",
       });
     }
   }
@@ -169,7 +169,7 @@ export function RemindersView({
         <Bot size={68} accent="#fbbf24" />
         <h1 className="mt-6 text-[22px] font-semibold text-ink">Reminders</h1>
         <p className="mt-2 text-[14px] leading-relaxed text-ink-3">
-          Tell CAIRN what to remind you about and it will notify you.
+          Tell Trove what to remind you about and it will notify you.
         </p>
         <Link
           href="/login"
@@ -185,7 +185,7 @@ export function RemindersView({
     <div className="nx-in mx-auto min-h-screen max-w-[720px] px-5 py-10 lg:px-8">
       <h1 className="text-[24px] font-semibold text-ink">Reminders</h1>
       <p className="mt-1.5 text-[13.5px] text-ink-3">
-        {pending.length} pending · notifications fire while CAIRN is open in a tab.
+        {pending.length} pending · notifications fire while Trove is open in a tab.
       </p>
 
       {/* permission */}

@@ -119,7 +119,7 @@ export function HomeChat({
             <div className="nx-rise mb-2 text-center">
               <Wordmark className="mx-auto" size={58} />
               <p className="mt-3 text-[14.5px] text-ink-3">
-                Describe what you want. CAIRN builds it.
+                Describe what you want. Trove builds it.
               </p>
             </div>
 

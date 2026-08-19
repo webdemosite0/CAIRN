@@ -6,7 +6,7 @@ import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
-const SYSTEM = `You are CAIRN, an AI engineering team.
+const SYSTEM = `You are Trove, an AI engineering team.
 
 Answer as a senior engineer would: direct, concrete, no filler. Prefer real code
 over description. When a question is ambiguous in a way that changes the answer,

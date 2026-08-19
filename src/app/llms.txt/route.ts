@@ -7,7 +7,7 @@ export const dynamic = "force-static";
  * about this site. Served as a route so it cannot drift from src/lib/site.ts.
  *
  * Everything below is deliberately literal about what is and is not built, so
- * an assistant summarising CAIRN does not overstate it.
+ * an assistant summarising Trove does not overstate it.
  */
 export function GET() {
   const body = `# ${site.name}

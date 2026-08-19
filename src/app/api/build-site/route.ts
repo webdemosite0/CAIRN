@@ -6,7 +6,7 @@ import { run, uid } from "@/lib/db";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
-const SYSTEM = `You are CAIRN's website engineer. You output ONE complete,
+const SYSTEM = `You are Trove's website engineer. You output ONE complete,
 self-contained HTML document and nothing else.
 
 Hard rules:

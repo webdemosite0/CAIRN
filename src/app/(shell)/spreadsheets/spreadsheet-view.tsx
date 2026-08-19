@@ -317,14 +317,14 @@ export function SpreadsheetView({
 
         <div className="flex items-center gap-1.5">
           <button
-            onClick={() => downloadXlsx(rows, "cairn-sheet.xlsx")}
+            onClick={() => downloadXlsx(rows, "trove-sheet.xlsx")}
             disabled={!rows.length}
             className="chip group !px-3 !py-1.5 !text-[12.5px] disabled:opacity-40"
           >
             <Ico icon={FiDownload} motion="lift" size={13} /> Excel
           </button>
           <button
-            onClick={() => downloadCsv(rows, "cairn-sheet.csv")}
+            onClick={() => downloadCsv(rows, "trove-sheet.csv")}
             disabled={!rows.length}
             className="chip group !px-3 !py-1.5 !text-[12.5px] disabled:opacity-40"
           >

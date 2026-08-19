@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 /**
  * Gives every visitor an identity immediately.
  *
- * Nothing in CAIRN should require an account to try. This sets a random guest
+ * Nothing in Trove should require an account to try. This sets a random guest
  * id on first request; the app resolves it into a real row on first use, so
  * agents, reminders and integrations all work before anyone signs up. Signing
  * up later adopts the same row, keeping whatever was already created.

@@ -1,11 +1,11 @@
-# CAIRN
+# Trove
 
 An AI workspace: chat, a website builder, an agent builder, and a swarm that
 puts four specialists on one task. Light and dark.
 
 ## The name
 
-A **cairn** is a stack of stones raised by travellers to mark a route across
+A **trove** is a stack of stones raised by travellers to mark a route across
 ground that has no path — moorland, desert, mountain. Each person who passes
 adds a stone. It is two things at once: proof that someone came this way, and a
 guide for whoever comes next.
@@ -174,7 +174,7 @@ not the build.
 Push to Vercel, set `GEMINI_API_KEY`, done — the app runs. It does not need a
 database configured to start.
 
-When the data directory is not writable (Vercel's bundle is read-only), CAIRN
+When the data directory is not writable (Vercel's bundle is read-only), Trove
 falls back to the OS temp directory instead of refusing to boot. Everything
 works: chat, documents, spreadsheets, agents, credits.
 
@@ -201,12 +201,12 @@ runs in production — which is the only reason the migration off `node:sqlite`
 could be verified without deploying.
 
 Turso's free tier is 5 GB, 500 M row reads and 10 M writes a month, with no card.
-CAIRN uses a few MB and a few thousand writes.
+Trove uses a few MB and a few thousand writes.
 
 ```bash
-turso db create cairn
-turso db show cairn --url      # -> TURSO_DATABASE_URL
-turso db tokens create cairn   # -> TURSO_AUTH_TOKEN
+turso db create trove
+turso db show trove --url      # -> TURSO_DATABASE_URL
+turso db tokens create trove   # -> TURSO_AUTH_TOKEN
 ```
 
 **Why this was necessary.** The database used to be `node:sqlite`, which is
@@ -216,7 +216,7 @@ data — the shell layout reads the account and credit balance on every render, 
 
 ### Static hosting cannot work
 
-GitHub Pages serves files. CAIRN is not a set of files — it is a server. Setting
+GitHub Pages serves files. Trove is not a set of files — it is a server. Setting
 `output: "export"` fails on the first server-dependent route, and there are a lot
 of them: **7 API routes** (`/api/chat`, `/api/tool`, `/api/builder`,
 `/api/conversations`, `/api/agent`, `/api/swarm`, `/api/build-site`), **5 server
@@ -233,11 +233,11 @@ self-contained `server.js` with only the modules actually reached, **31 MB**
 against an 863 MB `.next` directory.
 
 ```bash
-docker build --build-arg NEXT_PUBLIC_SITE_URL=https://your-domain.com -t cairn .
-docker run -p 3000:3000 -e GEMINI_API_KEY=... -v cairn-data:/data cairn
+docker build --build-arg NEXT_PUBLIC_SITE_URL=https://your-domain.com -t trove .
+docker run -p 3000:3000 -e GEMINI_API_KEY=... -v trove-data:/data trove
 ```
 
-The volume is not optional. `CAIRN_DATA_DIR` defaults to `/data` in the image;
+The volume is not optional. `TROVE_DATA_DIR` defaults to `/data` in the image;
 without a volume mounted there, every account and saved conversation disappears
 on redeploy. If the filesystem is read-only, startup fails with an explicit
 message naming the directory rather than a bare `EROFS`.
@@ -277,7 +277,7 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ### AI SEO
 
 - **`/llms.txt`** — a plain-text brief for LLM crawlers describing what the
-  product does *and what it does not do*, so an assistant summarising CAIRN
+  product does *and what it does not do*, so an assistant summarising Trove
   does not overstate it.
 - Seventeen AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended and
   others) are explicitly allowed on public pages and blocked from private ones.

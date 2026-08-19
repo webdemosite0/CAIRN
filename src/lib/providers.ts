@@ -48,7 +48,7 @@ export const PROVIDERS: Record<string, Provider> = {
         headers: {
           Authorization: `Bearer ${secret}`,
           Accept: "application/vnd.github+json",
-          "User-Agent": "cairn",
+          "User-Agent": "trove",
         },
       });
       if (!res.ok) {
@@ -125,7 +125,7 @@ export const PROVIDERS: Record<string, Provider> = {
   resend: {
     kind: "token",
     label: "API key",
-    help: "Resend → API Keys → Create API Key. This is how CAIRN sends real email.",
+    help: "Resend → API Keys → Create API Key. This is how Trove sends real email.",
     docs: "https://resend.com/api-keys",
     async verify(secret) {
       const res = await fetch("https://api.resend.com/domains", {

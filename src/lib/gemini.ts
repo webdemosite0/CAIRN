@@ -82,7 +82,7 @@ export function describeFailure(status: number, body: string) {
     return "The Gemini API key is not valid.";
   }
   if (status === 503) {
-    return "Google's servers are busy right now. CAIRN already retried every model a few times — give it a few seconds and try again.";
+    return "Google's servers are busy right now. Trove already retried every model a few times — give it a few seconds and try again.";
   }
   if (status === 404) {
     return "None of the configured models are available to this API key. Set GEMINI_MODEL in .env.local to a model your key can use.";

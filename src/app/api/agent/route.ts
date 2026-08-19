@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     tools = [];
   }
 
-  const system = `You are ${agent.name}, a specialist agent on a CAIRN engineering team.
+  const system = `You are ${agent.name}, a specialist agent on a Trove engineering team.
 
 Your role: ${agent.role}
 

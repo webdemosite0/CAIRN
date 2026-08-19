@@ -10,9 +10,9 @@ import { FiDatabase, FiExternalLink } from "react-icons/fi";
  */
 export function SetupNeeded({ detail }: { detail: string }) {
   const steps = [
-    "turso db create cairn",
-    "turso db show cairn --url      # -> TURSO_DATABASE_URL",
-    "turso db tokens create cairn   # -> TURSO_AUTH_TOKEN",
+    "turso db create trove",
+    "turso db show trove --url      # -> TURSO_DATABASE_URL",
+    "turso db tokens create trove   # -> TURSO_AUTH_TOKEN",
   ];
 
   return (
@@ -22,7 +22,7 @@ export function SetupNeeded({ detail }: { detail: string }) {
       </span>
 
       <h1 className="mt-6 text-[26px] font-semibold tracking-tight text-ink">
-        CAIRN needs a database
+        Trove needs a database
       </h1>
 
       <p className="mt-3 text-[14.5px] leading-relaxed text-ink-3">
@@ -51,7 +51,7 @@ export function SetupNeeded({ detail }: { detail: string }) {
 
       <p className="mt-5 text-[13.5px] text-ink-4">
         Self-hosting with a volume instead? Set{" "}
-        <code className="font-mono">CAIRN_DATA_DIR</code> to a writable path.{" "}
+        <code className="font-mono">TROVE_DATA_DIR</code> to a writable path.{" "}
         <a
           href="/api/health"
           className="inline-flex items-center gap-1 text-accent hover:underline"

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================================
-   CAIRN — dark tokens
+   Trove — dark tokens
    ============================================================ */
 
 @theme {
@@ -109,6 +109,9 @@
      to ~1.6:1. This mixes black into any such tint, and is 0% on dark. */
   /* Dark mode separates surfaces by lightness, so it needs no shadow. */
   --bezel: rgb(255 255 255 / 0.055);
+  --bezel-under: rgb(0 0 0 / 0.30);
+  --bezel-ring: rgb(255 255 255 / 0.028);
+  --hairline: rgb(255 255 255 / 0.20);
   --elev: none;
   --elev-lift: none;
 
@@ -192,6 +195,9 @@
   --tag-e: #875616;
   --tag-f: #ad2b48;
   --bezel: rgb(255 255 255 / 0.9);
+  --bezel-under: rgb(26 31 54 / 0.05);
+  --bezel-ring: rgb(26 31 54 / 0.035);
+  --hairline: rgb(26 31 54 / 0.16);
   /* raised == canvas == white here, so elevation has to come from shadow. */
   --elev: 0 1px 2px rgb(26 31 54 / 0.06), 0 1px 3px rgb(26 31 54 / 0.05);
   --elev-lift: 0 2px 5px rgb(26 31 54 / 0.08), 0 6px 16px rgb(26 31 54 / 0.07);
@@ -263,6 +269,9 @@
     --tag-e: #875616;
     --tag-f: #ad2b48;
     --bezel: rgb(255 255 255 / 0.9);
+    --bezel-under: rgb(26 31 54 / 0.05);
+    --bezel-ring: rgb(26 31 54 / 0.035);
+    --hairline: rgb(26 31 54 / 0.16);
     --elev: 0 1px 2px rgb(26 31 54 / 0.06), 0 1px 3px rgb(26 31 54 / 0.05);
     --elev-lift: 0 2px 5px rgb(26 31 54 / 0.08), 0 6px 16px rgb(26 31 54 / 0.07);
     color-scheme: light;
@@ -976,7 +985,7 @@ select:focus-visible,
 /* ============================================================
    THINKING
    ------------------------------------------------------------
-   While a reply streams, the CAIRN mark orbits (LogoMark's own
+   While a reply streams, the Trove mark orbits (LogoMark's own
    animation) and a soft halo breathes behind it, so the brand is
    the activity indicator rather than a generic spinner.
 
@@ -1173,4 +1182,71 @@ a[role="button"]:active {
   @page {
     margin: 18mm 16mm;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Landing surfaces                                                    */
+/* ------------------------------------------------------------------ */
+
+/*
+ * A deeper bezel than `panel`, for the few large surfaces on the landing page.
+ * Three layers do the work: a hairline of light along the top inside edge, a
+ * matching shadow along the bottom inside edge, and an outer ring just off the
+ * border colour. Together they read as a machined edge rather than a 1px box.
+ */
+@utility bezel {
+  position: relative;
+  background: var(--color-raised);
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  box-shadow:
+    inset 0 1px 0 0 var(--bezel),
+    inset 0 -1px 0 0 var(--bezel-under),
+    0 0 0 1px var(--bezel-ring),
+    var(--elev);
+}
+
+/* A single bright hairline across the top of a surface, fading at both ends.
+   Used where a full bezel would be too much furniture. */
+@utility hairline-top {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: 12%;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--hairline) 22%,
+      var(--hairline) 78%,
+      transparent
+    );
+    pointer-events: none;
+  }
+}
+
+/* The glow behind the hero. Sits under content, never intercepts a click. */
+@utility spotlight {
+  position: absolute;
+  inset-inline: 0;
+  top: -6rem;
+  height: 34rem;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 46rem 22rem at 50% 0%,
+    var(--orb-a),
+    transparent 68%
+  );
+}
+
+/* Monospace metadata — file types, counts, small factual labels. */
+@utility meta {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-4);
 }

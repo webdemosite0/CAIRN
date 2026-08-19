@@ -80,7 +80,7 @@ export default function OpengraphImage() {
               color: "#ededed",
             }}
           >
-            CAIRN
+            TROVE
           </div>
         </div>
 

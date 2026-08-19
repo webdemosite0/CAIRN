@@ -22,7 +22,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
       <div className="mb-6 flex flex-col items-center">
         <LogoMark size={40} />
         <h1 className="mt-4 text-[17px] font-semibold text-ink">
-          {isLogin ? "Log in to CAIRN" : "Create your CAIRN account"}
+          {isLogin ? "Log in to Trove" : "Create your Trove account"}
         </h1>
       </div>
 

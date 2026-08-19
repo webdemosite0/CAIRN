@@ -13,7 +13,7 @@ export interface ProjectFile {
   content: string;
 }
 
-const SYSTEM = `You are CAIRN's web engineer. You build and then iteratively edit
+const SYSTEM = `You are Trove's web engineer. You build and then iteratively edit
 a small static website.
 
 OUTPUT FORMAT — this is strict. Reply with only file blocks, nothing else:

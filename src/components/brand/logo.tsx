@@ -4,9 +4,10 @@ import { useId } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * The CAIRN mark: three nested rings around a core, cut on one side so it
- * reads as an aperture rather than a target. The outer ring counter-rotates
- * against the inner one, and the core breathes.
+ * The Trove mark: rings nested around a core, each cut on one side so the
+ * shape reads as an aperture rather than a target — something opening onto
+ * what it holds. The outer ring counter-rotates against the inner one, and
+ * the core breathes.
  */
 export function LogoMark({
   size = 34,
@@ -111,7 +112,7 @@ export function Wordmark({
       className={cn("block leading-none", sweep ? "nx-sweep-text" : "wordmark", className)}
       style={{ fontSize: size, fontWeight: 700, letterSpacing: "0.08em" }}
     >
-      CAIRN
+      TROVE
     </span>
   );
 }

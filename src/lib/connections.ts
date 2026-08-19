@@ -43,7 +43,7 @@ export async function connectService(
     return {
       ok: false,
       error:
-        "CAIRN_SECRET is not set, so credentials cannot be encrypted. Generate one with: openssl rand -base64 32",
+        "TROVE_SECRET is not set, so credentials cannot be encrypted. Generate one with: openssl rand -base64 32",
     };
   }
 

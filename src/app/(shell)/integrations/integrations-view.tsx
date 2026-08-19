@@ -25,7 +25,7 @@ export function IntegrationsView({
   signedIn,
 }: {
   connected: ConnectedService[];
-  /** Services CAIRN can actually authenticate, with what to ask for. */
+  /** Services Trove can actually authenticate, with what to ask for. */
   connectable: Record<string, { label: string; help: string; docs?: string }>;
   signedIn: boolean;
 }) {
@@ -155,7 +155,7 @@ export function IntegrationsView({
                 </p>
 
                 {/* Three honest states. Connected means a credential this
-                    provider accepted; Connect means CAIRN can authenticate it
+                    provider accepted; Connect means Trove can authenticate it
                     here; the rest need an OAuth app only the account owner can
                     register, and say so rather than offering a dead button. */}
                 {on ? (

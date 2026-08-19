@@ -1,5 +1,5 @@
 /**
- * The catalogue of third-party services CAIRN can connect to.
+ * The catalogue of third-party services Trove can connect to.
  *
  * `oauth: true` means the service uses an OAuth handshake that needs a client
  * id and secret registered with that provider. None are configured here, so

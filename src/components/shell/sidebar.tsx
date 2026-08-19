@@ -116,7 +116,7 @@ function RailBody({
   return (
     <>
       <div className="flex items-center justify-between px-3.5 pt-3.5">
-        <Link href="/chat" onClick={onNavigate} aria-label="CAIRN home">
+        <Link href="/chat" onClick={onNavigate} aria-label="Trove home">
           <Lockup size={26} />
         </Link>
         {onCollapse ? (

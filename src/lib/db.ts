@@ -41,7 +41,7 @@ function fileUrlIn(dir: string) {
 /**
  * Picks a writable location for the SQLite file.
  *
- * Preferred is CAIRN_DATA_DIR or ./.data. On a serverless host neither exists
+ * Preferred is TROVE_DATA_DIR or ./.data. On a serverless host neither exists
  * — the bundle at /var/task is read-only — but /tmp IS writable, so rather
  * than refusing to start we fall back to it and mark the store ephemeral.
  *
@@ -53,8 +53,11 @@ function fileUrlIn(dir: string) {
  * says it is temporary does.
  */
 function localFileUrl() {
-  const preferred = process.env.CAIRN_DATA_DIR
-    ? path.resolve(process.env.CAIRN_DATA_DIR)
+  // CAIRN_DATA_DIR still works so a running container keeps its volume
+  // through the rename.
+  const configured = process.env.TROVE_DATA_DIR ?? process.env.CAIRN_DATA_DIR;
+  const preferred = configured
+    ? path.resolve(configured)
     : path.join(process.cwd(), ".data");
 
   try {
@@ -68,21 +71,21 @@ function localFileUrl() {
       throw e;
     }
 
-    const temp = path.join(tmpdir(), "cairn");
+    const temp = path.join(tmpdir(), "trove");
     try {
       mkdirSync(temp, { recursive: true });
       ephemeral = true;
       console.warn(
-        `CAIRN: ${preferred} is not writable (${code}), using ${temp}. ` +
+        `Trove: ${preferred} is not writable (${code}), using ${temp}. ` +
           `Data will NOT survive a restart — set TURSO_DATABASE_URL and ` +
           `TURSO_AUTH_TOKEN to keep it.`,
       );
       return fileUrlIn(temp);
     } catch {
       throw new Error(
-        `CAIRN cannot write its database to ${preferred} (${code}) or to ` +
+        `Trove cannot write its database to ${preferred} (${code}) or to ` +
           `${temp}. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN to use a ` +
-          `hosted database, or point CAIRN_DATA_DIR at a writable volume. ` +
+          `hosted database, or point TROVE_DATA_DIR at a writable volume. ` +
           `See the Deploying section of the README.`,
       );
     }

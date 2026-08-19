@@ -15,7 +15,7 @@ function resolveSiteUrl(): string {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
   if (raw) {
-    // People type "cairn.app" as often as "https://cairn.app".
+    // People type "trove.app" as often as "https://trove.app".
     const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
     try {
       return new URL(withScheme).origin;
@@ -41,12 +41,12 @@ function resolveSiteUrl(): string {
 }
 
 export const site = {
-  name: "CAIRN",
+  name: "Trove",
   /** Set NEXT_PUBLIC_SITE_URL in production — canonical URLs depend on it. */
   url: resolveSiteUrl(),
-  tagline: "Describe what you want. CAIRN builds it.",
+  tagline: "Describe what you want. Trove builds it.",
   description:
-    "CAIRN is an AI workspace that builds real things and keeps them. Generate a complete website from a sentence and keep editing it in chat, create your own AI agents, put a team of four on one task, and export documents to Word and spreadsheets to Excel. Every conversation is saved, so reopening it shows the same answer you left.",
+    "Trove is an AI workspace that builds real things and keeps them. Generate a complete website from a sentence and keep editing it in chat, create your own AI agents, put a team of four on one task, and export documents to Word and spreadsheets to Excel. Every conversation is saved, so reopening it shows the same answer you left.",
   shortDescription:
     "An AI workspace that generates websites, agents, documents and spreadsheets you can actually download.",
   keywords: [
@@ -62,7 +62,7 @@ export const site = {
     "Gemini app",
   ],
   locale: "en_US",
-  twitter: "@cairn",
+  twitter: "@trove",
 } as const;
 
 /** Pages worth indexing, with crawl hints. */

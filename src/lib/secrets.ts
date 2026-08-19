@@ -23,10 +23,16 @@ const ALGO = "aes-256-gcm";
 
 /** Missing secret is fatal by design — see encrypt(). */
 function keyFor(): Buffer | null {
-  const raw = process.env.CAIRN_SECRET?.trim();
+  // CAIRN_SECRET is still honoured so an existing deployment keeps working
+  // through the rename; set TROVE_SECRET and the old name can go.
+  const raw = (process.env.TROVE_SECRET ?? process.env.CAIRN_SECRET)?.trim();
   if (!raw || raw.length < 16) return null;
   // Fixed salt: the secret is already high-entropy and the salt only needs to
   // be stable so the same secret always derives the same key.
+  //
+  // It keeps the old product name deliberately. The salt is an input to the
+  // key, so renaming it would derive a different key and every credential
+  // already stored would decrypt to nothing — a silent, unrecoverable loss.
   return scryptSync(raw, "cairn.connections.v1", 32);
 }
 
@@ -37,7 +43,7 @@ export function canStoreSecrets(): boolean {
 /**
  * Returns `iv:tag:ciphertext`, all base64.
  *
- * Throws when CAIRN_SECRET is unset rather than falling back to plaintext.
+ * Throws when TROVE_SECRET is unset rather than falling back to plaintext.
  * Refusing to store a credential is recoverable; storing it unprotected is
  * not, and the user would never know it happened.
  */
@@ -45,7 +51,7 @@ export function encrypt(plain: string): string {
   const key = keyFor();
   if (!key) {
     throw new Error(
-      "CAIRN_SECRET is not set, so credentials cannot be stored safely. " +
+      "TROVE_SECRET is not set, so credentials cannot be stored safely. " +
         "Generate one with: openssl rand -base64 32",
     );
   }

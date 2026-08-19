@@ -153,7 +153,7 @@ export function WebsiteBuilder({ signedIn }: { signedIn: boolean }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "cairn-site.zip";
+    a.download = "trove-site.zip";
     a.click();
     URL.revokeObjectURL(url);
   }

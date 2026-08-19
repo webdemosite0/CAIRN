@@ -118,7 +118,7 @@ export function ConnectDialog({
         <p className="mt-4 flex items-start gap-2 text-[12px] leading-relaxed text-ink-4">
           <FiLock size={12} className="mt-0.5 shrink-0" />
           Encrypted before it is stored, and never sent to the browser again.
-          CAIRN checks it against {name} first — a credential that does not work
+          Trove checks it against {name} first — a credential that does not work
           is not saved.
         </p>
       </div>
