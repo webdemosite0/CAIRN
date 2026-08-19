@@ -49,7 +49,9 @@ export default async function MePage() {
   return (
     <div className="nx-in mx-auto min-h-screen max-w-[880px] px-5 py-10 lg:px-8">
       <div className="mb-8 flex items-center gap-4">
-        <span className="grid h-14 w-14 place-items-center rounded-full bg-violet/25 text-[20px] font-semibold text-violet">
+        {/* Violet letter on a violet tint measured 3.65:1 in light mode.
+            The tint carries the colour; the letter stays ink. */}
+        <span className="grid h-14 w-14 place-items-center rounded-full bg-violet/25 text-[20px] font-semibold text-ink">
           {user.name.slice(0, 1).toUpperCase()}
         </span>
         <div>

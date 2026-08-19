@@ -45,28 +45,3 @@ export function PageFrame({
   );
 }
 
-/** The empty state every work page shows until real data exists. */
-export function Empty({
-  icon,
-  title,
-  description,
-  action,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  action?: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center rounded-[12px] border border-dashed border-line-strong px-6 py-20 text-center">
-      <span className="mb-4 grid h-11 w-11 place-items-center rounded-full bg-sunk text-ink-3">
-        {icon}
-      </span>
-      <h2 className="text-[15px] font-semibold text-ink">{title}</h2>
-      <p className="mt-1.5 max-w-sm text-[13.5px] leading-relaxed text-ink-2">
-        {description}
-      </p>
-      {action ? <div className="mt-6">{action}</div> : null}
-    </div>
-  );
-}

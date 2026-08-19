@@ -7,19 +7,7 @@ import { choosePlan } from "@/app/actions/billing";
 import { Ico } from "@/components/ui/ico";
 import { cn } from "@/lib/utils";
 import type { Balance, Plan, UsageRow } from "@/lib/credits";
-
-const KIND_LABEL: Record<string, string> = {
-  chat: "Chat",
-  docs: "Documents",
-  sheets: "Spreadsheets",
-  slides: "Slides",
-  design: "Design",
-  research: "Research",
-  code: "Code",
-  agent: "Agents",
-  team: "AI Team",
-  site: "Website builder",
-};
+import { kindLabel } from "@/lib/kind-label";
 
 export function PlansView({
   plans,
@@ -106,7 +94,7 @@ export function PlansView({
                   key={u.kind}
                   className="flex items-center justify-between gap-3 text-[13.5px]"
                 >
-                  <span className="text-ink-2">{KIND_LABEL[u.kind] ?? u.kind}</span>
+                  <span className="text-ink-2">{kindLabel(u.kind)}</span>
                   <span className="flex items-center gap-3 tabular-nums text-ink-4">
                     <span>{u.calls} calls</span>
                     <span className="text-ink-2">

@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FiPlus, FiTrash2, FiX, FiAlertCircle, FiLoader } from "react-icons/fi";
+import { FiPlus, FiTrash2, FiAlertCircle, FiLoader } from "react-icons/fi";
 import { Bot } from "@/components/agents/bot";
 import {
   createAgent,
@@ -12,6 +12,8 @@ import {
   type AgentRow,
 } from "@/app/actions/agents";
 import { Ico } from "@/components/ui/ico";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 
 const ACCENTS = ["#3b82f6", "#a78bfa", "#22d3ee", "#34d399", "#fbbf24", "#f87171"];
@@ -39,6 +41,11 @@ export function AgentsView({
   signedIn: boolean;
 }) {
   const [creating, setCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Derived, not stored: once the server action revalidates and the agent
+  // is gone from props, this becomes null and the dialog closes itself.
+  const deleting = agents.find((a) => a.id === deletingId) ?? null;
 
   if (!signedIn) {
     return (
@@ -79,16 +86,19 @@ export function AgentsView({
       </div>
 
       {agents.length === 0 ? (
-        <div className="nx-in flex flex-col items-center rounded-[12px] border border-dashed border-line-strong px-6 py-20 text-center">
-          <Bot size={64} />
-          <h2 className="mt-5 text-[16px] font-semibold text-ink">
-            Build your first agent
-          </h2>
-          <p className="mt-1.5 max-w-sm text-[13.5px] leading-relaxed text-ink-3">
-            Give it a role and clear instructions. It becomes a specialist you
-            can brief and talk to.
-          </p>
-        </div>
+        <EmptyState
+          illustration={<Bot size={64} />}
+          title="Build your first agent"
+          body="Give it a role and clear instructions. It becomes a specialist you can brief and talk to."
+          action={
+            <button
+              onClick={() => setCreating(true)}
+              className="flex items-center gap-2 rounded-[8px] btn-grad px-4 py-2.5 text-[14px] font-medium transition-transform hover:scale-[1.03]"
+            >
+              <Ico icon={FiPlus} motion="open" size={16} /> New agent
+            </button>
+          }
+        />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {agents.map((a, i) => (
@@ -97,17 +107,16 @@ export function AgentsView({
               className="nx-in group relative flex flex-col rounded-[10px] border border-line bg-rail p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong"
               style={{ animationDelay: `${i * 50}ms`, animationFillMode: "backwards" }}
             >
-              <form
-                action={deleteAgent.bind(null, a.id)}
-                className="absolute right-3 top-3 opacity-0 transition-opacity group-hover:opacity-100"
+              {/* Deleting an agent cannot be undone, and the button sits
+                  under the cursor on hover. It asks first. */}
+              <button
+                type="button"
+                onClick={() => setDeletingId(a.id)}
+                aria-label={`Delete ${a.name}`}
+                className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-[6px] text-ink-4 opacity-0 transition-opacity hover:bg-hover hover:text-critical group-hover:opacity-100"
               >
-                <button
-                  aria-label={`Delete ${a.name}`}
-                  className="grid h-7 w-7 place-items-center rounded-[6px] text-ink-4 hover:bg-hover hover:text-critical"
-                >
-                  <Ico icon={FiTrash2} motion="shake" size={13} />
-                </button>
-              </form>
+                <Ico icon={FiTrash2} motion="shake" size={13} />
+              </button>
 
               <Bot size={48} accent={a.accent} />
               <h3 className="mt-3.5 text-[15px] font-semibold text-ink">{a.name}</h3>
@@ -138,6 +147,32 @@ export function AgentsView({
         </div>
       )}
 
+      <Modal
+        open={Boolean(deleting)}
+        onClose={() => setDeletingId(null)}
+        title={deleting ? `Delete ${deleting.name}?` : "Delete agent?"}
+        description="This removes the agent and its instructions for good. Conversations you already had with it are kept."
+        size="sm"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setDeletingId(null)}
+              className="rounded-[8px] border border-line-strong px-3.5 py-2 text-[13.5px] font-medium text-ink-2 transition-colors hover:bg-hover hover:text-ink"
+            >
+              Keep it
+            </button>
+            {deleting ? (
+              <form action={deleteAgent.bind(null, deleting.id)}>
+                <button className="rounded-[8px] bg-critical px-3.5 py-2 text-[13.5px] font-medium text-canvas transition-opacity hover:opacity-90">
+                  Delete agent
+                </button>
+              </form>
+            ) : null}
+          </>
+        }
+      />
+
       {creating ? <CreateDialog onClose={() => setCreating(false)} /> : null}
     </div>
   );
@@ -161,7 +196,7 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
   }, [state.ok, onClose, router]);
 
   return (
-    <Shell onClose={onClose} title="New agent">
+    <Modal open onClose={onClose} title="New agent">
       <form action={action} className="space-y-4">
         <div className="flex items-center gap-4">
           <Bot size={56} accent={accent} state="idle" />
@@ -232,66 +267,7 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
           </button>
         </div>
       </form>
-    </Shell>
+    </Modal>
   );
 }
 
-/* ------------------------------------------------------------------ */
-
-
-function Shell({
-  title,
-  children,
-  onClose,
-  wide,
-}: {
-  title: string;
-  children: React.ReactNode;
-  onClose: () => void;
-  wide?: boolean;
-}) {
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" onClick={onClose} />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title || "Agent"}
-        className={cn(
-          "nx-in relative max-h-[90vh] w-full overflow-y-auto rounded-[12px] border border-line-strong bg-rail p-6 shadow-[0_30px_90px_rgba(0,0,0,0.8)]",
-          wide ? "max-w-[660px]" : "max-w-[540px]",
-        )}
-      >
-        {title ? (
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-[17px] font-semibold text-ink">{title}</h2>
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 hover:bg-hover hover:text-ink"
-            >
-              <Ico icon={FiX} motion="shake" size={17} />
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="absolute right-4 top-4 z-10 grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 hover:bg-hover hover:text-ink"
-          >
-            <Ico icon={FiX} motion="shake" size={17} />
-          </button>
-        )}
-        {children}
-      </div>
-    </div>
-  );
-}

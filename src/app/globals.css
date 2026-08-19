@@ -1609,6 +1609,30 @@ a[role="button"]:active {
   animation: nx-reveal 0.5s var(--ease-out);
 }
 
+/* A scrim, or anything that should simply arrive without moving. */
+@keyframes nx-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.nx-fade {
+  animation: nx-fade 0.18s var(--ease-out);
+}
+
+/* A toast, rising from the edge it is docked to. */
+@keyframes nx-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-slide-up {
+  animation: nx-slide-up 0.24s var(--ease-out);
+}
+
 /* A hero element, drifting up as the page settles. */
 @keyframes nx-rise-big {
   from {
@@ -1656,6 +1680,8 @@ a[role="button"]:active {
   .nx-step-active,
   .nx-stage,
   .nx-reveal,
+  .nx-fade,
+  .nx-slide-up,
   .nx-rise-big,
   .nx-drift,
   .nx-stagger > * {

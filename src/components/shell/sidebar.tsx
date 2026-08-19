@@ -41,6 +41,7 @@ import { cn } from "@/lib/utils";
 import type { User } from "@/lib/auth";
 import type { Balance } from "@/lib/credits";
 import { CreditMeter } from "@/components/shell/credit-meter";
+import { Tooltip } from "@/components/ui/tooltip";
 
 interface Item {
   href: string;
@@ -314,17 +315,20 @@ function RailBody({
         {/* Secondary actions, as icons — they are reached rarely and do not
             deserve a row of their own each. */}
         <div className="flex items-center gap-0.5 border-t border-line pt-2">
+          {/* Icon-only, so the name has to come from somewhere. A Tooltip
+              rather than the native title attribute: title does not appear on
+              keyboard focus, which is the case that matters here. */}
           {SECONDARY.map((x) => (
-            <Link
-              key={x.href}
-              href={x.href}
-              onClick={onNavigate}
-              title={x.label}
-              aria-label={x.label}
-              className="grid h-8 w-8 place-items-center rounded-[6px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
-            >
-              <x.icon size={16} />
-            </Link>
+            <Tooltip key={x.href} label={x.label} side="top">
+              <Link
+                href={x.href}
+                onClick={onNavigate}
+                aria-label={x.label}
+                className="grid h-8 w-8 place-items-center rounded-[6px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+              >
+                <x.icon size={16} />
+              </Link>
+            </Tooltip>
           ))}
           <span className="flex-1" />
           <ThemeToggle />

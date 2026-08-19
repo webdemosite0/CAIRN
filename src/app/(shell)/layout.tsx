@@ -4,6 +4,7 @@ import { CommandPalette } from "@/components/shell/command-palette";
 import { NavProvider } from "@/components/shell/nav-state";
 import { Backdrop } from "@/components/shell/backdrop";
 import { SetupNeeded } from "@/components/shell/setup-needed";
+import { ToastProvider } from "@/components/ui/toast";
 import { currentUser, type User } from "@/lib/auth";
 import { myBalance } from "@/lib/credits";
 import type { Balance } from "@/lib/credits";
@@ -45,18 +46,20 @@ export default async function ShellLayout({
 
   return (
     <NavProvider>
-      <Backdrop />
-      <CommandPalette />
-      <div className="flex min-h-screen">
-        <Sidebar user={user} balance={balance} />
-        {/* children are NOT wrapped in a re-keying client component: combined
-            with the loading.tsx Suspense boundary that left page content
-            server-rendered but never hydrated, so nothing was clickable. */}
-        <main className="flex min-w-0 flex-1 flex-col">
-          <TopBar initial={user?.name?.slice(0, 1)} />
-          {children}
-        </main>
-      </div>
+      <ToastProvider>
+        <Backdrop />
+        <CommandPalette />
+        <div className="flex min-h-screen">
+          <Sidebar user={user} balance={balance} />
+          {/* children are NOT wrapped in a re-keying client component: combined
+              with the loading.tsx Suspense boundary that left page content
+              server-rendered but never hydrated, so nothing was clickable. */}
+          <main className="flex min-w-0 flex-1 flex-col">
+            <TopBar initial={user?.name?.slice(0, 1)} />
+            {children}
+          </main>
+        </div>
+      </ToastProvider>
     </NavProvider>
   );
 }
