@@ -1001,9 +1001,9 @@ select:focus-visible,
 /* ============================================================
    THINKING
    ------------------------------------------------------------
-   While a reply streams, the Trove mark orbits (LogoMark's own
-   animation) and a soft halo breathes behind it, so the brand is
-   the activity indicator rather than a generic spinner.
+   While a reply streams, the Trove orb spins and a soft halo
+   breathes behind it, so the brand is the activity indicator
+   rather than a generic spinner.
 
    The halo is a separate pseudo-element rather than a filter on
    the mark: a filter on animated SVG re-rasterises every frame,
