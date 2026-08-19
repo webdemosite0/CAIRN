@@ -28,6 +28,20 @@ const PASS_DELAY_MS = 1200;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Reports each failed attempt as it happens.
+ *
+ * Without this, a long fallback sweep is completely silent: Google returning
+ * 503 across five models for two passes can take minutes, and the caller has
+ * no way to tell that apart from a hang. The builder streams these into its
+ * console so a stall says why it is stalling.
+ */
+export type OnAttempt = (info: {
+  model: string;
+  status: number;
+  pass: number;
+}) => void;
+
 export interface Turn {
   role: "user" | "model";
   text: string;
@@ -97,7 +111,7 @@ export function describeFailure(status: number, body: string) {
  * Posts to each model in turn, moving on when one is unavailable or busy.
  * Returns the first successful response, or throws the last failure.
  */
-async function callWithFallback(path: string, body: unknown) {
+async function callWithFallback(path: string, body: unknown, onAttempt?: OnAttempt) {
   // Rank failures by how useful they are to report. A 404 just means "this key
   // cannot use that model" — never the headline when something was merely busy.
   const priority: Record<number, number> = { 429: 3, 503: 2, 404: 1 };
@@ -123,6 +137,7 @@ async function callWithFallback(path: string, body: unknown) {
       } catch {
         console.warn(`gemini: ${model} timed out (pass ${pass + 1})`);
         note(503, "");
+        try { onAttempt?.({ model, status: 0, pass: pass + 1 }); } catch {}
         continue;
       }
 
@@ -143,6 +158,7 @@ async function callWithFallback(path: string, body: unknown) {
       }
 
       console.warn(`gemini: ${model} returned ${res.status} (pass ${pass + 1})`);
+      try { onAttempt?.({ model, status: res.status, pass: pass + 1 }); } catch {}
     }
 
     if (pass < PASSES - 1) await sleep(PASS_DELAY_MS * (pass + 1));
@@ -272,6 +288,7 @@ export async function generateText({
   maxOutputTokens = 8192,
   extraParts,
   onUsage,
+  onAttempt,
 }: {
   turns: Turn[];
   system: string;
@@ -281,6 +298,8 @@ export async function generateText({
   extraParts?: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }>;
   /** Fires with the real token counts once the response is parsed. */
   onUsage?: OnUsage;
+  /** Fires on each failed model attempt, so a slow fallback is visible. */
+  onAttempt?: OnAttempt;
 }) {
   const contents = turns.map((t) => ({
     role: t.role,
@@ -293,11 +312,15 @@ export async function generateText({
     if (last?.role === "user") last.parts.push(...extraParts);
   }
 
-  const res = await callWithFallback("generateContent", {
-    contents,
-    systemInstruction: { parts: [{ text: system }] },
-    generationConfig: { temperature, maxOutputTokens },
-  });
+  const res = await callWithFallback(
+    "generateContent",
+    {
+      contents,
+      systemInstruction: { parts: [{ text: system }] },
+      generationConfig: { temperature, maxOutputTokens },
+    },
+    onAttempt,
+  );
 
   const json = await res.json();
 
