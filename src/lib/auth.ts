@@ -6,11 +6,16 @@ import { one, run, uid, num, str } from "@/lib/db";
 const COOKIE = "nx_session";
 const SESSION_DAYS = 30;
 
+/** How long a verification link stays good. */
+const TOKEN_HOURS = 24;
+
 export interface User {
   id: string;
   email: string;
   name: string;
   plan: string;
+  emailVerified: boolean;
+  provider: string;
 }
 
 /* ---------------- passwords ---------------- */
@@ -32,36 +37,101 @@ export function verifyPassword(password: string, stored: string) {
 
 /* ---------------- users ---------------- */
 
-export async function createUser(
-  email: string,
-  name: string,
-  password: string,
-): Promise<User> {
-  const id = uid("usr");
-  await run(
-    `INSERT INTO users (id, email, name, password_hash, plan, created_at)
-     VALUES (?, ?, ?, ?, 'free', ?)`,
-    [id, email.toLowerCase(), name, hashPassword(password), Date.now()],
-  );
-  return { id, email: email.toLowerCase(), name, plan: "free" };
-}
-
-export async function findByEmail(email: string) {
-  const row = await one(`SELECT * FROM users WHERE email = ?`, [
-    email.toLowerCase(),
-  ]);
-  if (!row) return undefined;
+function rowToUser(row: Record<string, unknown>): User {
   return {
     id: str(row.id),
     email: str(row.email),
     name: str(row.name),
-    password_hash: str(row.password_hash),
     plan: str(row.plan),
+    emailVerified: num(row.email_verified) === 1,
+    provider: str(row.provider) || "password",
   };
+}
+
+export async function createUser(
+  email: string,
+  name: string,
+  password: string,
+  opts: { provider?: string; emailVerified?: boolean } = {},
+): Promise<User> {
+  const id = uid("usr");
+  const provider = opts.provider ?? "password";
+  const verified = opts.emailVerified ? 1 : 0;
+
+  await run(
+    `INSERT INTO users (id, email, name, password_hash, plan, created_at, email_verified, provider)
+     VALUES (?, ?, ?, ?, 'free', ?, ?, ?)`,
+    [id, email.toLowerCase(), name, hashPassword(password), Date.now(), verified, provider],
+  );
+
+  return {
+    id,
+    email: email.toLowerCase(),
+    name,
+    plan: "free",
+    emailVerified: Boolean(verified),
+    provider,
+  };
+}
+
+export async function findByEmail(email: string) {
+  const row = await one(`SELECT * FROM users WHERE email = ?`, [email.toLowerCase()]);
+  if (!row) return undefined;
+  return { ...rowToUser(row), password_hash: str(row.password_hash) };
 }
 
 export async function setPlan(userId: string, plan: string) {
   await run(`UPDATE users SET plan = ? WHERE id = ?`, [plan, userId]);
+}
+
+export async function markVerified(userId: string) {
+  await run(`UPDATE users SET email_verified = 1 WHERE id = ?`, [userId]);
+}
+
+/* ---------------- single-use links ---------------- */
+
+/**
+ * Issues a link token, replacing any earlier one for the same purpose.
+ *
+ * Replacing rather than accumulating means "resend" invalidates the previous
+ * email, so a link forwarded to the wrong person stops working the moment the
+ * real owner asks for another.
+ */
+export async function issueToken(userId: string, purpose: string): Promise<string> {
+  const token = randomBytes(32).toString("hex");
+  await run(`DELETE FROM auth_tokens WHERE user_id = ? AND purpose = ?`, [userId, purpose]);
+  await run(
+    `INSERT INTO auth_tokens (token, user_id, purpose, expires_at, created_at)
+     VALUES (?, ?, ?, ?, ?)`,
+    [token, userId, purpose, Date.now() + TOKEN_HOURS * 3_600_000, Date.now()],
+  );
+  return token;
+}
+
+/** Redeems a token, returning the user id. The row is destroyed either way. */
+export async function consumeToken(
+  token: string,
+  purpose: string,
+): Promise<{ userId: string } | { error: "unknown" | "expired" }> {
+  const row = await one(
+    `SELECT user_id, expires_at FROM auth_tokens WHERE token = ? AND purpose = ?`,
+    [token, purpose],
+  );
+  if (!row) return { error: "unknown" };
+
+  await run(`DELETE FROM auth_tokens WHERE token = ?`, [token]);
+
+  if (num(row.expires_at) < Date.now()) return { error: "expired" };
+  return { userId: str(row.user_id) };
+}
+
+/** When the last verification mail went out, for rate limiting the resend. */
+export async function lastTokenAt(userId: string, purpose: string): Promise<number> {
+  const row = await one(
+    `SELECT created_at FROM auth_tokens WHERE user_id = ? AND purpose = ? ORDER BY created_at DESC LIMIT 1`,
+    [userId, purpose],
+  );
+  return row ? num(row.created_at) : 0;
 }
 
 /* ---------------- sessions ---------------- */
@@ -95,67 +165,34 @@ export async function endSession() {
   }
 }
 
-/** Resolves the guest cookie into a real row, creating it on first use. */
-async function guestUser(guestId: string): Promise<User> {
-  const existing = await one(
-    `SELECT id, email, name, plan FROM users WHERE id = ?`,
-    [guestId],
-  );
-
-  if (existing) {
-    return {
-      id: str(existing.id),
-      email: str(existing.email),
-      name: str(existing.name),
-      plan: str(existing.plan),
-    };
-  }
-
-  const email = `guest-${guestId.slice(0, 8)}@local`;
-
-  // OR IGNORE because two concurrent first requests carry the same cookie and
-  // would otherwise race on the primary key.
-  await run(
-    `INSERT OR IGNORE INTO users (id, email, name, password_hash, plan, created_at)
-     VALUES (?, ?, ?, '', 'free', ?)`,
-    [guestId, email, "You", Date.now()],
-  );
-
-  return { id: guestId, email, name: "You", plan: "free" };
-}
-
+/**
+ * The signed-in account, or null.
+ *
+ * There is no guest fallback any more. Every visitor used to be handed a real
+ * user row on first request, which meant an account — and its free credit
+ * grant — could be minted by anyone, any number of times, just by clearing a
+ * cookie. Using the app now requires signing in.
+ */
 export async function currentUser(): Promise<User | null> {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
-
-  if (!token) {
-    const guest = jar.get("nx_guest")?.value;
-    return guest ? guestUser(guest) : null;
-  }
+  if (!token) return null;
 
   const row = await one(
-    `SELECT u.id, u.email, u.name, u.plan, s.expires_at
+    `SELECT u.id, u.email, u.name, u.plan, u.email_verified, u.provider, s.expires_at
        FROM sessions s
        JOIN users u ON u.id = s.user_id
       WHERE s.token = ?`,
     [token],
   );
 
-  if (!row) {
-    const guest = jar.get("nx_guest")?.value;
-    return guest ? guestUser(guest) : null;
-  }
+  if (!row) return null;
   if (num(row.expires_at) < Date.now()) {
     await run(`DELETE FROM sessions WHERE token = ?`, [token]);
     return null;
   }
 
-  return {
-    id: str(row.id),
-    email: str(row.email),
-    name: str(row.name),
-    plan: str(row.plan),
-  };
+  return rowToUser(row);
 }
 
 /** Throws to the caller when a route needs a signed-in user. */

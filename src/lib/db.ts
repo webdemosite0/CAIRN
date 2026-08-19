@@ -4,7 +4,7 @@ import { createClient, type Client, type InValue } from "@libsql/client";
 import { mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { SCHEMA, REPAIRS } from "@/lib/schema";
+import { SCHEMA, REPAIRS, MIGRATIONS } from "@/lib/schema";
 
 /**
  * The database, over libSQL.
@@ -155,6 +155,21 @@ function connect(): Promise<Client> {
         : SCHEMA;
 
       await client.executeMultiple(schema);
+    }
+
+    // Column additions run one at a time: ALTER TABLE ADD COLUMN throws
+    // once the column exists, which is the normal case on every start after
+    // the first, and a batch would abandon everything after the throw.
+    for (const statement of MIGRATIONS) {
+      try {
+        await client.execute(statement);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        // "duplicate column name" is the expected outcome, not a problem.
+        if (!/duplicate column name/i.test(message)) {
+          console.error("db: migration skipped —", message);
+        }
+      }
     }
 
     // Repairs run even when the schema was skipped — a database that already

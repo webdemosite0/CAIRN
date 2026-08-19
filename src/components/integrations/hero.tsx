@@ -100,7 +100,7 @@ export function IntegrationsHero({
 
           {/* the hub itself */}
           <span
-            className="absolute grid h-[74px] w-[74px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[16px] border bg-canvas"
+            className="absolute grid h-[60px] w-[60px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[16px] border bg-canvas sm:h-[74px] sm:w-[74px]"
             style={{
               left: "50%",
               top: "50%",
@@ -115,7 +115,7 @@ export function IntegrationsHero({
           {NODES.map((n, i) => (
             <span
               key={n.label}
-              className="nx-float absolute grid h-[54px] w-[54px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-line bg-canvas"
+              className="nx-float absolute grid h-[44px] w-[44px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-line bg-canvas sm:h-[54px] sm:w-[54px]"
               style={{
                 left: `${n.x}%`,
                 top: `${n.y}%`,

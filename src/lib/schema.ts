@@ -16,8 +16,24 @@ PRAGMA journal_mode = WAL;
       name          TEXT NOT NULL,
       password_hash TEXT NOT NULL,
       plan          TEXT NOT NULL DEFAULT 'free',
-      created_at    INTEGER NOT NULL
+      created_at    INTEGER NOT NULL,
+      /* 0 until the address is proven. Accounts created through Google are
+         verified on arrival: Google has already done it. */
+      email_verified INTEGER NOT NULL DEFAULT 0,
+      provider       TEXT NOT NULL DEFAULT 'password'
     );
+
+    /* Single-use links sent by email. Rows are deleted the moment they are
+       redeemed, so a leaked link is worthless once used. */
+    CREATE TABLE IF NOT EXISTS auth_tokens (
+      token      TEXT PRIMARY KEY,
+      user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      purpose    TEXT NOT NULL,
+      expires_at INTEGER NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS auth_tokens_user ON auth_tokens (user_id, purpose);
 
     CREATE TABLE IF NOT EXISTS sessions (
       token      TEXT PRIMARY KEY,
@@ -155,6 +171,40 @@ PRAGMA journal_mode = WAL;
  * Each statement is written so that running it a second time matches nothing,
  * making repeated execution free rather than merely harmless.
  */
+/**
+ * Statements that must run one at a time, because failure is expected.
+ *
+ * ALTER TABLE ADD COLUMN throws once the column is there, and REPAIRS is
+ * executed as a single batch — one duplicate-column error would abandon
+ * every statement after it. These are run individually so each can fail on
+ * its own without taking the rest down.
+ */
+export const MIGRATIONS: string[] = [
+  /* New tables belong here, not only in SCHEMA. SCHEMA is skipped wholesale
+     once the database has its tables, so a table added to it later reaches
+     exactly the databases that do not need it — the empty ones. IF NOT EXISTS
+     makes replaying this free. */
+  `CREATE TABLE IF NOT EXISTS auth_tokens (
+      token      TEXT PRIMARY KEY,
+      user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      purpose    TEXT NOT NULL,
+      expires_at INTEGER NOT NULL,
+      created_at INTEGER NOT NULL
+    )`,
+  `CREATE INDEX IF NOT EXISTS auth_tokens_user ON auth_tokens (user_id, purpose)`,
+
+  `ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE users ADD COLUMN provider TEXT NOT NULL DEFAULT 'password'`,
+
+  /* Grandfathering. Accounts that existed before verification was added
+     were created by someone who set a password, and locking them out to
+     prove an address they already use would be a regression. Guest rows are
+     excluded by the empty password hash: they were never real accounts and
+     are no longer reachable. */
+  `UPDATE users SET email_verified = 1
+    WHERE email_verified = 0 AND password_hash <> '' AND email NOT LIKE 'guest-%@local'`,
+];
+
 export const REPAIRS = `
     /* Chat moved from "/" to "/chat" when "/" became the landing page. Rows
        written before that point send people to the marketing page, which

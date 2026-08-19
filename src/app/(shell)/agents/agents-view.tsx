@@ -29,7 +29,7 @@ const TOOLS = [
 ];
 
 const field =
-  "w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 py-2.5 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent";
+  "w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 py-2.5 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent sm:text-[14px]";
 
 /* ------------------------------------------------------------------ */
 

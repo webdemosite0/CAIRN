@@ -191,7 +191,7 @@ export function CommandPalette() {
               >
                 <c.icon
                   size={17}
-                  className={cn("shrink-0", i === active ? "text-accent" : "text-ink-4")}
+                  className="shrink-0 text-ink"
                 />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13.5px] text-ink">{c.label}</span>

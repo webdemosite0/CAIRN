@@ -223,7 +223,7 @@ export function Composer({
         className={cn(
           "block max-h-[220px] w-full resize-none bg-transparent text-ink outline-none placeholder:text-ink-4 disabled:cursor-not-allowed",
           compact
-            ? "px-3.5 pb-1.5 pt-3 text-[13.5px] leading-[1.55]"
+            ? "px-3.5 pb-1.5 pt-3 text-[16px] leading-[1.55] sm:text-[13.5px]"
             : "min-h-[84px] px-5 pb-3 pt-5 text-[16px] leading-[1.6]",
         )}
       />

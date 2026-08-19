@@ -127,10 +127,7 @@ function NavRow({
         motion={item.motion}
         active={active}
         size={18}
-        className={cn(
-          "shrink-0 transition-colors duration-150",
-          active ? "text-accent" : "text-ink-4 group-hover:text-ink-2",
-        )}
+        className="shrink-0 text-ink transition-colors duration-150"
       />
       <span className="truncate">{item.label}</span>
       {item.badge ? (
@@ -367,7 +364,7 @@ export function Sidebar({
       <aside
         className={cn(
           "nx-no-print fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-line bg-rail transition-[width] duration-200 lg:flex",
-          collapsed ? "w-[76px]" : "w-[324px]",
+          collapsed ? "w-[64px]" : "w-[248px]",
         )}
       >
         {collapsed ? (
@@ -407,7 +404,7 @@ export function Sidebar({
                     aria-label={i.label}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group flex w-[58px] shrink-0 flex-col items-center gap-1 rounded-[8px] px-1 py-2 transition-colors",
+                      "group flex w-[52px] shrink-0 flex-col items-center gap-1 rounded-[8px] px-1 py-2 transition-colors",
                       active
                         ? "bg-accent-soft text-accent"
                         : "text-ink-4 hover:bg-hover hover:text-ink-2",
@@ -457,7 +454,7 @@ export function Sidebar({
       <div
         className={cn(
           "nx-no-print hidden shrink-0 transition-[width] duration-200 lg:block",
-          collapsed ? "w-[76px]" : "w-[324px]",
+          collapsed ? "w-[64px]" : "w-[248px]",
         )}
       />
     </>

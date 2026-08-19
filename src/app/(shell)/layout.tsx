@@ -5,6 +5,7 @@ import { NavProvider } from "@/components/shell/nav-state";
 import { Backdrop } from "@/components/shell/backdrop";
 import { SetupNeeded } from "@/components/shell/setup-needed";
 import { ToastProvider } from "@/components/ui/toast";
+import { redirect } from "next/navigation";
 import { currentUser, type User } from "@/lib/auth";
 import { myBalance } from "@/lib/credits";
 import type { Balance } from "@/lib/credits";
@@ -43,6 +44,12 @@ export default async function ShellLayout({
       </>
     );
   }
+
+  // The real gate. Middleware only sees whether a cookie is present; this is
+  // where the session is actually looked up, so an expired, revoked or forged
+  // cookie stops here.
+  if (!user) redirect("/login");
+  if (!user.emailVerified) redirect("/verify-email");
 
   return (
     <NavProvider>

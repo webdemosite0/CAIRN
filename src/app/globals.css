@@ -14,9 +14,9 @@
   /* Raised from #ededed/#b4b4b4/#8a8a8a/#5c5c5c — the old ramp read as dull,
      and ink-4 sat at ~2.9:1 on canvas, under the 4.5:1 minimum. */
   --color-ink: #ffffff;
-  --color-ink-2: #d6d6dd;
-  --color-ink-3: #a8a8b3;
-  --color-ink-4: #8b8b96;
+  --color-ink-2: #ffffff;
+  --color-ink-3: #ffffff;
+  --color-ink-4: #c8c8d2;
 
   --color-line: #26262e;
   --color-line-strong: #34343f;
@@ -51,9 +51,9 @@
   --color-raised: #131318;
   --color-hover: #18181f;
   --color-ink: #ffffff;
-  --color-ink-2: #d6d6dd;
-  --color-ink-3: #a8a8b3;
-  --color-ink-4: #8b8b96;
+  --color-ink-2: #ffffff;
+  --color-ink-3: #ffffff;
+  --color-ink-4: #c8c8d2;
   --color-line: #26262e;
   --color-line-strong: #34343f;
   --color-accent: #8b7cff;
@@ -144,10 +144,10 @@
   --color-raised: #ffffff;
   --color-hover: #f0f0f4;
 
-  --color-ink: #0d0d12;
-  --color-ink-2: #35353f;
-  --color-ink-3: #5c5c68;
-  --color-ink-4: #6b6b77;
+  --color-ink: #000000;
+  --color-ink-2: #000000;
+  --color-ink-3: #000000;
+  --color-ink-4: #45454f;
 
   --color-line: #e6e6ec;
   --color-line-strong: #d5dbe4;
@@ -230,10 +230,10 @@
     --color-sunk: #f4f4f7;
     --color-raised: #ffffff;
     --color-hover: #f0f0f4;
-    --color-ink: #0d0d12;
-    --color-ink-2: #35353f;
-    --color-ink-3: #5c5c68;
-    --color-ink-4: #6b6b77;
+    --color-ink: #000000;
+    --color-ink-2: #000000;
+    --color-ink-3: #000000;
+    --color-ink-4: #45454f;
     --color-line: #e6e6ec;
     --color-line-strong: #d5dbe4;
     --color-accent: #5b50f5;
