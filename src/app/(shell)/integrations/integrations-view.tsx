@@ -68,7 +68,7 @@ export function IntegrationsView({
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-[1120px] px-5 py-8 lg:px-8">
+    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[1120px] px-5 py-8 lg:px-8">
       <IntegrationsHero total={SERVICES.length} connected={optimistic.length} />
 
       {/* Title and search on one line, so the list starts higher up. */}
@@ -115,7 +115,7 @@ export function IntegrationsView({
           Nothing matches “{query}”.
         </p>
       ) : (
-        <div className="grid gap-x-8 gap-y-1 lg:grid-cols-2">
+        <div className="grid min-w-0 gap-x-8 gap-y-1 lg:grid-cols-2">
           {results.map((s, i) => {
             const conn = byId.get(s.id);
             const on = Boolean(conn);
