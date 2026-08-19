@@ -164,7 +164,7 @@ export function HomeChat({
               setError(null);
               reset();
             }}
-            className="shrink-0 rounded-[8px] px-2.5 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+            className="shrink-0 rounded-[6px] px-2.5 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
           >
             New Chat
           </button>
@@ -209,7 +209,7 @@ export function ErrorNote({
   onRetry?: () => void;
 }) {
   return (
-    <div className="nx-in mt-5 flex items-start gap-2.5 rounded-[12px] border border-critical/30 bg-critical/10 px-4 py-3">
+    <div className="nx-in mt-5 flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
       <FiAlertCircle size={15} className="mt-0.5 shrink-0 text-critical" />
       <div className="min-w-0 flex-1">
         <p className="text-[13.5px] leading-relaxed text-ink-2">{message}</p>

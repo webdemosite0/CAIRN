@@ -8,7 +8,7 @@ import { logIn, signUp, type AuthState } from "@/app/actions/auth";
 import { LogoMark } from "@/components/brand/logo";
 
 const field =
-  "h-12 w-full rounded-[10px] border border-line-strong bg-sunk px-3.5 text-[14.5px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent";
+  "h-12 w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 text-[14.5px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent";
 
 export function AuthCard({ mode }: { mode: "login" | "signup" }) {
   const isLogin = mode === "login";
@@ -18,7 +18,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
   );
 
   return (
-    <div className="nx-in w-full max-w-[420px] rounded-[18px] border border-line bg-rail p-7 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)]">
+    <div className="nx-in w-full max-w-[420px] rounded-[12px] border border-line bg-rail p-7 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)]">
       <div className="mb-6 flex flex-col items-center">
         <LogoMark size={40} />
         <h1 className="mt-4 text-[17px] font-semibold text-ink">
@@ -28,7 +28,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
 
       <button
         type="button"
-        className="flex h-12 w-full items-center justify-center gap-3 rounded-[10px] border border-line-strong bg-raised text-[14.5px] font-medium text-ink transition-colors hover:bg-hover"
+        className="flex h-12 w-full items-center justify-center gap-3 rounded-[8px] border border-line-strong bg-raised text-[14.5px] font-medium text-ink transition-colors hover:bg-hover"
         disabled
         title="Coming soon"
       >
@@ -77,7 +77,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
         />
 
         {state.error ? (
-          <div className="flex items-start gap-2 rounded-[9px] border border-critical/30 bg-critical/10 px-3 py-2.5">
+          <div className="flex items-start gap-2 rounded-[8px] border border-critical/30 bg-critical/10 px-3 py-2.5">
             <FiAlertCircle size={14} className="mt-0.5 shrink-0 text-critical" />
             <p className="text-[13px] text-critical">{state.error}</p>
           </div>
@@ -86,7 +86,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
         <button
           type="submit"
           disabled={pending}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-[10px] bg-accent text-[15px] font-semibold text-white transition-colors hover:brightness-110 disabled:opacity-60"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-[8px] btn-grad text-[15px] font-semibold transition-colors disabled:opacity-60"
         >
           {pending ? <FiLoader size={16} className="animate-spin" /> : null}
           {isLogin ? "Log In" : "Sign Up"}

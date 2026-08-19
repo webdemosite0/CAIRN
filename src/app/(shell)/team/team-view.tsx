@@ -160,7 +160,7 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
             <div
               key={r.id}
               className={cn(
-                "relative flex flex-col items-center gap-2 rounded-[14px] border px-3 py-4 text-center transition-all duration-300",
+                "relative flex flex-col items-center gap-2 rounded-[10px] border px-3 py-4 text-center transition-all duration-300",
                 isWorking
                   ? "border-line-strong bg-raised"
                   : isDone
@@ -191,7 +191,7 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
       </div>
 
       {error ? (
-        <div className="mb-6 flex items-start gap-2 rounded-[11px] border border-critical/30 bg-critical/10 px-4 py-3">
+        <div className="mb-6 flex items-start gap-2 rounded-[8px] border border-critical/30 bg-critical/10 px-4 py-3">
           <FiAlertCircle size={15} className="mt-0.5 shrink-0 text-critical" />
           <div>
             <p className="text-[13.5px] text-ink-2">{error}</p>
@@ -210,7 +210,7 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
         {results.map((r, i) => (
           <section
             key={r.id}
-            className="nx-in rounded-[14px] border border-line bg-rail p-5"
+            className="nx-in rounded-[10px] border border-line bg-rail p-5"
             style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
           >
             <div className="mb-3.5 flex items-center gap-2.5">
@@ -223,7 +223,7 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
       </div>
 
       {done ? (
-        <div className="nx-in mt-8 flex items-center justify-between rounded-[13px] border border-positive/25 bg-positive/8 px-5 py-4">
+        <div className="nx-in mt-8 flex items-center justify-between rounded-[10px] border border-positive/25 bg-positive/8 px-5 py-4">
           <span className="flex items-center gap-2.5 text-[14px] text-ink">
             <FiCheck size={16} className="text-positive" />
             All four agents finished.

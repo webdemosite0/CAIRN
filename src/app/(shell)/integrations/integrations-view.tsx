@@ -83,7 +83,7 @@ export function IntegrationsView({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search integrations…"
           aria-label="Search integrations"
-          className="h-11 w-full rounded-[11px] border border-line-strong bg-rail pl-10 pr-4 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent"
+          className="h-11 w-full rounded-[8px] border border-line-strong bg-rail pl-10 pr-4 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent"
         />
       </div>
 
@@ -106,7 +106,7 @@ export function IntegrationsView({
       </div>
 
       {results.length === 0 ? (
-        <p className="rounded-[13px] border border-dashed border-line-strong py-16 text-center text-[13.5px] text-ink-4">
+        <p className="rounded-[10px] border border-dashed border-line-strong py-16 text-center text-[13.5px] text-ink-4">
           Nothing matches “{query}”.
         </p>
       ) : (
@@ -119,7 +119,7 @@ export function IntegrationsView({
               <article
                 key={s.id}
                 className={cn(
-                  "nx-in flex flex-col rounded-[13px] border p-4 transition-all duration-200",
+                  "nx-in flex flex-col rounded-[10px] border p-4 transition-all duration-200",
                   on
                     ? "border-positive/30 bg-positive/6"
                     : "border-line bg-rail hover:border-line-strong",
@@ -133,7 +133,7 @@ export function IntegrationsView({
                   <div className="flex items-center gap-2.5">
                     <span
                       className={cn(
-                        "grid h-9 w-9 shrink-0 place-items-center rounded-[9px] text-[13px] font-semibold",
+                        "grid h-9 w-9 shrink-0 place-items-center rounded-[8px] text-[13px] font-semibold",
                         on
                           ? "bg-positive/15 text-positive"
                           : "bg-raised text-ink-3",
@@ -162,7 +162,7 @@ export function IntegrationsView({
                   <button
                     onClick={() => remove(s.id)}
                     disabled={pending}
-                    className="group mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] border border-positive/35 py-2 text-[13px] text-positive transition-colors hover:border-critical/40 hover:bg-critical/10 hover:text-critical disabled:opacity-50"
+                    className="group mt-3.5 flex items-center justify-center gap-1.5 rounded-[8px] border border-positive/35 py-2 text-[13px] text-positive transition-colors hover:border-critical/40 hover:bg-critical/10 hover:text-critical disabled:opacity-50"
                   >
                     <Ico icon={FiCheck} motion="check" size={13} />
                     <span className="group-hover:hidden">Connected</span>
@@ -172,14 +172,14 @@ export function IntegrationsView({
                   <button
                     onClick={() => setOpening(s.id)}
                     disabled={!signedIn || pending}
-                    className="group mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] border border-line-strong py-2 text-[13px] text-ink-2 transition-colors hover:bg-hover hover:text-ink disabled:opacity-50"
+                    className="group mt-3.5 flex items-center justify-center gap-1.5 rounded-[8px] border border-line-strong py-2 text-[13px] text-ink-2 transition-colors hover:bg-hover hover:text-ink disabled:opacity-50"
                   >
                     <Ico icon={FiPlus} motion="open" size={13} /> Connect
                   </button>
                 ) : (
                   <span
                     title="This service authenticates through OAuth, which needs a client id and secret registered with the provider."
-                    className="mt-3.5 flex items-center justify-center gap-1.5 rounded-[9px] border border-dashed border-line-strong py-2 text-[12.5px] text-ink-4"
+                    className="mt-3.5 flex items-center justify-center gap-1.5 rounded-[8px] border border-dashed border-line-strong py-2 text-[12.5px] text-ink-4"
                   >
                     <FiLock size={11} /> Needs an OAuth app
                   </span>

@@ -117,7 +117,7 @@ export function AgentChat({
           <Link
             href="/agents"
             aria-label="Back to agents"
-            className="group grid h-8 w-8 shrink-0 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+            className="group grid h-8 w-8 shrink-0 place-items-center rounded-[6px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
           >
             <Ico icon={FiArrowLeft} motion="nudge" size={17} />
           </Link>
@@ -176,7 +176,7 @@ export function AgentChat({
           )}
 
           {error ? (
-            <div className="flex items-start gap-2.5 rounded-[12px] border border-critical/30 bg-critical/10 px-4 py-3">
+            <div className="flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
               <Ico icon={FiAlertCircle} motion="pop" size={15} className="mt-0.5 shrink-0 text-critical" />
               <p className="text-[13.5px] text-ink-2">{error}</p>
             </div>

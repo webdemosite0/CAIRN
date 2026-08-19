@@ -154,7 +154,7 @@ export function SlidesView({
     return (
       <div className="nx-in mx-auto flex min-h-screen max-w-[760px] flex-col justify-center px-5 py-16">
         <div className="mb-7 text-center">
-          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[16px] bg-accent/15 text-accent">
+          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[12px] bg-accent/15 text-accent">
             <Ico icon={FiLayout} motion="lift" size={26} />
           </span>
           <h1 className="text-[27px] font-semibold text-ink">Slides</h1>
@@ -250,7 +250,7 @@ export function SlidesView({
                     onClick={() => setCurrent(i)}
                     aria-current={i === safeIndex}
                     className={cn(
-                      "group block w-full rounded-[14px] text-left transition",
+                      "group block w-full rounded-[10px] text-left transition",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60",
                     )}
                   >
@@ -358,7 +358,7 @@ export function SlidesView({
         ) : null}
 
         {error ? (
-          <div className="mt-4 flex items-start gap-2.5 rounded-[12px] border border-critical/30 bg-critical/10 px-4 py-3">
+          <div className="mt-4 flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
             <Ico icon={FiAlertCircle} motion="pop" size={15} className="mt-0.5 shrink-0 text-critical" />
             <div>
               <p className="text-[13.5px] text-ink-2">{error}</p>

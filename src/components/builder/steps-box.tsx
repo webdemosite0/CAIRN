@@ -71,7 +71,7 @@ export function StepsBox({
             <li
               key={s.id}
               className={cn(
-                "rounded-[8px] px-2 py-1.5 transition-colors",
+                "rounded-[6px] px-2 py-1.5 transition-colors",
                 isCurrent && "nx-step-active bg-accent/[0.07]",
               )}
             >

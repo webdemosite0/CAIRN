@@ -16,7 +16,7 @@ export default async function SettingsPage() {
         <p className="mt-2 text-[14px] text-ink-3">Log in to manage your account.</p>
         <Link
           href="/login"
-          className="mt-6 rounded-[10px] bg-accent px-5 py-2.5 text-[14px] font-medium text-white"
+          className="mt-6 rounded-[8px] btn-grad px-5 py-2.5 text-[14px] font-medium"
         >
           Log in
         </Link>
@@ -38,7 +38,7 @@ export default async function SettingsPage() {
     <div className="nx-in mx-auto min-h-screen max-w-[680px] px-5 py-10 lg:px-8">
       <h1 className="text-[24px] font-semibold text-ink">Settings</h1>
 
-      <section className="mt-7 rounded-[14px] border border-line bg-rail">
+      <section className="mt-7 rounded-[10px] border border-line bg-rail">
         <h2 className="border-b border-line px-5 py-3.5 text-[13px] font-medium uppercase tracking-[0.06em] text-ink-3">
           Account
         </h2>
@@ -61,7 +61,7 @@ export default async function SettingsPage() {
         </dl>
       </section>
 
-      <section className="mt-4 rounded-[14px] border border-line bg-rail">
+      <section className="mt-4 rounded-[10px] border border-line bg-rail">
         <h2 className="border-b border-line px-5 py-3.5 text-[13px] font-medium uppercase tracking-[0.06em] text-ink-3">
           Workspace
         </h2>
@@ -86,13 +86,13 @@ export default async function SettingsPage() {
         </div>
       </section>
 
-      <section className="mt-4 rounded-[14px] border border-critical/25 bg-critical/6 p-5">
+      <section className="mt-4 rounded-[10px] border border-critical/25 bg-critical/6 p-5">
         <h2 className="text-[14px] font-medium text-ink">Session</h2>
         <p className="mt-1 text-[13px] text-ink-3">
           Signs you out on this device.
         </p>
         <form action={logOut} className="mt-4">
-          <button className="flex items-center gap-2 rounded-[9px] border border-critical/35 px-4 py-2 text-[13.5px] text-critical transition-colors hover:bg-critical/10">
+          <button className="flex items-center gap-2 rounded-[8px] border border-critical/35 px-4 py-2 text-[13.5px] text-critical transition-colors hover:bg-critical/10">
             <FiLogOut size={14} /> Log out
           </button>
         </form>

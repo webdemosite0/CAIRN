@@ -99,7 +99,7 @@ export function ThemeToggle({ className }: { className?: string }) {
             title={o.label}
             onClick={() => choose(o.value)}
             className={cn(
-              "grid h-7 w-7 place-items-center rounded-[7px] transition-colors duration-150",
+              "grid h-7 w-7 place-items-center rounded-[6px] transition-colors duration-150",
               active ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
             )}
           >

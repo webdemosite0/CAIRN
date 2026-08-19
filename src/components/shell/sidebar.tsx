@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { IconType } from "react-icons";
@@ -123,7 +122,7 @@ function RailBody({
           <button
             onClick={onCollapse}
             aria-label="Collapse sidebar"
-            className="group grid h-8 w-8 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+            className="group grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
           >
             <Ico icon={FiSidebar} motion="nudge" size={17} />
           </button>
@@ -134,7 +133,7 @@ function RailBody({
         <Link
           href="/chat"
           onClick={onNavigate}
-          className="group flex items-center justify-center gap-2 rounded-[8px] bg-accent px-3 py-2.5 text-[13.5px] font-medium text-white shadow-[var(--elev)] transition-[filter,transform] duration-150 hover:brightness-110 active:scale-[0.99]"
+          className="group flex items-center justify-center gap-2 rounded-[6px] btn-grad px-3 py-2.5 text-[13.5px] font-medium transition-[filter,transform] active:scale-[0.99]"
         >
           <Ico icon={FiPlus} motion="open" size={16} />
           New chat
@@ -165,7 +164,7 @@ function RailBody({
             <Link
               href="/settings"
               onClick={onNavigate}
-              className="flex min-w-0 flex-1 items-center gap-2.5 rounded-[8px] px-2 py-1.5 transition-colors hover:bg-hover"
+              className="flex min-w-0 flex-1 items-center gap-2.5 rounded-[6px] px-2 py-1.5 transition-colors hover:bg-hover"
             >
               {/* Neutral, not violet. The rail has exactly one accent colour —
                   the active nav row — and a second hue here fought it. */}
@@ -184,7 +183,7 @@ function RailBody({
             <form action={logOut}>
               <button
                 aria-label="Log out"
-                className="group grid h-7 w-7 place-items-center rounded-[7px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+                className="group grid h-7 w-7 place-items-center rounded-[6px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
               >
                 <Ico icon={FiLogOut} motion="launch" size={15} />
               </button>
@@ -194,7 +193,7 @@ function RailBody({
           <Link
             href="/login"
             onClick={onNavigate}
-            className="group flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13.5px] text-ink transition-colors hover:bg-hover"
+            className="group flex items-center gap-2.5 rounded-[6px] px-2 py-1.5 text-[13.5px] text-ink transition-colors hover:bg-hover"
           >
             <span className="grid h-7 w-7 place-items-center rounded-full bg-raised text-ink-3">
               <Ico icon={FiUser} motion="tilt" size={14} />
@@ -216,8 +215,9 @@ export function Sidebar({
   user: User | null;
   balance: Balance | null;
 }) {
-  const [collapsed, setCollapsed] = useState(false);
-  const { open, setOpen } = useNav();
+  // Collapse lives in the shared nav context so a page can ask for the room
+  // — the builder collapses the rail once a build starts.
+  const { open, setOpen, collapsed, setCollapsed } = useNav();
   const pathname = usePathname();
 
   return (
@@ -234,7 +234,7 @@ export function Sidebar({
             <button
               onClick={() => setCollapsed(false)}
               aria-label="Expand sidebar"
-              className="group mb-2 mt-1 grid h-8 w-8 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+              className="group mb-2 mt-1 grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
             >
               <Ico icon={FiSidebar} motion="nudge" size={17} />
             </button>
@@ -249,7 +249,7 @@ export function Sidebar({
                   aria-label={i.label}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "grid h-9 w-9 shrink-0 place-items-center rounded-[8px] transition-colors",
+                    "grid h-9 w-9 shrink-0 place-items-center rounded-[6px] transition-colors",
                     active
                       ? "bg-accent/10 text-accent"
                       : "text-ink-4 hover:bg-hover hover:text-ink-2",
@@ -277,7 +277,7 @@ export function Sidebar({
             <button
               onClick={() => setOpen(false)}
               aria-label="Close menu"
-              className="group absolute right-3 top-4 z-10 grid h-8 w-8 place-items-center rounded-[8px] text-ink-3 hover:bg-hover"
+              className="group absolute right-3 top-4 z-10 grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 hover:bg-hover"
             >
               <Ico icon={FiX} motion="shake" size={17} />
             </button>

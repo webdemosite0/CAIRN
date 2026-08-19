@@ -11,6 +11,7 @@ import {
 } from "react-icons/fi";
 import { TbPuzzle, TbTerminal2 } from "react-icons/tb";
 import type { IconType } from "react-icons";
+import { Ico, type Motion } from "@/components/ui/ico";
 import type { Task, TaskKind } from "@/lib/builder";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,17 @@ const ICON: Record<TaskKind, IconType> = {
   write: FiFileText,
   check: FiAlertCircle,
   think: TbTerminal2,
+};
+
+/* Motion matched to what the row means: a file is lifted off disk, a write
+   types, a check shakes its head, a run scans. */
+const MOTION: Record<TaskKind, Motion> = {
+  plan: "open",
+  skill: "pop",
+  read: "lift",
+  write: "type",
+  check: "shake",
+  think: "scan",
 };
 
 const VERB: Record<TaskKind, string> = {
@@ -38,7 +50,7 @@ function Row({ task }: { task: Task }) {
   const failed = task.state === "fail";
 
   return (
-    <li className="nx-in flex items-center gap-2.5 py-[3px] text-[13px]">
+    <li className="group nx-in flex items-center gap-2.5 py-[3px] text-[13px]">
       <span
         className={cn(
           "grid h-4 w-4 shrink-0 place-items-center",
@@ -48,7 +60,7 @@ function Row({ task }: { task: Task }) {
         {running ? (
           <span className="block h-3.5 w-3.5 animate-spin rounded-full border-[1.5px] border-current border-t-transparent" />
         ) : (
-          <Icon size={14} />
+          <Ico icon={Icon} motion={MOTION[task.kind]} size={14} />
         )}
       </span>
 
@@ -104,7 +116,7 @@ export function ActivityBox({
   const done = tasks.filter((t) => t.state !== "run").length;
 
   return (
-    <div className="rounded-[10px] border border-line bg-rail/60 px-3 py-2">
+    <div className="rounded-[8px] border border-line bg-rail/60 px-3 py-2">
       <button
         onClick={() => setChoice(!open)}
         className="flex w-full items-center gap-2 text-left"

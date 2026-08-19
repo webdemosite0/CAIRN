@@ -30,7 +30,7 @@ export function QuestionBox({
   const filled = Object.values(answers).filter((v) => v.trim()).length;
 
   return (
-    <div className="bezel nx-settle overflow-hidden">
+    <div className="bezel nx-stage overflow-hidden">
       <div className="border-b border-line bg-rail/60 px-4 py-2.5">
         <p className="text-[13px] font-medium text-ink-2">A few quick questions</p>
         <p className="text-[12px] text-ink-4">
@@ -60,7 +60,7 @@ export function QuestionBox({
               value={answers[q.id] ?? ""}
               onChange={(e) => set(q.id, e.target.value)}
               placeholder={q.options[0] ? `e.g. ${q.options[0]}` : "Your answer"}
-              className="mt-2 w-full rounded-[9px] border border-line bg-sunk px-3 py-2 text-[13.5px] text-ink placeholder:text-ink-4 focus:border-accent focus:outline-none"
+              className="mt-2 w-full rounded-[8px] border border-line bg-sunk px-3 py-2 text-[13.5px] text-ink placeholder:text-ink-4 focus:border-accent focus:outline-none"
             />
 
             {q.options.length ? (
@@ -71,7 +71,7 @@ export function QuestionBox({
                     type="button"
                     onClick={() => set(q.id, o)}
                     className={cn(
-                      "rounded-[7px] border px-2.5 py-1 text-[12px] transition-colors",
+                      "rounded-[6px] border px-2.5 py-1 text-[12px] transition-colors",
                       answers[q.id] === o
                         ? "border-accent bg-accent/10 text-ink"
                         : "border-line text-ink-3 hover:bg-hover hover:text-ink-2",
@@ -90,7 +90,7 @@ export function QuestionBox({
         <button
           onClick={onSkip}
           disabled={busy}
-          className="flex items-center gap-1.5 rounded-[8px] px-3 py-2 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40"
+          className="flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40"
         >
           <FiSkipForward size={13} /> Skip
         </button>
@@ -100,7 +100,7 @@ export function QuestionBox({
         <button
           onClick={() => onSubmit(answers)}
           disabled={busy}
-          className="group flex items-center gap-2 rounded-[9px] bg-accent px-4 py-2 text-[13.5px] font-medium text-white shadow-[var(--elev)] transition-[filter,transform] duration-150 hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
+          className="group flex items-center gap-2 rounded-[8px] btn-grad px-4 py-2 text-[13.5px] font-medium transition-[filter,transform] active:scale-[0.99] disabled:opacity-50"
         >
           Plan it
           <FiArrowRight

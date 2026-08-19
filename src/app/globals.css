@@ -5,24 +5,24 @@
    ============================================================ */
 
 @theme {
-  --color-canvas: #0f0f0f;
-  --color-rail: #171717;
-  --color-sunk: #1e1e1e;
-  --color-raised: #242424;
-  --color-hover: #2a2a2a;
+  --color-canvas: #08090d;
+  --color-rail: #0d1017;
+  --color-sunk: #0b0d13;
+  --color-raised: #161b29;
+  --color-hover: #1b2130;
 
   /* Raised from #ededed/#b4b4b4/#8a8a8a/#5c5c5c — the old ramp read as dull,
      and ink-4 sat at ~2.9:1 on canvas, under the 4.5:1 minimum. */
-  --color-ink: #f2f2f3;
-  --color-ink-2: #c9ccd1;
-  --color-ink-3: #a1a6ae;
-  --color-ink-4: #878d97;
+  --color-ink: #eef1f8;
+  --color-ink-2: #c6cdda;
+  --color-ink-3: #99a3b5;
+  --color-ink-4: #8b94a7;
 
-  --color-line: #262626;
-  --color-line-strong: #333333;
+  --color-line: #252d3d;
+  --color-line-strong: #333c50;
 
-  --color-accent: #3b82f6;
-  --color-accent-soft: #16233c;
+  --color-accent: #4d8dff;
+  --color-accent-soft: #142544;
   --color-violet: #a78bfa;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
@@ -44,19 +44,19 @@
    all: --shade, the direction elevation travels, and --ground, used by any
    effect that needs to know what it is sitting on. */
 :root {
-  --color-canvas: #0f0f0f;
-  --color-rail: #171717;
-  --color-sunk: #1e1e1e;
-  --color-raised: #242424;
-  --color-hover: #2a2a2a;
-  --color-ink: #f2f2f3;
-  --color-ink-2: #c9ccd1;
-  --color-ink-3: #a1a6ae;
-  --color-ink-4: #878d97;
-  --color-line: #262626;
-  --color-line-strong: #333333;
-  --color-accent: #3b82f6;
-  --color-accent-soft: #16233c;
+  --color-canvas: #08090d;
+  --color-rail: #0d1017;
+  --color-sunk: #0b0d13;
+  --color-raised: #161b29;
+  --color-hover: #1b2130;
+  --color-ink: #eef1f8;
+  --color-ink-2: #c6cdda;
+  --color-ink-3: #99a3b5;
+  --color-ink-4: #8b94a7;
+  --color-line: #252d3d;
+  --color-line-strong: #333c50;
+  --color-accent: #4d8dff;
+  --color-accent-soft: #142544;
   --color-violet: #a78bfa;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
@@ -108,10 +108,14 @@
   /* Callers hand us neon pastels tuned for a black ground; on white they drop
      to ~1.6:1. This mixes black into any such tint, and is 0% on dark. */
   /* Dark mode separates surfaces by lightness, so it needs no shadow. */
-  --bezel: rgb(255 255 255 / 0.055);
-  --bezel-under: rgb(0 0 0 / 0.30);
-  --bezel-ring: rgb(255 255 255 / 0.028);
-  --hairline: rgb(255 255 255 / 0.20);
+  --bezel: rgb(190 214 255 / 0.075);
+  --btn-a: #8cc2ff;
+  --btn-b: #5a9bff;
+  --btn-ink: #08152f;
+  --btn-glow: rgb(90 155 255 / 0.35);
+  --bezel-under: rgb(0 0 0 / 0.42);
+  --bezel-ring: rgb(150 180 235 / 0.04);
+  --hairline: rgb(190 214 255 / 0.26);
   --elev: none;
   --elev-lift: none;
 
@@ -195,6 +199,10 @@
   --tag-e: #875616;
   --tag-f: #ad2b48;
   --bezel: rgb(255 255 255 / 0.9);
+  --btn-a: #7db8ff;
+  --btn-b: #4f8bff;
+  --btn-ink: #06122a;
+  --btn-glow: rgb(79 139 255 / 0.30);
   --bezel-under: rgb(26 31 54 / 0.05);
   --bezel-ring: rgb(26 31 54 / 0.035);
   --hairline: rgb(26 31 54 / 0.16);
@@ -269,6 +277,10 @@
     --tag-e: #875616;
     --tag-f: #ad2b48;
     --bezel: rgb(255 255 255 / 0.9);
+    --btn-a: #7db8ff;
+    --btn-b: #4f8bff;
+    --btn-ink: #06122a;
+    --btn-glow: rgb(79 139 255 / 0.30);
     --bezel-under: rgb(26 31 54 / 0.05);
     --bezel-ring: rgb(26 31 54 / 0.035);
     --hairline: rgb(26 31 54 / 0.16);
@@ -317,7 +329,7 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: var(--scrollbar);
-  border-radius: 8px;
+  border-radius: 6px;
   border: 3px solid transparent;
   background-clip: padding-box;
 }
@@ -329,7 +341,7 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 5px;
 }
 
 /* Text fields always match :focus-visible, even on a plain click — so the rule
@@ -383,7 +395,7 @@ select:focus-visible,
   display: flex;
   align-items: center;
   gap: 11px;
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 7px 11px;
   font-size: 13.5px;
   font-weight: 500;
@@ -435,7 +447,7 @@ select:focus-visible,
 @utility panel {
   background: var(--color-raised);
   border: 1px solid var(--color-line);
-  border-radius: 12px;
+  border-radius: 10px;
   /* The bezel: a hairline of light along the top edge inside the border, so a
      panel reads as a raised object catching light rather than a flat cut-out.
      --bezel is a highlight on dark and a soft shadow on light, because the
@@ -1198,7 +1210,7 @@ a[role="button"]:active {
   position: relative;
   background: var(--color-raised);
   border: 1px solid var(--color-line);
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow:
     inset 0 1px 0 0 var(--bezel),
     inset 0 -1px 0 0 var(--bezel-under),
@@ -1349,5 +1361,299 @@ a[role="button"]:active {
   .nx-step-active::before,
   .nx-sweep::after {
     animation: none;
+  }
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Primary action                                                      */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The light blue gradient button.
+ *
+ * Navy ink, not white: white on this blue measures 2.43:1. The lightest
+ * blue that holds white text at 4.5:1 is #3170e6, which is no longer a
+ * light blue — so the colour and the contrast requirement are reconciled
+ * by changing the text instead of abandoning the gradient.
+ */
+@utility btn-grad {
+  position: relative;
+  overflow: hidden;
+  color: var(--btn-ink);
+  background-image: linear-gradient(135deg, var(--btn-a) 0%, var(--btn-b) 100%);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.35),
+    0 1px 2px rgb(0 0 0 / 0.10),
+    0 6px 16px -8px var(--btn-glow);
+  transition:
+    transform 0.15s var(--ease-out),
+    box-shadow 0.2s var(--ease-out),
+    filter 0.15s var(--ease-out);
+
+  &:hover {
+    filter: brightness(1.05);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.45),
+      0 2px 4px rgb(0 0 0 / 0.10),
+      0 10px 24px -10px var(--btn-glow);
+  }
+
+  &:active {
+    transform: scale(0.985);
+  }
+
+  /* A slow highlight crossing the face, so the primary action is the one
+     thing on screen that looks alive without moving. */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.28) 50%,
+      transparent 70%
+    );
+    background-size: 220% 100%;
+    animation: nx-btn-sheen 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+@keyframes nx-btn-sheen {
+  0%,
+  62% {
+    background-position: 190% 0;
+  }
+  100% {
+    background-position: -90% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-grad::after {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion                                                              */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Everything here animates transform, opacity or a filter — never width,
+ * height or a box offset, which force layout on every frame and turn a smooth
+ * animation into a stutter on a mid-range phone.
+ *
+ * The whole block is opt-out at the end via prefers-reduced-motion, and the
+ * reduced path is an instant state rather than a faster animation.
+ */
+
+/* --- small: things that react to you ---------------------------------- */
+
+/* A card that lifts and deepens as the pointer arrives. */
+@utility lift {
+  transition:
+    transform 0.18s var(--ease-out),
+    box-shadow 0.18s var(--ease-out),
+    border-color 0.18s var(--ease-out);
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-line-strong);
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(0.995);
+  }
+}
+
+/* Any pressable thing, without a full restyle. */
+@utility press {
+  transition: transform 0.12s var(--ease-out);
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* An icon that leans toward its label on hover of the parent .group. */
+@utility lean {
+  transition: transform 0.2s var(--ease-out);
+
+  .group:hover & {
+    transform: translateX(2px);
+  }
+}
+
+/* A number or badge that just changed. */
+@keyframes nx-bump {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.16);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.nx-bump {
+  animation: nx-bump 0.32s var(--ease-out);
+}
+
+/* A console line arriving. */
+@keyframes nx-line-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-line-in {
+  animation: nx-line-in 0.18s var(--ease-out);
+}
+
+/* The active step in a plan, breathing so the eye can find it. */
+@keyframes nx-step-active {
+  0%,
+  100% {
+    box-shadow: inset 2px 0 0 0 var(--color-accent);
+  }
+  50% {
+    box-shadow: inset 2px 0 0 0 color-mix(in oklab, var(--color-accent) 45%, transparent);
+  }
+}
+.nx-step-active {
+  animation: nx-step-active 2.2s ease-in-out infinite;
+}
+
+/* A progress track that shows work is happening even between increments. */
+@keyframes nx-sweep {
+  from {
+    background-position: -40% 0;
+  }
+  to {
+    background-position: 140% 0;
+  }
+}
+.nx-sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--color-accent) 55%, transparent),
+    transparent
+  );
+  background-size: 40% 100%;
+  background-repeat: no-repeat;
+  animation: nx-sweep 1.4s linear infinite;
+  pointer-events: none;
+}
+
+/* --- big: things that arrive ------------------------------------------ */
+
+/* A panel taking the stage: further, slower and with a touch of scale. */
+@keyframes nx-stage {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-stage {
+  animation: nx-stage 0.42s var(--ease-out);
+}
+
+/* The preview frame, once there is finally something in it. */
+@keyframes nx-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+    filter: blur(6px);
+  }
+  60% {
+    filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+.nx-reveal {
+  animation: nx-reveal 0.5s var(--ease-out);
+}
+
+/* A hero element, drifting up as the page settles. */
+@keyframes nx-rise-big {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-rise-big {
+  animation: nx-rise-big 0.6s var(--ease-out);
+}
+
+/* Slow ambient drift, for a decorative shape behind content. */
+@keyframes nx-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -2%, 0) scale(1.04);
+  }
+}
+.nx-drift {
+  animation: nx-drift 18s ease-in-out infinite;
+}
+
+/* Staggers a group of children without a style attribute on each one. */
+.nx-stagger > * {
+  animation: nx-in 0.34s var(--ease-out) backwards;
+}
+.nx-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.nx-stagger > *:nth-child(2) { animation-delay: 55ms; }
+.nx-stagger > *:nth-child(3) { animation-delay: 110ms; }
+.nx-stagger > *:nth-child(4) { animation-delay: 165ms; }
+.nx-stagger > *:nth-child(5) { animation-delay: 220ms; }
+.nx-stagger > *:nth-child(6) { animation-delay: 275ms; }
+.nx-stagger > *:nth-child(n + 7) { animation-delay: 330ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-bump,
+  .nx-line-in,
+  .nx-step-active,
+  .nx-stage,
+  .nx-reveal,
+  .nx-rise-big,
+  .nx-drift,
+  .nx-stagger > * {
+    animation: none;
+  }
+
+  .nx-sweep::after {
+    display: none;
+  }
+
+  .lift:hover,
+  .press:active,
+  .lift:active {
+    transform: none;
   }
 }

@@ -18,7 +18,7 @@ export function MobileBar() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"
-        className="group grid h-9 w-9 shrink-0 place-items-center rounded-[9px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
+        className="group grid h-9 w-9 shrink-0 place-items-center rounded-[8px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
       >
         <Ico icon={FiMenu} motion="pop" size={18} />
       </button>

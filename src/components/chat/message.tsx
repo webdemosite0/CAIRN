@@ -134,7 +134,7 @@ function CodeBlock({ lang, code }: { lang: string; code: string }) {
   const tokens = useMemo(() => highlight(code, lang), [code, lang]);
 
   return (
-    <div className="overflow-hidden rounded-[12px] border border-line bg-sunk">
+    <div className="overflow-hidden rounded-[10px] border border-line bg-sunk">
       <div className="flex items-center justify-between border-b border-line bg-rail px-3.5 py-2">
         <span className="font-mono text-[11.5px] lowercase tracking-wide text-ink-3">
           {lang || "code"}
@@ -146,7 +146,7 @@ function CodeBlock({ lang, code }: { lang: string; code: string }) {
             setTimeout(() => setCopied(false), 1500);
           }}
           aria-label="Copy code"
-          className="group flex items-center gap-1.5 rounded-[6px] px-1.5 py-1 text-[11.5px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+          className="group flex items-center gap-1.5 rounded-[5px] px-1.5 py-1 text-[11.5px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
         >
           {copied ? (
             <Ico icon={FiCheck} motion="check" size={12} className="text-positive" />
@@ -201,7 +201,7 @@ function Action({
       aria-label={label}
       title={label}
       className={cn(
-        "group grid h-7 w-7 place-items-center rounded-[7px] transition-colors",
+        "group grid h-7 w-7 place-items-center rounded-[6px] transition-colors",
         active ? "text-accent" : "text-ink-4 hover:bg-hover hover:text-ink-2",
       )}
     >
@@ -234,17 +234,17 @@ export function Message({
             {files.map((f, i) => (
               <span
                 key={`${f.name}-${i}`}
-                className="flex items-center gap-2 rounded-[10px] border border-line bg-raised py-1.5 pl-1.5 pr-2.5"
+                className="flex items-center gap-2 rounded-[8px] border border-line bg-raised py-1.5 pl-1.5 pr-2.5"
               >
                 {f.kind === "image" ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={`data:${f.mimeType};base64,${f.data}`}
                     alt={f.name}
-                    className="h-8 w-8 rounded-[6px] object-cover"
+                    className="h-8 w-8 rounded-[5px] object-cover"
                   />
                 ) : (
-                  <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-sunk text-ink-3">
+                  <span className="grid h-8 w-8 place-items-center rounded-[5px] bg-sunk text-ink-3">
                     <FiFile size={14} />
                   </span>
                 )}
@@ -261,7 +261,7 @@ export function Message({
           </div>
         ) : null}
         {text ? (
-          <div className="max-w-[85%] rounded-[16px] rounded-br-[6px] bg-sunk px-4 py-2.5 text-[15px] leading-[1.6] text-ink">
+          <div className="max-w-[85%] rounded-[12px] rounded-br-[5px] bg-sunk px-4 py-2.5 text-[15px] leading-[1.6] text-ink">
             <p className="whitespace-pre-wrap">{text}</p>
           </div>
         ) : null}

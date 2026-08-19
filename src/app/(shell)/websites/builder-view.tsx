@@ -18,8 +18,9 @@ import {
 } from "react-icons/fi";
 import { TbWorld, TbPuzzle, TbTerminal2, TbCode, TbFiles } from "react-icons/tb";
 import { Composer } from "@/components/chat/composer";
+import { useNav } from "@/components/shell/nav-state";
 import { LogoMark } from "@/components/brand/logo";
-import { Ico } from "@/components/ui/ico";
+import { Ico, type Motion } from "@/components/ui/ico";
 import { ActivityBox } from "@/components/builder/task-feed";
 import { StepsBox, type StepState } from "@/components/builder/steps-box";
 import { BuildConsole } from "@/components/builder/console";
@@ -60,11 +61,11 @@ const DEVICE = {
   mobile: { w: "390px", icon: FiSmartphone, label: "Mobile" },
 } as const;
 
-const PANES: { id: Pane; icon: typeof TbWorld; label: string }[] = [
-  { id: "preview", icon: TbWorld, label: "Preview" },
-  { id: "files", icon: TbFiles, label: "Files" },
-  { id: "code", icon: TbCode, label: "Code" },
-  { id: "console", icon: TbTerminal2, label: "Console" },
+const PANES: { id: Pane; icon: typeof TbWorld; label: string; motion: Motion }[] = [
+  { id: "preview", icon: TbWorld, label: "Preview", motion: "spin" },
+  { id: "files", icon: TbFiles, label: "Files", motion: "lift" },
+  { id: "code", icon: TbCode, label: "Code", motion: "type" },
+  { id: "console", icon: TbTerminal2, label: "Console", motion: "scan" },
 ];
 
 /** What the model is doing, phrased for someone who is waiting. */
@@ -125,6 +126,8 @@ export function BuilderView() {
   const [copied, setCopied] = useState(false);
   const [skillsOpen, setSkillsOpen] = useState(false);
   const [questionsOpen, setQuestionsOpen] = useState(false);
+
+  const { setCollapsed } = useNav();
 
   const nextLog = useRef(0);
   const feedEnd = useRef<HTMLDivElement>(null);
@@ -340,6 +343,8 @@ export function BuilderView() {
     setPhase("building");
     setError(null);
     setPane("console");
+    // The preview is what matters from here; the nav is not.
+    setCollapsed(true);
     log(`building ${plan.title} — ${plan.steps.length} steps`);
 
     let current = files;
@@ -380,7 +385,7 @@ export function BuilderView() {
         : `build complete — ${target.commands[0]} to run it`,
       "ok",
     );
-  }, [plan, busy, files, runStep, styleBrief, log, target]);
+  }, [plan, busy, files, runStep, styleBrief, log, target, setCollapsed]);
 
   /* ---------------- 4. edits ---------------- */
 
@@ -443,6 +448,7 @@ export function BuilderView() {
 
   function reset() {
     abort.current?.abort();
+    setCollapsed(false);
     setPhase("idle");
     setPlan(null);
     setFiles([]);
@@ -462,7 +468,7 @@ export function BuilderView() {
     return (
       <div className="nx-in mx-auto flex min-h-screen max-w-[720px] flex-col justify-center px-5 py-16">
         <div className="mb-7 text-center">
-          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[16px] bg-accent/15 text-accent">
+          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[12px] bg-accent/15 text-accent">
             <Ico icon={TbWorld} motion="spin" size={26} />
           </span>
           <h1 className="text-[27px] font-semibold text-ink">Website Builder</h1>
@@ -482,7 +488,7 @@ export function BuilderView() {
               key={t.id}
               onClick={() => setTargetId(t.id)}
               className={cn(
-                "nx-in rounded-[10px] border p-3 text-left transition-colors",
+                "nx-in rounded-[8px] border p-3 text-left transition-colors",
                 targetId === t.id
                   ? "border-accent bg-accent/[0.06]"
                   : "border-line hover:bg-hover",
@@ -525,7 +531,7 @@ export function BuilderView() {
               key={m.id}
               onClick={() => setDepth(m.id)}
               className={cn(
-                "flex items-center gap-1.5 rounded-[8px] border px-3 py-1.5 text-[12.5px] transition-colors",
+                "flex items-center gap-1.5 rounded-[6px] border px-3 py-1.5 text-[12.5px] transition-colors",
                 depth === m.id
                   ? "border-accent bg-accent/10 text-ink"
                   : "border-line text-ink-3 hover:bg-hover hover:text-ink-2",
@@ -552,7 +558,7 @@ export function BuilderView() {
         </div>
 
         {error ? (
-          <div className="mt-6 flex items-start gap-2.5 rounded-[12px] border border-critical/30 bg-critical/10 px-4 py-3">
+          <div className="mt-6 flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
             <Ico icon={FiAlertCircle} motion="pop" size={15} className="mt-0.5 shrink-0 text-critical" />
             <p className="text-[13.5px] text-ink-2">{error}</p>
           </div>
@@ -600,11 +606,11 @@ export function BuilderView() {
                 key={p.id}
                 onClick={() => setPane(p.id)}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-[7px] px-2.5 py-1.5 text-[12.5px] transition-colors",
+                  "group flex items-center gap-1.5 rounded-[6px] px-2.5 py-1.5 text-[12.5px] transition-colors",
                   pane === p.id ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
                 )}
               >
-                <p.icon size={14} />
+                <Ico icon={p.icon} motion={p.motion} size={14} active={pane === p.id} />
                 {p.label}
                 {p.id === "files" && files.length ? (
                   <span className="rounded-[4px] bg-sunk px-1 text-[10px] tabular-nums text-ink-4">
@@ -626,7 +632,7 @@ export function BuilderView() {
                       onClick={() => setDevice(d)}
                       aria-label={D.label}
                       className={cn(
-                        "grid h-7 w-7 place-items-center rounded-[7px] transition-colors",
+                        "grid h-7 w-7 place-items-center rounded-[6px] transition-colors",
                         device === d ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
                       )}
                     >
@@ -637,7 +643,7 @@ export function BuilderView() {
                 <button
                   onClick={() => setFiles((f) => [...f])}
                   aria-label="Reload preview"
-                  className="grid h-7 w-7 place-items-center rounded-[7px] text-ink-4 transition-colors hover:text-ink-2"
+                  className="grid h-7 w-7 place-items-center rounded-[6px] text-ink-4 transition-colors hover:text-ink-2"
                 >
                   <FiRefreshCw size={13} />
                 </button>
@@ -675,7 +681,7 @@ export function BuilderView() {
                     title="Preview"
                     srcDoc={preview}
                     sandbox="allow-scripts allow-forms allow-modals allow-popups"
-                    className="nx-preview-in mx-auto h-full min-h-[560px] rounded-[10px] border border-line bg-white shadow-[var(--elev-lift)] transition-[width] duration-300 ease-out"
+                    className="nx-preview-in mx-auto h-full min-h-[560px] rounded-[8px] border border-line bg-white shadow-[var(--elev-lift)] transition-[width] duration-300 ease-out"
                     style={{ width: DEVICE[device].w, maxWidth: "100%" }}
                   />
                 </div>
@@ -713,7 +719,7 @@ export function BuilderView() {
                           setOpenFile(f.path);
                           setPane("code");
                         }}
-                        className="flex w-full items-center gap-2 rounded-[7px] px-2 py-1.5 text-left text-[13px] text-ink-2 transition-colors hover:bg-hover"
+                        className="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[13px] text-ink-2 transition-colors hover:bg-hover"
                       >
                         <FiFile size={13} className="shrink-0 text-ink-4" />
                         <span className="flex-1 truncate">{f.path}</span>
@@ -735,7 +741,7 @@ export function BuilderView() {
                       key={f.path}
                       onClick={() => setOpenFile(f.path)}
                       className={cn(
-                        "shrink-0 rounded-[6px] px-2 py-1 font-mono text-[11.5px] transition-colors",
+                        "shrink-0 rounded-[5px] px-2 py-1 font-mono text-[11.5px] transition-colors",
                         openFile === f.path ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
                       )}
                     >
@@ -751,7 +757,7 @@ export function BuilderView() {
                       setCopied(true);
                       setTimeout(() => setCopied(false), 1500);
                     }}
-                    className="shrink-0 rounded-[6px] px-2 py-1 text-ink-4 hover:text-ink-2"
+                    className="shrink-0 rounded-[5px] px-2 py-1 text-ink-4 hover:text-ink-2"
                     aria-label="Copy file"
                   >
                     {copied ? <FiCheck size={13} className="text-positive" /> : <FiCopy size={13} />}
@@ -773,7 +779,7 @@ export function BuilderView() {
         <section className="flex min-h-0 flex-col">
           <div className="min-h-0 flex-1 space-y-3 overflow-auto p-3.5">
             <div className="flex justify-end">
-              <p className="max-w-[85%] rounded-[12px] bg-raised px-3.5 py-2 text-[13.5px] text-ink">
+              <p className="max-w-[85%] rounded-[10px] bg-raised px-3.5 py-2 text-[13.5px] text-ink">
                 {idea}
               </p>
             </div>
@@ -813,7 +819,7 @@ export function BuilderView() {
             <ActivityBox tasks={tasks} running={phase === "building"} />
 
             {error ? (
-              <div className="nx-in flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-3 py-2.5">
+              <div className="nx-in flex items-start gap-2.5 rounded-[8px] border border-critical/30 bg-critical/10 px-3 py-2.5">
                 <FiAlertCircle size={14} className="mt-0.5 shrink-0 text-critical" />
                 <p className="text-[13px] text-ink-2">{error}</p>
               </div>
@@ -830,7 +836,7 @@ export function BuilderView() {
                     key={q}
                     onClick={() => edit(q)}
                     disabled={busy}
-                    className="rounded-[7px] border border-line px-2.5 py-1 text-[12px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40"
+                    className="rounded-[6px] border border-line px-2.5 py-1 text-[12px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40"
                   >
                     {q}
                   </button>
@@ -839,9 +845,9 @@ export function BuilderView() {
             ) : null}
 
             {skillsOpen ? (
-              <div className="nx-in mb-2 max-h-[38vh] overflow-auto rounded-[10px] border border-line bg-rail p-2">
+              <div className="nx-in mb-2 max-h-[38vh] overflow-auto rounded-[8px] border border-line bg-rail p-2">
                 {SKILL_LIST.map((s) => (
-                  <div key={s.id} className="rounded-[7px] px-2 py-1.5">
+                  <div key={s.id} className="rounded-[6px] px-2 py-1.5">
                     <p className="text-[12.5px] font-medium text-ink-2">{s.label}</p>
                     <p className="text-[11.5px] leading-snug text-ink-4">{s.blurb}</p>
                   </div>

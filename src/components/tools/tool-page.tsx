@@ -119,7 +119,7 @@ export function ToolPage({
       <div className="nx-in mx-auto flex min-h-screen max-w-[780px] flex-col justify-center px-5 py-16">
         <div className="mb-7 flex flex-col items-center text-center">
           <span
-            className="mb-4 grid h-14 w-14 place-items-center rounded-[16px]"
+            className="mb-4 grid h-14 w-14 place-items-center rounded-[12px]"
             style={{ background: `${accent}1f`, color: accent }}
           >
             <Icon size={26} />
@@ -197,20 +197,20 @@ export function ToolPage({
       </header>
 
       {busy && !output ? (
-        <div className="flex items-center gap-3.5 rounded-[13px] border border-line bg-rail px-5 py-4">
+        <div className="flex items-center gap-3.5 rounded-[10px] border border-line bg-rail px-5 py-4">
           <Bot size={38} accent={accent} state="working" />
           <span className="nx-dots text-[14px] text-ink-2">Working</span>
         </div>
       ) : null}
 
       {output ? (
-        <div className="rounded-[14px] border border-line bg-rail p-5">
+        <div className="rounded-[10px] border border-line bg-rail p-5">
           <Message role="model" text={output} pending={busy} />
         </div>
       ) : null}
 
       {error ? (
-        <div className="mt-4 flex items-start gap-2.5 rounded-[12px] border border-critical/30 bg-critical/10 px-4 py-3">
+        <div className="mt-4 flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
           <Ico icon={FiAlertCircle} motion="pop" size={15} className="mt-0.5 shrink-0 text-critical" />
           <div>
             <p className="text-[13.5px] text-ink-2">{error}</p>

@@ -9,14 +9,14 @@ type Size = "sm" | "md";
 
 const variants: Record<Variant, string> = {
   solid: "bg-ink text-canvas hover:bg-ink/88",
-  accent: "bg-accent text-white hover:brightness-108",
+  accent: "btn-grad",
   outline: "border border-line-strong bg-canvas text-ink hover:bg-sunk",
   ghost: "text-ink-2 hover:bg-hover hover:text-ink",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-8 gap-1.5 rounded-[9px] px-3 text-[13px]",
-  md: "h-10 gap-2 rounded-[10px] px-4 text-[14px]",
+  sm: "h-8 gap-1.5 rounded-[8px] px-3 text-[13px]",
+  md: "h-10 gap-2 rounded-[8px] px-4 text-[14px]",
 };
 
 export function Button({

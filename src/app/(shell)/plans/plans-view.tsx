@@ -136,13 +136,13 @@ export function PlansView({
             <article
               key={t.id}
               className={cn(
-                "nx-in relative flex flex-col rounded-[14px] border p-6 transition-transform duration-200 hover:-translate-y-1",
+                "nx-in relative flex flex-col rounded-[10px] border p-6 transition-transform duration-200 hover:-translate-y-1",
                 featured ? "border-accent/45 bg-accent-soft" : "border-line bg-rail",
               )}
               style={{ animationDelay: `${i * 70}ms`, animationFillMode: "backwards" }}
             >
               {featured ? (
-                <span className="absolute -top-2.5 left-6 rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-medium text-white">
+                <span className="absolute -top-2.5 left-6 rounded-full btn-grad px-2.5 py-0.5 text-[11px] font-medium">
                   Most popular
                 </span>
               ) : null}
@@ -167,7 +167,7 @@ export function PlansView({
                   payment processor, and letting anyone switch to Team for free
                   would make the credit budget meaningless. */}
               {paid ? (
-                <span className="mt-5 flex items-center justify-center gap-2 rounded-[9px] border border-line-strong py-2.5 text-[13.5px] font-medium text-ink-4">
+                <span className="mt-5 flex items-center justify-center gap-2 rounded-[8px] border border-line-strong py-2.5 text-[13.5px] font-medium text-ink-4">
                   Coming soon
                 </span>
               ) : (
@@ -175,7 +175,7 @@ export function PlansView({
                   onClick={() => pick(t.id)}
                   disabled={!signedIn || active || pending}
                   className={cn(
-                    "mt-5 flex items-center justify-center gap-2 rounded-[9px] py-2.5 text-[13.5px] font-medium transition-colors",
+                    "mt-5 flex items-center justify-center gap-2 rounded-[8px] py-2.5 text-[13.5px] font-medium transition-colors",
                     active
                       ? "border border-positive/35 text-positive"
                       : "border border-line-strong text-ink hover:bg-hover",

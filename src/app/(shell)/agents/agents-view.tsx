@@ -27,7 +27,7 @@ const TOOLS = [
 ];
 
 const field =
-  "w-full rounded-[10px] border border-line-strong bg-sunk px-3.5 py-2.5 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent";
+  "w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 py-2.5 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent";
 
 /* ------------------------------------------------------------------ */
 
@@ -51,7 +51,7 @@ export function AgentsView({
         </p>
         <Link
           href="/login"
-          className="mt-7 rounded-[10px] bg-accent px-5 py-2.5 text-[14px] font-medium text-white transition-transform hover:scale-105"
+          className="mt-7 rounded-[8px] btn-grad px-5 py-2.5 text-[14px] font-medium transition-transform hover:scale-105"
         >
           Log in to continue
         </Link>
@@ -72,14 +72,14 @@ export function AgentsView({
         </div>
         <button
           onClick={() => setCreating(true)}
-          className="flex items-center gap-2 rounded-[10px] bg-accent px-4 py-2.5 text-[14px] font-medium text-white transition-transform hover:scale-[1.03]"
+          className="flex items-center gap-2 rounded-[8px] btn-grad px-4 py-2.5 text-[14px] font-medium transition-transform hover:scale-[1.03]"
         >
           <Ico icon={FiPlus} motion="open" size={16} /> New agent
         </button>
       </div>
 
       {agents.length === 0 ? (
-        <div className="nx-in flex flex-col items-center rounded-[16px] border border-dashed border-line-strong px-6 py-20 text-center">
+        <div className="nx-in flex flex-col items-center rounded-[12px] border border-dashed border-line-strong px-6 py-20 text-center">
           <Bot size={64} />
           <h2 className="mt-5 text-[16px] font-semibold text-ink">
             Build your first agent
@@ -94,7 +94,7 @@ export function AgentsView({
           {agents.map((a, i) => (
             <article
               key={a.id}
-              className="nx-in group relative flex flex-col rounded-[14px] border border-line bg-rail p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong"
+              className="nx-in group relative flex flex-col rounded-[10px] border border-line bg-rail p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong"
               style={{ animationDelay: `${i * 50}ms`, animationFillMode: "backwards" }}
             >
               <form
@@ -103,7 +103,7 @@ export function AgentsView({
               >
                 <button
                   aria-label={`Delete ${a.name}`}
-                  className="grid h-7 w-7 place-items-center rounded-[7px] text-ink-4 hover:bg-hover hover:text-critical"
+                  className="grid h-7 w-7 place-items-center rounded-[6px] text-ink-4 hover:bg-hover hover:text-critical"
                 >
                   <Ico icon={FiTrash2} motion="shake" size={13} />
                 </button>
@@ -120,7 +120,7 @@ export function AgentsView({
 
               <Link
                 href={`/agents/${a.id}`}
-                className="mt-4 block w-full rounded-[9px] border border-line-strong py-2 text-center text-[13px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
+                className="mt-4 block w-full rounded-[8px] border border-line-strong py-2 text-center text-[13px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
               >
                 Talk to {a.name.split(" ")[0]}
               </Link>
@@ -199,7 +199,7 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
         </div>
 
         {state.error ? (
-          <div className="flex items-start gap-2 rounded-[9px] border border-critical/30 bg-critical/10 px-3 py-2.5">
+          <div className="flex items-start gap-2 rounded-[8px] border border-critical/30 bg-critical/10 px-3 py-2.5">
             <Ico icon={FiAlertCircle} motion="pop" size={14} className="mt-0.5 shrink-0 text-critical" />
             <p className="text-[13px] text-critical">{state.error}</p>
           </div>
@@ -209,14 +209,14 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-[9px] px-4 py-2.5 text-[14px] text-ink-3 hover:text-ink"
+            className="rounded-[8px] px-4 py-2.5 text-[14px] text-ink-3 hover:text-ink"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={pending}
-            className="flex items-center gap-2 rounded-[9px] bg-accent px-4 py-2.5 text-[14px] font-medium text-white disabled:opacity-60"
+            className="flex items-center gap-2 rounded-[8px] btn-grad px-4 py-2.5 text-[14px] font-medium disabled:opacity-60"
           >
             {pending ? <Ico icon={FiLoader} motion="spin" size={15} className="animate-spin" /> : null}
             Create agent
@@ -257,7 +257,7 @@ function Shell({
         aria-modal="true"
         aria-label={title || "Agent"}
         className={cn(
-          "nx-in relative max-h-[90vh] w-full overflow-y-auto rounded-[16px] border border-line-strong bg-rail p-6 shadow-[0_30px_90px_rgba(0,0,0,0.8)]",
+          "nx-in relative max-h-[90vh] w-full overflow-y-auto rounded-[12px] border border-line-strong bg-rail p-6 shadow-[0_30px_90px_rgba(0,0,0,0.8)]",
           wide ? "max-w-[660px]" : "max-w-[540px]",
         )}
       >
@@ -267,7 +267,7 @@ function Shell({
             <button
               onClick={onClose}
               aria-label="Close"
-              className="grid h-8 w-8 place-items-center rounded-[8px] text-ink-3 hover:bg-hover hover:text-ink"
+              className="grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 hover:bg-hover hover:text-ink"
             >
               <Ico icon={FiX} motion="shake" size={17} />
             </button>
@@ -276,7 +276,7 @@ function Shell({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="absolute right-4 top-4 z-10 grid h-8 w-8 place-items-center rounded-[8px] text-ink-3 hover:bg-hover hover:text-ink"
+            className="absolute right-4 top-4 z-10 grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 hover:bg-hover hover:text-ink"
           >
             <Ico icon={FiX} motion="shake" size={17} />
           </button>

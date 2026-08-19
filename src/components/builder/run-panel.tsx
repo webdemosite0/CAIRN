@@ -36,7 +36,7 @@ export function RunPanel({
     <div className="h-full overflow-auto p-5">
       <div className="bezel mx-auto max-w-[560px] p-5">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-accent/12 text-accent">
+          <span className="grid h-9 w-9 place-items-center rounded-[8px] bg-accent/12 text-accent">
             <FiTerminal size={17} />
           </span>
           <div className="min-w-0">
@@ -58,13 +58,13 @@ export function RunPanel({
               <span className="grid w-5 shrink-0 place-items-center pt-1 text-[11px] tabular-nums text-ink-4">
                 {i + 1}
               </span>
-              <code className="min-w-0 flex-1 overflow-x-auto whitespace-pre rounded-[8px] border border-line bg-sunk px-3 py-2 font-mono text-[12px] text-ink-2">
+              <code className="min-w-0 flex-1 overflow-x-auto whitespace-pre rounded-[6px] border border-line bg-sunk px-3 py-2 font-mono text-[12px] text-ink-2">
                 {c}
               </code>
               <button
                 onClick={() => copy(c, i)}
                 aria-label={`Copy: ${c}`}
-                className="grid w-8 shrink-0 place-items-center rounded-[8px] text-ink-4 transition-colors hover:bg-hover hover:text-ink-2"
+                className="grid w-8 shrink-0 place-items-center rounded-[6px] text-ink-4 transition-colors hover:bg-hover hover:text-ink-2"
               >
                 {copied === i ? (
                   <FiCheck size={13} className="text-positive" />
@@ -87,16 +87,15 @@ export function RunPanel({
             onClick={onDownload}
             disabled={!fileCount}
             className={cn(
-              "flex items-center gap-2 rounded-[9px] bg-accent px-4 py-2 text-[13.5px] font-medium text-white",
-              "shadow-[var(--elev)] transition-[filter,transform] duration-150",
-              "hover:brightness-110 active:scale-[0.99] disabled:opacity-40",
+              "btn-grad flex items-center gap-2 rounded-[8px] px-4 py-2",
+              "text-[13.5px] font-medium disabled:opacity-40",
             )}
           >
             <FiDownload size={14} /> Download project
           </button>
           <button
             onClick={() => copy(all, -1)}
-            className="flex items-center gap-2 rounded-[9px] border border-line-strong px-4 py-2 text-[13.5px] text-ink transition-colors hover:bg-hover"
+            className="flex items-center gap-2 rounded-[8px] border border-line-strong px-4 py-2 text-[13.5px] text-ink transition-colors hover:bg-hover"
           >
             {copied === -1 ? <FiCheck size={14} className="text-positive" /> : <FiCopy size={14} />}
             Copy all commands

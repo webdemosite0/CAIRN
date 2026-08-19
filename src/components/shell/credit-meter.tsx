@@ -21,7 +21,7 @@ export function CreditMeter({ balance }: { balance: Balance | null }) {
   return (
     <Link
       href="/plans"
-      className="group block rounded-[8px] px-2 py-1.5 transition-colors hover:bg-hover"
+      className="group block rounded-[6px] px-2 py-1.5 transition-colors hover:bg-hover"
       title={`${remaining.toLocaleString()} of ${granted.toLocaleString()} credits left on ${plan.name}`}
     >
       <div className="flex items-baseline justify-between gap-2">

@@ -51,7 +51,7 @@ export function BuildStages({
           <li
             key={s.label}
             className={cn(
-              "nx-in relative flex items-center gap-3.5 overflow-hidden rounded-[13px] border px-4 py-3 transition-colors duration-300",
+              "nx-in relative flex items-center gap-3.5 overflow-hidden rounded-[10px] border px-4 py-3 transition-colors duration-300",
               working
                 ? "border-line-strong bg-raised"
                 : complete

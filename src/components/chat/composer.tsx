@@ -122,7 +122,7 @@ export function Composer({
       data-disabled={disabled}
       className={cn(
         "composer border bg-rail",
-        compact ? "rounded-[13px]" : "rounded-[18px]",
+        compact ? "rounded-[10px]" : "rounded-[12px]",
       )}
     >
       {/* attached files */}
@@ -131,17 +131,17 @@ export function Composer({
           {files.map((a, i) => (
             <div
               key={`${a.name}-${i}`}
-              className="nx-in group relative flex items-center gap-2 rounded-[10px] border border-line bg-raised py-1.5 pl-1.5 pr-7"
+              className="nx-in group relative flex items-center gap-2 rounded-[8px] border border-line bg-raised py-1.5 pl-1.5 pr-7"
             >
               {a.preview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={a.preview}
                   alt={a.name}
-                  className="h-8 w-8 rounded-[6px] object-cover"
+                  className="h-8 w-8 rounded-[5px] object-cover"
                 />
               ) : (
-                <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-sunk text-ink-3">
+                <span className="grid h-8 w-8 place-items-center rounded-[5px] bg-sunk text-ink-3">
                   {a.kind === "text" ? <FiFileText size={14} /> : <FiFile size={14} />}
                 </span>
               )}

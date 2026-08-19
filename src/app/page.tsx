@@ -110,7 +110,7 @@ function ArtifactStack() {
       <div className="bezel relative z-10 p-5 sm:p-6">
         <div className="mb-4 flex items-center justify-between">
           <span className="meta">document.docx</span>
-          <span className="grid h-6 w-6 place-items-center rounded-[7px] bg-accent/12 text-accent">
+          <span className="grid h-6 w-6 place-items-center rounded-[6px] bg-accent/12 text-accent">
             <FiDownload size={12} />
           </span>
         </div>
@@ -157,14 +157,14 @@ export default async function Landing() {
           <div className="flex items-center gap-1.5">
             <Link
               href="/plans"
-              className="hidden rounded-[8px] px-3 py-2 text-[13.5px] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:block"
+              className="hidden rounded-[6px] px-3 py-2 text-[13.5px] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:block"
             >
               Pricing
             </Link>
             <ThemeToggle />
             <Link
               href="/login"
-              className="rounded-[8px] px-3 py-2 text-[13.5px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
+              className="rounded-[6px] px-3 py-2 text-[13.5px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
             >
               Sign in
             </Link>
@@ -199,7 +199,7 @@ export default async function Landing() {
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href="/chat"
-                className="group flex items-center gap-2 rounded-[10px] bg-accent px-6 py-3 text-[14.5px] font-medium text-white shadow-[var(--elev)] transition-[filter,transform] duration-150 hover:brightness-110 active:scale-[0.99]"
+                className="group flex items-center gap-2 rounded-[8px] btn-grad px-6 py-3 text-[14.5px] font-medium transition-[filter,transform] active:scale-[0.99]"
               >
                 Start without an account
                 <FiArrowRight
@@ -209,7 +209,7 @@ export default async function Landing() {
               </Link>
               <Link
                 href="/signup"
-                className="rounded-[10px] border border-line-strong px-6 py-3 text-[14.5px] font-medium text-ink transition-colors hover:bg-hover"
+                className="rounded-[8px] border border-line-strong px-6 py-3 text-[14.5px] font-medium text-ink transition-colors hover:bg-hover"
               >
                 Create an account
               </Link>
@@ -237,7 +237,7 @@ export default async function Landing() {
             {FORMATS.map((f) => (
               <li
                 key={f.ext}
-                className="flex items-center gap-2 rounded-[9px] border border-line bg-sunk px-3 py-1.5"
+                className="flex items-center gap-2 rounded-[8px] border border-line bg-sunk px-3 py-1.5"
               >
                 <span className="font-mono text-[12.5px] font-medium text-accent">
                   {f.ext}
@@ -249,14 +249,14 @@ export default async function Landing() {
         </section>
 
         {/* Bento — the first tile is wide, so the grid has a first read. */}
-        <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="nx-stagger mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {BENTO.map((t, i) => (
             <article
               key={t.name}
               className={`bezel panel-hover nx-in p-5 ${t.wide ? "sm:col-span-2" : ""}`}
               style={{ animationDelay: `${i * 55}ms`, animationFillMode: "backwards" }}
             >
-              <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-accent/10 text-accent">
+              <span className="grid h-9 w-9 place-items-center rounded-[8px] bg-accent/10 text-accent">
                 <Ico icon={t.icon} motion="pop" size={18} />
               </span>
               <h2 className="mt-4 text-[15px] font-semibold text-ink">{t.name}</h2>
@@ -292,7 +292,7 @@ export default async function Landing() {
 
           <div
             aria-hidden
-            className="w-full max-w-[280px] rounded-[12px] border border-line bg-sunk p-3.5"
+            className="w-full max-w-[280px] rounded-[10px] border border-line bg-sunk p-3.5"
           >
             <span className="meta">Recents</span>
             <ul className="mt-2.5 space-y-1.5">
@@ -300,7 +300,7 @@ export default async function Landing() {
                 (r, i) => (
                   <li
                     key={r}
-                    className="flex items-center gap-2 rounded-[8px] bg-raised px-2.5 py-2 text-[12.5px] text-ink-2"
+                    className="flex items-center gap-2 rounded-[6px] bg-raised px-2.5 py-2 text-[12.5px] text-ink-2"
                     style={{ opacity: 1 - i * 0.16 }}
                   >
                     <FiCornerDownLeft size={11} className="shrink-0 text-ink-4" />

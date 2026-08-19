@@ -58,7 +58,7 @@ export function Empty({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-[16px] border border-dashed border-line-strong px-6 py-20 text-center">
+    <div className="flex flex-col items-center justify-center rounded-[12px] border border-dashed border-line-strong px-6 py-20 text-center">
       <span className="mb-4 grid h-11 w-11 place-items-center rounded-full bg-sunk text-ink-3">
         {icon}
       </span>

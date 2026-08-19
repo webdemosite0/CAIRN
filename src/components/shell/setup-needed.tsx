@@ -17,7 +17,7 @@ export function SetupNeeded({ detail }: { detail: string }) {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-[620px] flex-col justify-center px-5 py-16">
-      <span className="grid h-14 w-14 place-items-center rounded-[16px] bg-caution/15 text-caution">
+      <span className="grid h-14 w-14 place-items-center rounded-[12px] bg-caution/15 text-caution">
         <FiDatabase size={26} />
       </span>
 
@@ -30,7 +30,7 @@ export function SetupNeeded({ detail }: { detail: string }) {
         there is nowhere to keep accounts, saved conversations or credits.
       </p>
 
-      <pre className="mt-5 overflow-x-auto rounded-[12px] border border-line bg-sunk px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">
+      <pre className="mt-5 overflow-x-auto rounded-[10px] border border-line bg-sunk px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">
         {detail}
       </pre>
 
@@ -38,7 +38,7 @@ export function SetupNeeded({ detail }: { detail: string }) {
         On a serverless host, create a free Turso database:
       </p>
 
-      <pre className="mt-3 overflow-x-auto rounded-[12px] border border-line bg-sunk px-4 py-3 font-mono text-[12.5px] leading-[1.9] text-ink-2">
+      <pre className="mt-3 overflow-x-auto rounded-[10px] border border-line bg-sunk px-4 py-3 font-mono text-[12.5px] leading-[1.9] text-ink-2">
         {steps.join("\n")}
       </pre>
 
