@@ -5,24 +5,24 @@
    ============================================================ */
 
 @theme {
-  --color-canvas: #08090d;
+  --color-canvas: #0b0d12;
   --color-rail: #0d0f14;
-  --color-sunk: #0a0c11;
-  --color-raised: #11141b;
-  --color-hover: #171b25;
+  --color-sunk: #0f1218;
+  --color-raised: #131720;
+  --color-hover: #171b24;
 
   /* Raised from #ededed/#b4b4b4/#8a8a8a/#5c5c5c — the old ramp read as dull,
      and ink-4 sat at ~2.9:1 on canvas, under the 4.5:1 minimum. */
-  --color-ink: #f5f7fa;
-  --color-ink-2: #c2c9d6;
-  --color-ink-3: #8b92a3;
-  --color-ink-4: #838b9c;
+  --color-ink: #f4f5f8;
+  --color-ink-2: #c3cad8;
+  --color-ink-3: #a0a8b8;
+  --color-ink-4: #828a9b;
 
-  --color-line: #202532;
-  --color-line-strong: #2c3344;
+  --color-line: #252b38;
+  --color-line-strong: #333a4a;
 
-  --color-accent: #7c6fff;
-  --color-accent-soft: #171334;
+  --color-accent: #8b7cff;
+  --color-accent-soft: #181433;
   --color-violet: #a78bfa;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
@@ -44,19 +44,19 @@
    all: --shade, the direction elevation travels, and --ground, used by any
    effect that needs to know what it is sitting on. */
 :root {
-  --color-canvas: #08090d;
+  --color-canvas: #0b0d12;
   --color-rail: #0d0f14;
-  --color-sunk: #0a0c11;
-  --color-raised: #11141b;
-  --color-hover: #171b25;
-  --color-ink: #f5f7fa;
-  --color-ink-2: #c2c9d6;
-  --color-ink-3: #8b92a3;
-  --color-ink-4: #838b9c;
-  --color-line: #202532;
-  --color-line-strong: #2c3344;
-  --color-accent: #7c6fff;
-  --color-accent-soft: #171334;
+  --color-sunk: #0f1218;
+  --color-raised: #131720;
+  --color-hover: #171b24;
+  --color-ink: #f4f5f8;
+  --color-ink-2: #c3cad8;
+  --color-ink-3: #a0a8b8;
+  --color-ink-4: #828a9b;
+  --color-line: #252b38;
+  --color-line-strong: #333a4a;
+  --color-accent: #8b7cff;
+  --color-accent-soft: #181433;
   --color-violet: #a78bfa;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
@@ -108,14 +108,14 @@
   /* Callers hand us neon pastels tuned for a black ground; on white they drop
      to ~1.6:1. This mixes black into any such tint, and is 0% on dark. */
   /* Dark mode separates surfaces by lightness, so it needs no shadow. */
-  --bezel: rgb(190 214 255 / 0.075);
+  --bezel: rgb(190 214 255 / 0.06);
   --grad-text-from: #a99bff;
   --grad-text-to: #6ee7f9;
-  --btn-a: #6a5cfa;
-  --btn-b: #5348ee;
+  --btn-a: #6c5ce7;
+  --btn-b: #5a4bd6;
   --btn-ink: #ffffff;
-  --btn-glow: rgb(107 92 250 / 0.38);
-  --bezel-under: rgb(0 0 0 / 0.42);
+  --btn-glow: rgb(80 70 180 / 0.30);
+  --bezel-under: rgb(0 0 0 / 0.34);
   --bezel-ring: rgb(150 180 235 / 0.04);
   --hairline: rgb(190 214 255 / 0.26);
   --elev: none;
@@ -203,8 +203,8 @@
   --bezel: rgb(255 255 255 / 0.9);
   --grad-text-from: #5b50f5;
   --grad-text-to: #0d8fc4;
-  --btn-a: #6a5cfa;
-  --btn-b: #5348ee;
+  --btn-a: #6c5ce7;
+  --btn-b: #5a4bd6;
   --btn-ink: #ffffff;
   --btn-glow: rgb(91 80 245 / 0.32);
   --bezel-under: rgb(26 31 54 / 0.05);
@@ -283,8 +283,8 @@
     --bezel: rgb(255 255 255 / 0.9);
     --grad-text-from: #5b50f5;
     --grad-text-to: #0d8fc4;
-    --btn-a: #6a5cfa;
-    --btn-b: #5348ee;
+    --btn-a: #6c5ce7;
+    --btn-b: #5a4bd6;
     --btn-ink: #ffffff;
     --btn-glow: rgb(91 80 245 / 0.32);
     --bezel-under: rgb(26 31 54 / 0.05);
@@ -372,9 +372,12 @@ select:focus-visible,
     box-shadow 0.18s var(--ease-out),
     background-color 0.18s var(--ease-out);
 }
+/* Focus should read as precision, not decoration: a definite border and a
+   ring you notice only if you look for it. The previous 16% ring was doing
+   the job of the border and drawing attention to itself. */
 .composer:focus-within {
-  border-color: color-mix(in oklab, var(--color-accent) 55%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 16%, transparent);
+  border-color: color-mix(in oklab, var(--color-accent) 75%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 8%, transparent);
 }
 .composer[data-dragging="true"] {
   border-color: var(--color-accent);
@@ -1709,16 +1712,16 @@ a[role="button"]:active {
 /* Shadows have to carry further on a dark ground to read at all. */
 :root:not([data-theme="light"]) {
   @media (prefers-color-scheme: dark) {
-    --sh-1: 0 1px 2px rgb(0 0 0 / 0.40);
-    --sh-2: 0 1px 2px rgb(0 0 0 / 0.45), 0 4px 12px -4px rgb(0 0 0 / 0.55);
-    --sh-3: 0 2px 4px rgb(0 0 0 / 0.45), 0 14px 36px -12px rgb(0 0 0 / 0.65);
+    --sh-1: 0 1px 2px rgb(0 0 0 / 0.32);
+    --sh-2: 0 2px 6px rgb(0 0 0 / 0.24), 0 10px 30px -10px rgb(0 0 0 / 0.34);
+    --sh-3: 0 4px 10px rgb(0 0 0 / 0.26), 0 20px 50px -16px rgb(0 0 0 / 0.42);
   }
 }
 
 :root[data-theme="dark"] {
-  --sh-1: 0 1px 2px rgb(0 0 0 / 0.40);
-  --sh-2: 0 1px 2px rgb(0 0 0 / 0.45), 0 4px 12px -4px rgb(0 0 0 / 0.55);
-  --sh-3: 0 2px 4px rgb(0 0 0 / 0.45), 0 14px 36px -12px rgb(0 0 0 / 0.65);
+  --sh-1: 0 1px 2px rgb(0 0 0 / 0.32);
+  --sh-2: 0 2px 6px rgb(0 0 0 / 0.24), 0 10px 30px -10px rgb(0 0 0 / 0.34);
+  --sh-3: 0 4px 10px rgb(0 0 0 / 0.26), 0 20px 50px -16px rgb(0 0 0 / 0.42);
 }
 
 /* ------------------------------------------------------------------ */

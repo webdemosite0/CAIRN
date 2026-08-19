@@ -124,13 +124,13 @@ export function HomeChat({
             "Unlock unlimited builds" would promise something it cannot do. */}
 
         <div className="relative flex flex-1 flex-col items-center px-5 pb-16 pt-10 lg:pt-14">
-          <div className="w-full max-w-[1000px]">
+          <div className="w-full max-w-[1140px]">
             {/* The wordmark used to sit here at 58px. The reader is already
                 inside Trove, so a logo the size of a headline was telling them
                 where they are instead of what to do next. */}
             <div className="nx-rise mb-2">
               <Greeting name={name} />
-              <h1 className="mt-2 text-[clamp(2rem,1.4rem+1.6vw,2.75rem)] font-semibold leading-[1.08] tracking-tight text-ink">
+              <h1 className="mt-2 text-[clamp(2.125rem,1.4rem+1.9vw,3rem)] font-semibold leading-[1.05] tracking-tight text-ink">
                 What will you build today?
               </h1>
               <p className="mt-3 max-w-[52ch] text-[16.5px] leading-relaxed text-ink-3">
@@ -138,8 +138,10 @@ export function HomeChat({
               </p>
             </div>
 
+            {/* 36px, so the composer reads as the continuation of the
+                hero rather than a separate block below it. */}
             <div
-              className="nx-rise mt-8"
+              className="nx-rise mt-9"
               style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
             >
               {/* Keyed by the draft so a starter card refills an existing
@@ -157,9 +159,10 @@ export function HomeChat({
 
             <QuickActions className="mt-6" />
 
-            {activity.length === 0 ? (
-              <StarterCards className="mt-10" onPick={setDraft} />
-            ) : null}
+            {/* Always shown. These are shortcuts, not filler — someone
+                with a full workspace still wants a one-tap way to start the
+                next thing. */}
+            <StarterCards className="mt-10" onPick={setDraft} />
 
             <div className="mt-8 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
               <ContinuePanel items={activity} />

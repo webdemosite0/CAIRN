@@ -12,8 +12,9 @@ import { cn } from "@/lib/utils";
  * new person does is see their intent appear in the box they will keep using —
  * the point being taught is "describe it here", not "click through to a tool".
  *
- * Shown only while there is no history. Once real work exists it is more
- * useful than any example, and this disappears.
+ * Always shown. They are shortcuts rather than filler for an empty page —
+ * someone with a full workspace still wants a one-tap way to start the next
+ * thing.
  */
 export interface Starter {
   icon: IconType;
@@ -125,7 +126,7 @@ export function StarterCards({
     <section className={className} aria-labelledby="starter-heading">
       <h2
         id="starter-heading"
-        className="mb-3 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-4"
+        className="mb-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-4"
       >
         Start with something
       </h2>
@@ -139,7 +140,7 @@ export function StarterCards({
             className={cn(
               "group flex flex-col rounded-[14px] border border-line bg-canvas p-4 text-left",
               "shadow-[var(--sh-1)] transition-[transform,border-color,box-shadow] duration-200",
-              "hover:-translate-y-[2px] hover:border-line-strong hover:shadow-[var(--sh-2)]",
+              "hover:-translate-y-[2px] hover:border-accent/35 hover:shadow-[var(--sh-2)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
             )}
           >
