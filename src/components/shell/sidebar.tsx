@@ -47,6 +47,8 @@ interface Item {
   label: string;
   icon: IconType;
   motion: Motion;
+  /** A short tag, for something not finished yet. */
+  badge?: string;
 }
 
 /**
@@ -82,7 +84,7 @@ const GROUPS: { label: string; items: Item[] }[] = [
     label: "Automate",
     items: [
       { href: "/research", label: "Research", icon: TbSearch, motion: "scan" },
-      { href: "/workflows", label: "Workflows", icon: TbRefreshDot, motion: "spin" },
+      { href: "/workflows", label: "Workflows", icon: TbRefreshDot, motion: "spin", badge: "Soon" },
       { href: "/reminders", label: "Reminders", icon: TbBell, motion: "ring" },
       { href: "/integrations", label: "Integrations", icon: TbPlugConnected, motion: "open" },
     ],
@@ -90,6 +92,13 @@ const GROUPS: { label: string; items: Item[] }[] = [
 ];
 
 const ALL = GROUPS.flatMap((g) => g.items);
+
+/** Reached rarely, so they get icons at the foot rather than nav rows. */
+const SECONDARY: { href: string; label: string; icon: IconType }[] = [
+  { href: "/settings", label: "Settings", icon: FiSettings },
+  { href: "/integrations", label: "Integrations", icon: TbPlugConnected },
+  { href: "/plans", label: "Plan and usage", icon: FiCreditCard },
+];
 
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + "/");
@@ -123,6 +132,11 @@ function NavRow({
         )}
       />
       <span className="truncate">{item.label}</span>
+      {item.badge ? (
+        <span className="ml-auto shrink-0 rounded-[5px] bg-accent-soft px-1.5 py-0.5 text-[9.5px] font-medium uppercase tracking-[0.06em] text-accent">
+          {item.badge}
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -297,7 +311,24 @@ function RailBody({
           </Link>
         )}
 
-        <ThemeToggle className="px-1 pt-0.5" />
+        {/* Secondary actions, as icons — they are reached rarely and do not
+            deserve a row of their own each. */}
+        <div className="flex items-center gap-0.5 border-t border-line pt-2">
+          {SECONDARY.map((x) => (
+            <Link
+              key={x.href}
+              href={x.href}
+              onClick={onNavigate}
+              title={x.label}
+              aria-label={x.label}
+              className="grid h-8 w-8 place-items-center rounded-[6px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+            >
+              <x.icon size={16} />
+            </Link>
+          ))}
+          <span className="flex-1" />
+          <ThemeToggle />
+        </div>
       </div>
     </>
   );
@@ -332,11 +363,14 @@ export function Sidebar({
       <aside
         className={cn(
           "nx-no-print fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-line bg-rail transition-[width] duration-200 lg:flex",
-          collapsed ? "w-[68px]" : "w-[324px]",
+          collapsed ? "w-[76px]" : "w-[324px]",
         )}
       >
         {collapsed ? (
-          <div className="flex h-full flex-col items-center gap-1.5 py-3.5">
+          // Labels sit under the icons rather than in tooltips: a rail you can
+          // read is worth more than four saved pixels, and a tooltip only
+          // helps someone who already hovered the right thing.
+          <div className="flex h-full flex-col items-center gap-1 py-3.5">
             <Link href="/chat" aria-label="Trove home">
               <TroveOrb size={28} state="idle" />
             </Link>
@@ -369,13 +403,16 @@ export function Sidebar({
                     aria-label={i.label}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group grid h-9 w-9 shrink-0 place-items-center rounded-[6px] transition-colors",
+                      "group flex w-[58px] shrink-0 flex-col items-center gap-1 rounded-[8px] px-1 py-2 transition-colors",
                       active
                         ? "bg-accent-soft text-accent"
                         : "text-ink-4 hover:bg-hover hover:text-ink-2",
                     )}
                   >
-                    <Ico icon={i.icon} motion={i.motion} active={active} size={18} />
+                    <Ico icon={i.icon} motion={i.motion} active={active} size={19} />
+                    <span className="w-full truncate text-center text-[9.5px] leading-none">
+                      {i.label}
+                    </span>
                   </Link>
                 );
               })}
@@ -416,7 +453,7 @@ export function Sidebar({
       <div
         className={cn(
           "nx-no-print hidden shrink-0 transition-[width] duration-200 lg:block",
-          collapsed ? "w-[68px]" : "w-[324px]",
+          collapsed ? "w-[76px]" : "w-[324px]",
         )}
       />
     </>
