@@ -184,7 +184,7 @@
   --aurora-a: rgb(99 91 255 / 0.13);
   --aurora-b: rgb(122 90 248 / 0.11);
   --aurora-c: rgb(0 191 191 / 0.08);
-  --tint-darken: 36%;
+  --tint-darken: 50%;
   /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
   --sx-plain: #1f2430;
   --sx-comment: #636a78;
@@ -264,7 +264,7 @@
     --aurora-a: rgb(99 91 255 / 0.13);
     --aurora-b: rgb(122 90 248 / 0.11);
     --aurora-c: rgb(0 191 191 / 0.08);
-    --tint-darken: 36%;
+    --tint-darken: 50%;
     /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
     --sx-plain: #1f2430;
     --sx-comment: #636a78;

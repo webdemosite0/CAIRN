@@ -350,9 +350,13 @@ export function Files() {
             >
               <span
                 className="grid h-8 w-8 place-items-center rounded-[6px] text-[10px] font-semibold tracking-tight"
+                /* The label is darkened on light, where a bright tone on a
+                   16% tint of itself measured as low as 1.58:1. Mixed in
+                   srgb so the result matches what was measured, and
+                   --tint-darken is 0% on dark, where the tone reads fine. */
                 style={{
-                  background: `color-mix(in oklab, ${f.tone} 16%, transparent)`,
-                  color: f.tone,
+                  background: `color-mix(in srgb, ${f.tone} 16%, transparent)`,
+                  color: `color-mix(in srgb, ${f.tone}, #000 var(--tint-darken))`,
                 }}
               >
                 {f.ext}
