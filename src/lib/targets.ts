@@ -35,7 +35,7 @@ export const TARGETS: Record<TargetId, Target> = {
   static: {
     id: "static",
     label: "Static site",
-    blurb: "HTML, CSS and JavaScript. Runs anywhere, previews here.",
+    blurb: "HTML, CSS and JavaScript. No build step, opens anywhere.",
     previewable: true,
     entry: "index.html",
     commands: ["open index.html"],
