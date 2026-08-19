@@ -109,6 +109,8 @@
      to ~1.6:1. This mixes black into any such tint, and is 0% on dark. */
   /* Dark mode separates surfaces by lightness, so it needs no shadow. */
   --bezel: rgb(190 214 255 / 0.075);
+  --grad-text-from: #a99bff;
+  --grad-text-to: #6ee7f9;
   --btn-a: #6a5cfa;
   --btn-b: #5348ee;
   --btn-ink: #ffffff;
@@ -199,6 +201,8 @@
   --tag-e: #875616;
   --tag-f: #ad2b48;
   --bezel: rgb(255 255 255 / 0.9);
+  --grad-text-from: #5b50f5;
+  --grad-text-to: #0d8fc4;
   --btn-a: #6a5cfa;
   --btn-b: #5348ee;
   --btn-ink: #ffffff;
@@ -277,6 +281,8 @@
     --tag-e: #875616;
     --tag-f: #ad2b48;
     --bezel: rgb(255 255 255 / 0.9);
+    --grad-text-from: #5b50f5;
+    --grad-text-to: #0d8fc4;
     --btn-a: #6a5cfa;
     --btn-b: #5348ee;
     --btn-ink: #ffffff;
@@ -1713,4 +1719,99 @@ a[role="button"]:active {
   --sh-1: 0 1px 2px rgb(0 0 0 / 0.40);
   --sh-2: 0 1px 2px rgb(0 0 0 / 0.45), 0 4px 12px -4px rgb(0 0 0 / 0.55);
   --sh-3: 0 2px 4px rgb(0 0 0 / 0.45), 0 14px 36px -12px rgb(0 0 0 / 0.65);
+}
+
+/* ------------------------------------------------------------------ */
+/* Landing                                                             */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Gradient headline text.
+ *
+ * background-clip: text needs a colour behind it for the fallback path — if a
+ * browser skips the clip, transparent text would leave the line invisible
+ * rather than merely unstyled. `color` is set to the first stop so the worst
+ * case is a solid heading in the right colour.
+ */
+.nx-grad-text {
+  color: var(--grad-text-from);
+  background-image: linear-gradient(
+    100deg,
+    var(--grad-text-from) 0%,
+    var(--grad-text-to) 55%,
+    var(--grad-text-from) 100%
+  );
+  background-size: 180% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: nx-grad-drift 9s ease-in-out infinite;
+}
+
+@keyframes nx-grad-drift {
+  0%,
+  100% {
+    background-position: 0% 0;
+  }
+  50% {
+    background-position: 100% 0;
+  }
+}
+
+/* A card resting on air. Deliberately slow and small — anything faster reads
+   as a glitch rather than depth. */
+@keyframes nx-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+.nx-float {
+  animation: nx-float 7s ease-in-out infinite;
+}
+
+/*
+ * The connector between agents in the flow diagram.
+ *
+ * A travelling highlight on a static hairline, so the chain reads as a
+ * direction of travel. The line itself never moves, only the gradient
+ * position, which the compositor handles without touching layout.
+ */
+.nx-wire {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-line) 0%,
+    var(--color-line) 40%,
+    var(--color-accent) 50%,
+    var(--color-line) 60%,
+    var(--color-line) 100%
+  );
+  background-size: 260% 100%;
+  animation: nx-wire 2.6s linear infinite;
+}
+
+@keyframes nx-wire {
+  from {
+    background-position: 130% 0;
+  }
+  to {
+    background-position: -30% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-grad-text,
+  .nx-float,
+  .nx-wire {
+    animation: none;
+  }
+
+  /* Without the travelling highlight the wire still has to be visible. */
+  .nx-wire {
+    background-image: none;
+    background-color: var(--color-line);
+  }
 }
