@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { streamText, type Turn } from "@/lib/gemini";
 import { toParts, type Attachment } from "@/lib/attachments";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
+import { temperatureFor } from "@/lib/modes";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -19,11 +20,13 @@ read, say so plainly rather than guessing what it contained.`;
 export async function POST(req: NextRequest) {
   let turns: Turn[];
   let attachments: Attachment[] = [];
+  let mode: unknown;
 
   try {
     const body = await req.json();
     turns = Array.isArray(body?.messages) ? body.messages : [];
     attachments = Array.isArray(body?.attachments) ? body.attachments : [];
+    mode = body?.mode;
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -53,6 +56,9 @@ export async function POST(req: NextRequest) {
         account && spend(account.userId, "chat", u.totalTokens),
       turns,
       system: SYSTEM,
+      // The composer's mode, resolved to a real temperature. An unknown
+      // value falls back to balanced rather than being trusted.
+      temperature: temperatureFor(mode),
       // Attachments belong to the newest user turn.
       extraParts: attachments.length ? toParts(attachments) : undefined,
     });

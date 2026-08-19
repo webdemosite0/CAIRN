@@ -14,7 +14,7 @@ import {
 import { Ico } from "@/components/ui/ico";
 import { useVoice } from "@/components/chat/use-voice";
 import { ModePicker } from "@/components/chat/mode-picker";
-import { DEFAULT_MODE, type ModeId } from "@/lib/modes";
+import type { ModeId } from "@/lib/modes";
 import {
   MAX_FILES,
   MAX_TOTAL_BYTES,
@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 
 export function Composer({
   onSend,
+  initialValue = "",
   mode,
   onModeChange,
   placeholder = "Ask anything, or describe what to build…",
@@ -36,6 +37,8 @@ export function Composer({
   compact = false,
 }: {
   onSend?: (value: string, attachments?: Attachment[]) => void;
+  /** Prefills the field. Change it with a key= to refill an existing box. */
+  initialValue?: string;
   /** Shown as a picker when supplied; the caller sends it with the request. */
   mode?: ModeId;
   onModeChange?: (id: ModeId) => void;
@@ -47,7 +50,7 @@ export function Composer({
   /** Tighter spacing and type, for narrow side panels. */
   compact?: boolean;
 }) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(initialValue);
   const [files, setFiles] = useState<Attachment[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -131,7 +134,7 @@ export function Composer({
       data-focused={focused}
       className={cn(
         "composer border bg-rail",
-        compact ? "rounded-[10px]" : "rounded-[12px]",
+        compact ? "rounded-[10px]" : "rounded-[18px] shadow-[var(--sh-2)]",
       )}
     >
       {/* attached files */}
@@ -189,7 +192,7 @@ export function Composer({
 
       <textarea
         ref={ref}
-        rows={compact ? 1 : 2}
+        rows={compact ? 1 : 3}
         value={value}
         autoFocus={autoFocus}
         disabled={disabled}
@@ -221,14 +224,14 @@ export function Composer({
           "block max-h-[220px] w-full resize-none bg-transparent text-ink outline-none placeholder:text-ink-4 disabled:cursor-not-allowed",
           compact
             ? "px-3.5 pb-1.5 pt-3 text-[13.5px] leading-[1.55]"
-            : "px-5 pb-3 pt-4 text-[15.5px] leading-[1.6]",
+            : "min-h-[84px] px-5 pb-3 pt-5 text-[16px] leading-[1.6]",
         )}
       />
 
       <div
         className={cn(
-          "flex items-center gap-1.5",
-          compact ? "px-2 pb-2" : "gap-2 px-3.5 pb-3.5",
+          "flex items-center",
+          compact ? "gap-1.5 px-2 pb-2" : "gap-2 border-t border-line/70 px-3.5 py-3",
         )}
       >
         {allowAttachments ? (
@@ -249,11 +252,12 @@ export function Composer({
               aria-label="Attach files"
               title="Attach images, PDFs, text or code"
               className={cn(
-                "group grid shrink-0 place-items-center rounded-full text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40",
-                compact ? "h-7 w-7" : "h-8 w-8",
+                "group flex shrink-0 items-center gap-1.5 rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40",
+                compact ? "h-7 w-7 justify-center" : "h-9 px-2.5",
               )}
             >
-              <Ico icon={FiPaperclip} motion="nudge" size={compact ? 15 : 17} />
+              <Ico icon={FiPaperclip} motion="nudge" size={compact ? 15 : 16} />
+              {!compact ? <span className="text-[13px]">Attach</span> : null}
             </button>
           </>
         ) : null}
@@ -265,8 +269,8 @@ export function Composer({
             aria-pressed={voice.listening}
             title={voice.listening ? "Listening — click to stop" : "Speak your message"}
             className={cn(
-              "group relative grid shrink-0 place-items-center rounded-full transition-colors disabled:opacity-40",
-              compact ? "h-7 w-7" : "h-8 w-8",
+              "group relative flex shrink-0 items-center gap-1.5 rounded-[8px] transition-colors disabled:opacity-40",
+              compact ? "h-7 w-7 justify-center" : "h-9 px-2.5",
               voice.listening
                 ? "bg-critical/15 text-critical"
                 : "text-ink-3 hover:bg-hover hover:text-ink",
@@ -276,6 +280,7 @@ export function Composer({
               <span className="nx-pulse absolute inset-0 rounded-full bg-critical/20" />
             ) : null}
           <Ico icon={FiMic} motion="pop" size={compact ? 14 : 16} live={voice.listening} />
+          {!compact ? <span className="text-[13px]">Voice</span> : null}
         </button>
 
         {mode && onModeChange ? (
@@ -295,14 +300,14 @@ export function Composer({
           aria-label="Send message"
           className={cn(
             "group ml-auto grid shrink-0 place-items-center rounded-full transition-all duration-200",
-            compact ? "h-8 w-8" : "h-9 w-9",
+            compact ? "h-8 w-8" : "h-12 w-12",
             ready ? "btn-grad hover:scale-105" : "bg-raised text-ink-4",
           )}
         >
           {disabled ? (
             <Ico icon={FiLoader} motion="spin" size={compact ? 14 : 16} live />
           ) : (
-            <Ico icon={FiArrowUp} motion="launch" size={compact ? 15 : 17} />
+            <Ico icon={FiArrowUp} motion="launch" size={compact ? 15 : 19} />
           )}
         </button>
       </div>

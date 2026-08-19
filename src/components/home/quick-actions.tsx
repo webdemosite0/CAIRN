@@ -45,7 +45,9 @@ const GROUPS: { label: string; actions: Action[] }[] = [
     ],
   },
   {
-    label: "Research",
+    // Named Explore rather than Research so the group has room for
+    // more than one kind of looking-things-up later.
+    label: "Explore",
     actions: [{ href: "/research", label: "Research", icon: TbSearch, key: "6" }],
   },
 ];

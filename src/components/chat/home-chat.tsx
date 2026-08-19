@@ -7,6 +7,8 @@ import { Composer } from "@/components/chat/composer";
 import { Message } from "@/components/chat/message";
 import { Greeting } from "@/components/chat/greeting";
 import { QuickActions } from "@/components/home/quick-actions";
+import { StarterCards } from "@/components/home/starter-cards";
+import { DEFAULT_MODE, type ModeId } from "@/lib/modes";
 import { ContinuePanel, ActivityPanel } from "@/components/home/recent-panels";
 import { Aurora } from "@/components/shell/aurora";
 import type { Attachment } from "@/lib/attachments";
@@ -39,6 +41,8 @@ export function HomeChat({
     (restored?.messages ?? []).map((m, i) => ({ id: i, role: m.role, text: m.text })),
   );
   const [busy, setBusy] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [mode, setMode] = useState<ModeId>(DEFAULT_MODE);
   const [error, setError] = useState<string | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const nextId = useRef(restored?.messages.length ?? 0);
@@ -59,6 +63,7 @@ export function HomeChat({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history.map(({ role, text }) => ({ role, text })),
+          mode,
           attachments: files?.map(({ name, mimeType, size, data, kind }) => ({
             name, mimeType, size, data, kind,
           })),
@@ -94,7 +99,7 @@ export function HomeChat({
     } finally {
       setBusy(false);
     }
-  }, [router, save]);
+  }, [router, save, mode]);
 
   const send = useCallback(
     (text: string, files?: Attachment[]) => {
@@ -118,17 +123,17 @@ export function HomeChat({
         {/* No upsell banner here: /plans has no payment processor wired up, so
             "Unlock unlimited builds" would promise something it cannot do. */}
 
-        <div className="relative flex flex-1 flex-col items-center justify-center px-5 pb-16 pt-12">
-          <div className="w-full max-w-[760px]">
+        <div className="relative flex flex-1 flex-col items-center px-5 pb-16 pt-10 lg:pt-14">
+          <div className="w-full max-w-[1000px]">
             {/* The wordmark used to sit here at 58px. The reader is already
                 inside Trove, so a logo the size of a headline was telling them
                 where they are instead of what to do next. */}
             <div className="nx-rise mb-2">
               <Greeting name={name} />
-              <h1 className="mt-1.5 text-[var(--fs-hero)] font-semibold leading-[var(--lh-tight)] tracking-tight text-ink">
+              <h1 className="mt-2 text-[clamp(2rem,1.4rem+1.6vw,2.75rem)] font-semibold leading-[1.08] tracking-tight text-ink">
                 What will you build today?
               </h1>
-              <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-ink-3">
+              <p className="mt-3 max-w-[52ch] text-[16.5px] leading-relaxed text-ink-3">
                 Describe an idea, automate a task, or create something new.
               </p>
             </div>
@@ -137,10 +142,24 @@ export function HomeChat({
               className="nx-rise mt-8"
               style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
             >
-              <Composer onSend={send} autoFocus disabled={busy} />
+              {/* Keyed by the draft so a starter card refills an existing
+                  box, rather than an effect syncing a prop into state. */}
+              <Composer
+                key={draft}
+                initialValue={draft}
+                onSend={send}
+                mode={mode}
+                onModeChange={setMode}
+                autoFocus
+                disabled={busy}
+              />
             </div>
 
             <QuickActions className="mt-6" />
+
+            {activity.length === 0 ? (
+              <StarterCards className="mt-10" onPick={setDraft} />
+            ) : null}
 
             <div className="mt-8 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
               <ContinuePanel items={activity} />

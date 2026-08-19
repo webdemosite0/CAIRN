@@ -29,6 +29,7 @@ import {
   TbSearch,
   TbMessageCircle,
   TbPlugConnected,
+  TbRefreshDot,
 } from "react-icons/tb";
 import { TroveOrb } from "@/components/brand/orb";
 import { Wordmark } from "@/components/brand/logo";
@@ -60,7 +61,8 @@ const GROUPS: { label: string; items: Item[] }[] = [
     label: "Workspace",
     items: [
       { href: "/dashboard", label: "Home", icon: TbLayoutDashboard, motion: "pop" },
-      { href: "/chat", label: "Chat", icon: TbMessageCircle, motion: "lift" },
+      // Route stays /chat — only the label changes, so nothing breaks.
+      { href: "/chat", label: "AI Workspace", icon: TbMessageCircle, motion: "lift" },
       { href: "/team", label: "AI Team", icon: TbUsers, motion: "tilt" },
     ],
   },
@@ -80,6 +82,7 @@ const GROUPS: { label: string; items: Item[] }[] = [
     label: "Automate",
     items: [
       { href: "/research", label: "Research", icon: TbSearch, motion: "scan" },
+      { href: "/workflows", label: "Workflows", icon: TbRefreshDot, motion: "spin" },
       { href: "/reminders", label: "Reminders", icon: TbBell, motion: "ring" },
       { href: "/integrations", label: "Integrations", icon: TbPlugConnected, motion: "open" },
     ],
@@ -251,7 +254,7 @@ function RailBody({
         <Link
           href="/chat"
           onClick={onNavigate}
-          className="btn-grad group flex items-center justify-center gap-2 rounded-[8px] px-3 py-2.5 text-[13.5px] font-medium"
+          className="btn-grad group flex h-[52px] items-center justify-center gap-2 rounded-[10px] px-4 text-[14.5px] font-medium"
         >
           <Ico icon={FiPlus} motion="open" size={16} />
           New
@@ -329,7 +332,7 @@ export function Sidebar({
       <aside
         className={cn(
           "nx-no-print fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-line bg-rail transition-[width] duration-200 lg:flex",
-          collapsed ? "w-[64px]" : "w-[248px]",
+          collapsed ? "w-[68px]" : "w-[324px]",
         )}
       >
         {collapsed ? (
@@ -413,7 +416,7 @@ export function Sidebar({
       <div
         className={cn(
           "nx-no-print hidden shrink-0 transition-[width] duration-200 lg:block",
-          collapsed ? "w-[64px]" : "w-[248px]",
+          collapsed ? "w-[68px]" : "w-[324px]",
         )}
       />
     </>
