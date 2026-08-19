@@ -133,7 +133,23 @@ export async function POST(req: NextRequest) {
       maxOutputTokens: 1024,
     });
 
-    return Response.json({ questions: [...FIXED, ...parseQuestions(raw)] });
+    const generated = parseQuestions(raw);
+
+    // A reply that parses to nothing is a quiet failure: the call succeeded, so
+    // no catch fires, and the user simply gets fewer questions with no reason
+    // given. Report it rather than letting it look like the intended output.
+    if (!generated.length) {
+      console.warn(
+        `builder/questions: model returned ${raw.length} chars but no usable questions`,
+      );
+      return Response.json({
+        questions: FIXED,
+        degraded: true,
+        reason: "the model's extra questions could not be read",
+      });
+    }
+
+    return Response.json({ questions: [...FIXED, ...generated] });
   } catch (e) {
     // Questions are a convenience, not a gate. If the model is unavailable the
     // build should still be possible, so fall back to the fixed pair rather

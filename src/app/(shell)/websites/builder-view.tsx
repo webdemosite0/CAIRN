@@ -182,7 +182,9 @@ export function BuilderView() {
         if (!res.ok) throw new Error(data?.error ?? `Failed (${res.status}).`);
 
         setQuestions(data.questions ?? []);
-        if (data.degraded) log("planner unavailable — asking the basics only", "warn");
+        if (data.degraded) {
+          log(data.reason ?? "asking the basics only", "warn");
+        }
         log(`${(data.questions ?? []).length} questions ready`, "ok");
         setPhase("review");
         setPlan(null);
