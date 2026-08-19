@@ -10,6 +10,7 @@ import {
 import { disconnect } from "@/app/actions/connections";
 import { ConnectDialog } from "@/components/integrations/connect-dialog";
 import { CATEGORIES, SERVICES, type Category } from "@/lib/services";
+import { IntegrationsHero } from "@/components/integrations/hero";
 import { Ico } from "@/components/ui/ico";
 import { cn } from "@/lib/utils";
 
@@ -68,23 +69,27 @@ export function IntegrationsView({
 
   return (
     <div className="mx-auto min-h-screen max-w-[1120px] px-5 py-8 lg:px-8">
-      <header className="mb-6">
-        <h1 className="text-[24px] font-semibold text-ink">Integrations</h1>
-        <p className="mt-1.5 text-[13.5px] text-ink-3">
-          {SERVICES.length} services · {optimistic.length} connected
-        </p>
-      </header>
+      <IntegrationsHero total={SERVICES.length} connected={optimistic.length} />
 
-      {/* search */}
-      <div className="relative mb-4">
-        <Ico icon={FiSearch} motion="scan" size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-4" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search integrations…"
-          aria-label="Search integrations"
-          className="h-11 w-full rounded-[8px] border border-line-strong bg-rail pl-10 pr-4 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent"
-        />
+      {/* Title and search on one line, so the list starts higher up. */}
+      <div className="mb-5 mt-9 flex flex-wrap items-center justify-between gap-4">
+        <h2 className="text-[19px] font-semibold text-ink">My integrations</h2>
+
+        <div className="relative w-full sm:w-[340px]">
+          <Ico
+            icon={FiSearch}
+            motion="scan"
+            size={16}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-4"
+          />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search"
+            aria-label="Search integrations"
+            className="h-11 w-full rounded-[10px] border border-line bg-sunk pl-10 pr-4 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent"
+          />
+        </div>
       </div>
 
       {/* categories */}
@@ -110,7 +115,7 @@ export function IntegrationsView({
           Nothing matches “{query}”.
         </p>
       ) : (
-        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-x-8 gap-y-1 lg:grid-cols-2">
           {results.map((s, i) => {
             const conn = byId.get(s.id);
             const on = Boolean(conn);

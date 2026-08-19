@@ -5,24 +5,24 @@
    ============================================================ */
 
 @theme {
-  --color-canvas: #0b0d12;
-  --color-rail: #0d0f14;
-  --color-sunk: #0f1218;
-  --color-raised: #131720;
-  --color-hover: #171b24;
+  --color-canvas: #0a0a0c;
+  --color-rail: #0c0c10;
+  --color-sunk: #0e0e13;
+  --color-raised: #131318;
+  --color-hover: #18181f;
 
   /* Raised from #ededed/#b4b4b4/#8a8a8a/#5c5c5c — the old ramp read as dull,
      and ink-4 sat at ~2.9:1 on canvas, under the 4.5:1 minimum. */
-  --color-ink: #f4f5f8;
-  --color-ink-2: #c3cad8;
-  --color-ink-3: #a0a8b8;
-  --color-ink-4: #828a9b;
+  --color-ink: #ffffff;
+  --color-ink-2: #d6d6dd;
+  --color-ink-3: #a8a8b3;
+  --color-ink-4: #8b8b96;
 
-  --color-line: #252b38;
-  --color-line-strong: #333a4a;
+  --color-line: #26262e;
+  --color-line-strong: #34343f;
 
   --color-accent: #8b7cff;
-  --color-accent-soft: #181433;
+  --color-accent-soft: #17142e;
   --color-violet: #a78bfa;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
@@ -44,19 +44,19 @@
    all: --shade, the direction elevation travels, and --ground, used by any
    effect that needs to know what it is sitting on. */
 :root {
-  --color-canvas: #0b0d12;
-  --color-rail: #0d0f14;
-  --color-sunk: #0f1218;
-  --color-raised: #131720;
-  --color-hover: #171b24;
-  --color-ink: #f4f5f8;
-  --color-ink-2: #c3cad8;
-  --color-ink-3: #a0a8b8;
-  --color-ink-4: #828a9b;
-  --color-line: #252b38;
-  --color-line-strong: #333a4a;
+  --color-canvas: #0a0a0c;
+  --color-rail: #0c0c10;
+  --color-sunk: #0e0e13;
+  --color-raised: #131318;
+  --color-hover: #18181f;
+  --color-ink: #ffffff;
+  --color-ink-2: #d6d6dd;
+  --color-ink-3: #a8a8b3;
+  --color-ink-4: #8b8b96;
+  --color-line: #26262e;
+  --color-line-strong: #34343f;
   --color-accent: #8b7cff;
-  --color-accent-soft: #181433;
+  --color-accent-soft: #17142e;
   --color-violet: #a78bfa;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
@@ -82,7 +82,7 @@
   --orb-c: rgb(28 150 235 / 0.13);
   --sweep-base: #6f6f6f;
   --sweep-hi: #ffffff;
-  --grad-sky: rgb(24 42 92 / 0.084);
+  --grad-sky: rgb(20 20 34 / 0.09);
   --floor: rgb(0 0 0 / 0.55);
   --aurora-a: rgb(59 130 246 / 0.32);
   --aurora-b: rgb(167 139 250 / 0.26);
@@ -137,17 +137,17 @@
    ============================================================ */
 :root[data-theme="light"] {
   --color-canvas: #ffffff;
-  --color-rail: #f5f6f9;
-  --color-sunk: #f8f9fc;
+  --color-rail: #f7f7f9;
+  --color-sunk: #f4f4f7;
   --color-raised: #ffffff;
-  --color-hover: #eef0f6;
+  --color-hover: #f0f0f4;
 
-  --color-ink: #171a2b;
-  --color-ink-2: #3c4257;
-  --color-ink-3: #626a7d;
-  --color-ink-4: #5b6373;
+  --color-ink: #0d0d12;
+  --color-ink-2: #35353f;
+  --color-ink-3: #5c5c68;
+  --color-ink-4: #6b6b77;
 
-  --color-line: #e4e7ef;
+  --color-line: #e6e6ec;
   --color-line-strong: #d5dbe4;
 
   /* Darker, saturated variants — the dark-mode hues are pastels tuned to glow
@@ -224,15 +224,15 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     --color-canvas: #ffffff;
-    --color-rail: #f5f6f9;
-    --color-sunk: #f8f9fc;
+    --color-rail: #f7f7f9;
+    --color-sunk: #f4f4f7;
     --color-raised: #ffffff;
-    --color-hover: #eef0f6;
-    --color-ink: #171a2b;
-    --color-ink-2: #3c4257;
-    --color-ink-3: #626a7d;
-    --color-ink-4: #5b6373;
-    --color-line: #e4e7ef;
+    --color-hover: #f0f0f4;
+    --color-ink: #0d0d12;
+    --color-ink-2: #35353f;
+    --color-ink-3: #5c5c68;
+    --color-ink-4: #6b6b77;
+    --color-line: #e6e6ec;
     --color-line-strong: #d5dbe4;
     --color-accent: #5b50f5;
     --color-accent-soft: #f0efff;
