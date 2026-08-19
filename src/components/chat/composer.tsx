@@ -13,6 +13,8 @@ import {
 } from "react-icons/fi";
 import { Ico } from "@/components/ui/ico";
 import { useVoice } from "@/components/chat/use-voice";
+import { ModePicker } from "@/components/chat/mode-picker";
+import { DEFAULT_MODE, type ModeId } from "@/lib/modes";
 import {
   MAX_FILES,
   MAX_TOTAL_BYTES,
@@ -24,6 +26,8 @@ import { cn } from "@/lib/utils";
 
 export function Composer({
   onSend,
+  mode,
+  onModeChange,
   placeholder = "Ask anything, or describe what to build…",
   autoFocus = false,
   disabled = false,
@@ -32,6 +36,9 @@ export function Composer({
   compact = false,
 }: {
   onSend?: (value: string, attachments?: Attachment[]) => void;
+  /** Shown as a picker when supplied; the caller sends it with the request. */
+  mode?: ModeId;
+  onModeChange?: (id: ModeId) => void;
   placeholder?: string;
   autoFocus?: boolean;
   disabled?: boolean;
@@ -44,6 +51,7 @@ export function Composer({
   const [files, setFiles] = useState<Attachment[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [focused, setFocused] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
   const picker = useRef<HTMLInputElement>(null);
 
@@ -120,6 +128,7 @@ export function Composer({
       }}
       data-dragging={dragging}
       data-disabled={disabled}
+      data-focused={focused}
       className={cn(
         "composer border bg-rail",
         compact ? "rounded-[10px]" : "rounded-[12px]",
@@ -196,6 +205,8 @@ export function Composer({
             void add(pasted);
           }
         }}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -267,6 +278,15 @@ export function Composer({
           <Ico icon={FiMic} motion="pop" size={compact ? 14 : 16} live={voice.listening} />
         </button>
 
+        {mode && onModeChange ? (
+          <ModePicker
+            value={mode}
+            onChange={onModeChange}
+            disabled={disabled}
+            compact={compact}
+          />
+        ) : null}
+
         {leading}
 
         <button
@@ -276,7 +296,7 @@ export function Composer({
           className={cn(
             "group ml-auto grid shrink-0 place-items-center rounded-full transition-all duration-200",
             compact ? "h-8 w-8" : "h-9 w-9",
-            ready ? "bg-ink text-canvas hover:scale-105" : "bg-raised text-ink-4",
+            ready ? "btn-grad hover:scale-105" : "bg-raised text-ink-4",
           )}
         >
           {disabled ? (

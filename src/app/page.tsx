@@ -4,17 +4,20 @@ import { cookies } from "next/headers";
 import { FiArrowRight, FiCheck } from "react-icons/fi";
 import { Backdrop } from "@/components/shell/backdrop";
 import { LandingNav } from "@/components/landing/nav";
-import { WorkspaceVisual } from "@/components/landing/workspace-visual";
+import { AppMockup } from "@/components/landing/app-mockup";
 import {
-  ProofBar,
-  Outcomes,
   AgentFlow,
   Files,
-  HowItWorks,
   UseCases,
   PricingPreview,
   FinalCta,
 } from "@/components/landing/sections";
+import { CapabilityStrip, Outcomes } from "@/components/landing/proof-and-outcomes";
+import {
+  ConnectedWorkspace,
+  HowItWorks,
+  WhyTrust,
+} from "@/components/landing/workspace-and-steps";
 import { Testimonials } from "@/components/landing/testimonials";
 import { Faq } from "@/components/landing/faq";
 import { PLANS } from "@/lib/credits";
@@ -97,24 +100,30 @@ export default async function Landing() {
               className="nx-rise-big"
               style={{ animationDelay: "140ms", animationFillMode: "backwards" }}
             >
-              <WorkspaceVisual />
+              <AppMockup />
             </div>
           </div>
         </section>
 
-        <ProofBar />
+        <CapabilityStrip />
 
         <div id="capabilities">
           <Outcomes />
         </div>
 
+        <ConnectedWorkspace />
+
         <div id="agents">
           <AgentFlow />
         </div>
 
-        <Files />
+        <div id="files">
+          <Files />
+        </div>
+
         <HowItWorks />
         <UseCases />
+        <WhyTrust />
 
         {/* No real customers yet, so this renders nothing rather than showing
             invented quotes. See components/landing/testimonials.tsx. */}
