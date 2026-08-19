@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FiFolder,
   FiFileText,
@@ -23,7 +23,6 @@ const ICON: Record<TaskKind, IconType> = {
   think: TbTerminal2,
 };
 
-/** The verb shown before the label, so a row reads like a sentence. */
 const VERB: Record<TaskKind, string> = {
   plan: "Plan",
   skill: "Skill",
@@ -75,24 +74,31 @@ function Row({ task }: { task: Task }) {
 }
 
 /**
- * The live record of what the build is doing.
+ * Everything the build has done, in one box.
  *
- * Collapses to a single "N tasks completed" line once a group finishes, so a
- * long build does not bury the conversation above it — the detail is one click
- * away rather than always on screen.
+ * One box for the whole run rather than one per step: a seven-step build used
+ * to stack seven collapsible panels down the conversation, which buried the
+ * plan and the composer under its own bookkeeping. Collapsed by default once
+ * the run finishes, since by then the artefact matters more than the log.
  */
-export function TaskFeed({
-  title,
+export function ActivityBox({
   tasks,
   running,
-  defaultOpen,
 }: {
-  title: string;
   tasks: Task[];
   running: boolean;
-  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen ?? true);
+  // Null until the user expresses a preference, at which point theirs wins.
+  // Derived rather than synced through an effect: an effect would fire a
+  // second render on every transition just to reach the same conclusion.
+  const [choice, setChoice] = useState<boolean | null>(null);
+  const open = choice ?? running;
+  const end = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (open && running) end.current?.scrollIntoView({ block: "end" });
+  }, [tasks, open, running]);
+
   if (!tasks.length) return null;
 
   const done = tasks.filter((t) => t.state !== "run").length;
@@ -100,7 +106,7 @@ export function TaskFeed({
   return (
     <div className="rounded-[10px] border border-line bg-rail/60 px-3 py-2">
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setChoice(!open)}
         className="flex w-full items-center gap-2 text-left"
         aria-expanded={open}
       >
@@ -110,7 +116,9 @@ export function TaskFeed({
           <FiCheck size={13} className="shrink-0 text-positive" />
         )}
         <span className="flex-1 truncate text-[13px] font-medium text-ink-2">
-          {running ? title : `${done} task${done === 1 ? "" : "s"} completed`}
+          {running
+            ? `Working — ${done} of ${tasks.length} done`
+            : `${done} task${done === 1 ? "" : "s"} completed`}
         </span>
         <FiChevronDown
           size={14}
@@ -122,10 +130,11 @@ export function TaskFeed({
       </button>
 
       {open ? (
-        <ul className="mt-1.5 border-t border-line pt-1.5">
+        <ul className="mt-1.5 max-h-[34vh] overflow-auto border-t border-line pt-1.5">
           {tasks.map((t) => (
             <Row key={t.id} task={t} />
           ))}
+          <div ref={end} />
         </ul>
       ) : null}
     </div>

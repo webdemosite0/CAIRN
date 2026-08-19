@@ -13,38 +13,36 @@ import {
   FiCopy,
   FiRotateCcw,
   FiFile,
+  FiZap,
+  FiLayers,
 } from "react-icons/fi";
 import { TbWorld, TbPuzzle, TbTerminal2, TbCode, TbFiles } from "react-icons/tb";
 import { Composer } from "@/components/chat/composer";
 import { LogoMark } from "@/components/brand/logo";
 import { Ico } from "@/components/ui/ico";
-import { TaskFeed } from "@/components/builder/task-feed";
+import { ActivityBox } from "@/components/builder/task-feed";
+import { StepsBox, type StepState } from "@/components/builder/steps-box";
 import { BuildConsole } from "@/components/builder/console";
 import { PlanPanel } from "@/components/builder/plan-panel";
+import { QuestionBox } from "@/components/builder/question-box";
 import { strip, type Attachment } from "@/lib/attachments";
-import { SKILL_LIST, skillLabel } from "@/lib/skills";
+import { SKILL_LIST } from "@/lib/skills";
 import {
   bundle,
   mergeFiles,
   projectSlug,
   type BuildPlan,
+  type Depth,
   type LogLine,
-  type ProjectFile,
-  type Task,
   type PlanStep,
+  type ProjectFile,
+  type Question,
+  type Task,
 } from "@/lib/builder";
 import { cn } from "@/lib/utils";
 
-type Phase = "idle" | "planning" | "review" | "building" | "ready";
+type Phase = "idle" | "asking" | "planning" | "review" | "building" | "ready";
 type Pane = "preview" | "files" | "code" | "console";
-
-interface Turn {
-  id: number;
-  role: "user" | "agent";
-  text: string;
-  tasks?: Task[];
-  running?: boolean;
-}
 
 const IDEAS = [
   "An online shop for a specialty coffee roaster",
@@ -52,7 +50,7 @@ const IDEAS = [
   "A portfolio for a freelance motion designer",
 ];
 
-const QUICK = ["Add dark mode", "Add a search bar", "Make it feel more premium"];
+const QUICK_EDITS = ["Add dark mode", "Add a search bar", "Make it feel more premium"];
 
 const DEVICE = {
   desktop: { w: "100%", icon: FiMonitor, label: "Desktop" },
@@ -67,32 +65,73 @@ const PANES: { id: Pane; icon: typeof TbWorld; label: string }[] = [
   { id: "console", icon: TbTerminal2, label: "Console" },
 ];
 
+/** What the model is doing, phrased for someone who is waiting. */
+const THINKING: Record<string, string[]> = {
+  asking: ["Reading your idea", "Working out what to ask"],
+  planning: [
+    "Reading your idea",
+    "Deciding what to build",
+    "Choosing a visual direction",
+    "Ordering the steps",
+  ],
+};
+
+/** Logo, a halo, and a line that changes — so a wait reads as progress. */
+function Thinking({ phase }: { phase: "asking" | "planning" }) {
+  const lines = THINKING[phase];
+  const [i, setI] = useState(0);
+
+  // No reset here: the parent keys this component by phase, so a phase change
+  // remounts it and the index starts at 0 without a second render.
+  useEffect(() => {
+    const t = setInterval(() => setI((n) => (n + 1) % lines.length), 2400);
+    return () => clearInterval(t);
+  }, [lines.length]);
+
+  return (
+    <div className="flex items-center gap-3">
+      <span className="nx-thinking relative grid place-items-center">
+        <LogoMark size={26} animated />
+      </span>
+      <span key={i} className="nx-in nx-dots text-[13.5px] text-ink-2">
+        {lines[i]}
+      </span>
+    </div>
+  );
+}
+
 export function BuilderView() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [idea, setIdea] = useState("");
+  const [depth, setDepth] = useState<Depth>("deep");
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [plan, setPlan] = useState<BuildPlan | null>(null);
   const [storage, setStorage] = useState<"local" | "none">("local");
   const [files, setFiles] = useState<ProjectFile[]>([]);
-  const [turns, setTurns] = useState<Turn[]>([]);
   const [logs, setLogs] = useState<LogLine[]>([]);
-  const [stepStates, setStepStates] = useState<Record<string, "todo" | "run" | "ok" | "fail">>({});
+
+  // One consolidated list for the whole run, rather than one per step.
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [stepStates, setStepStates] = useState<Record<string, StepState>>({});
+  const [currentStep, setCurrentStep] = useState(-1);
+
   const [error, setError] = useState<string | null>(null);
   const [pane, setPane] = useState<Pane>("preview");
   const [device, setDevice] = useState<keyof typeof DEVICE>("desktop");
   const [openFile, setOpenFile] = useState("index.html");
   const [copied, setCopied] = useState(false);
   const [skillsOpen, setSkillsOpen] = useState(false);
+  const [questionsOpen, setQuestionsOpen] = useState(false);
 
-  const nextTurn = useRef(0);
   const nextLog = useRef(0);
   const feedEnd = useRef<HTMLDivElement>(null);
   const abort = useRef<AbortController | null>(null);
 
-  const busy = phase === "planning" || phase === "building";
+  const busy = phase === "asking" || phase === "planning" || phase === "building";
 
   useEffect(() => {
     feedEnd.current?.scrollIntoView({ block: "end", behavior: "smooth" });
-  }, [turns, phase]);
+  }, [tasks.length, phase, currentStep]);
 
   useEffect(() => () => abort.current?.abort(), []);
 
@@ -102,98 +141,112 @@ export function BuilderView() {
   }, []);
 
   const preview = useMemo(() => bundle(files), [files]);
-  const doneSteps = plan
-    ? plan.steps.filter((s) => stepStates[s.id] === "ok").length
-    : 0;
 
-  /* ---------------- planning ---------------- */
+  /** The task currently running, shown inside the active step. */
+  const activity = useMemo(
+    () => [...tasks].reverse().find((t) => t.state === "run") ?? null,
+    [tasks],
+  );
 
-  const startPlan = useCallback(
-    async (text: string, attachments?: Attachment[]) => {
-      if ((!text.trim() && !attachments?.length) || busy) return;
+  const upsertTask = useCallback((task: Task) => {
+    setTasks((prev) => {
+      const i = prev.findIndex((t) => t.id === task.id);
+      if (i === -1) return [...prev, task];
+      const next = [...prev];
+      next[i] = task;
+      return next;
+    });
+  }, []);
+
+  /* ---------------- 1. questions ---------------- */
+
+  const ask = useCallback(
+    async (text: string, attach?: Attachment[]) => {
+      if ((!text.trim() && !attach?.length) || busy) return;
       setIdea(text);
       setError(null);
-      setPhase("planning");
-      setTurns([{ id: nextTurn.current++, role: "user", text }]);
+      setPhase("asking");
       setLogs([]);
-      log(`planning "${text.slice(0, 60)}"`);
+      setTasks([]);
+      setFiles([]);
+      setPlan(null);
+      log(`new project — "${text.slice(0, 60)}"`);
 
-      const agentId = nextTurn.current++;
-      setTurns((t) => [
-        ...t,
-        {
-          id: agentId,
-          role: "agent",
-          text: "I'll map out the plan before writing any code.",
-          tasks: [{ id: "plan", kind: "plan", label: "New Plan", state: "run" }],
-          running: true,
-        },
-      ]);
+      try {
+        const res = await fetch("/api/builder/questions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idea: text }),
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) throw new Error(data?.error ?? `Failed (${res.status}).`);
+
+        setQuestions(data.questions ?? []);
+        if (data.degraded) log("planner unavailable — asking the basics only", "warn");
+        log(`${(data.questions ?? []).length} questions ready`, "ok");
+        setPhase("review");
+        setPlan(null);
+        setQuestionsOpen(true);
+      } catch (e) {
+        // Questions are optional; a failure here should not end the build.
+        const m = e instanceof Error ? e.message : "Could not prepare questions.";
+        log(`${m} — planning without them`, "warn");
+        setQuestions([]);
+        void plan_(text, {});
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [busy, log],
+  );
+
+
+  /* ---------------- 2. plan ---------------- */
+
+  const plan_ = useCallback(
+    async (text: string, given: Record<string, string>) => {
+      setPhase("planning");
+      setQuestionsOpen(false);
+      setError(null);
+      log("planning");
 
       try {
         const res = await fetch("/api/builder/plan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idea: text, attachments: strip(attachments) }),
+          body: JSON.stringify({
+            idea: text,
+            answers: given,
+            questions,
+            depth,
+          }),
         });
         const data = await res.json().catch(() => null);
         if (!res.ok) throw new Error(data?.error ?? `Failed (${res.status}).`);
 
         const p: BuildPlan = data.plan;
         setPlan(p);
-        setStepStates(Object.fromEntries(p.steps.map((s) => [s.id, "todo" as const])));
+        setStepStates(Object.fromEntries(p.steps.map((s) => [s.id, "todo" as StepState])));
         setPhase("review");
         log(`plan ready — ${p.steps.length} steps`, "ok");
-
-        setTurns((t) =>
-          t.map((x) =>
-            x.id === agentId
-              ? {
-                  ...x,
-                  running: false,
-                  text: `Here's the plan for ${p.title}. Review it, then generate.`,
-                  tasks: [
-                    { id: "plan", kind: "plan", label: "New Plan", state: "ok" },
-                    ...p.steps.map((s) => ({
-                      id: `p-${s.id}`,
-                      kind: "check" as const,
-                      label: s.title,
-                      state: "ok" as const,
-                    })),
-                  ],
-                }
-              : x,
-          ),
-        );
       } catch (e) {
         const m = e instanceof Error ? e.message : "Something went wrong.";
         setError(m);
         setPhase("idle");
         log(m, "warn");
-        setTurns((t) => t.map((x) => (x.id === agentId ? { ...x, running: false } : x)));
       }
     },
-    [busy, log],
+    [questions, depth, log],
   );
 
-  /* ---------------- executing ---------------- */
+  /* ---------------- 3. execute ---------------- */
 
-  /**
-   * Runs one unit of work and folds its written files into the project.
-   *
-   * Takes the step itself rather than an index into the plan, so a follow-up
-   * edit can be executed through exactly the same path by handing it a
-   * one-off step — the alternative was re-running plan step 0, which rebuilt
-   * the design system every time someone asked for a small change.
-   */
   const runStep = useCallback(
     async (
       step: PlanStep,
       style: string,
       current: ProjectFile[],
-      turnId: number,
       position: { index: number; total: number },
-      attachments?: Attachment[],
+      attach?: Attachment[],
     ): Promise<ProjectFile[]> => {
       const controller = new AbortController();
       abort.current = controller;
@@ -209,7 +262,7 @@ export function BuilderView() {
           style,
           index: position.index,
           total: position.total,
-          attachments: strip(attachments),
+          attachments: strip(attach),
         }),
       });
 
@@ -227,7 +280,6 @@ export function BuilderView() {
         const { done, value } = await reader.read();
         if (done) break;
         buf += decoder.decode(value, { stream: true });
-
         const lines = buf.split("\n");
         buf = lines.pop() ?? "";
 
@@ -241,41 +293,29 @@ export function BuilderView() {
           }
 
           if (e.t === "task") {
-            const task: Task = {
-              id: String(e.id),
+            // Namespaced by step, or step 3's "read styles.css" would silently
+            // overwrite step 2's row instead of appearing as its own.
+            upsertTask({
+              id: `${step.id}:${String(e.id)}`,
               kind: e.kind as Task["kind"],
               label: String(e.label),
               state: e.state as Task["state"],
-            };
-            setTurns((t) =>
-              t.map((x) => {
-                if (x.id !== turnId) return x;
-                const tasks = [...(x.tasks ?? [])];
-                const at = tasks.findIndex((q) => q.id === task.id);
-                if (at > -1) tasks[at] = task;
-                else tasks.push(task);
-                return { ...x, tasks };
-              }),
-            );
+            });
           } else if (e.t === "log") {
             log(String(e.text), (e.level as LogLine["level"]) ?? "info");
           } else if (e.t === "file") {
-            const f = { path: String(e.path), content: String(e.content) };
-            acc = mergeFiles(acc, [f]);
+            acc = mergeFiles(acc, [{ path: String(e.path), content: String(e.content) }]);
             setFiles(acc);
-            setOpenFile((o) => (o === "index.html" || !o ? "index.html" : o));
           } else if (e.t === "error") {
             throw new Error(String(e.message));
           }
         }
       }
-
       return acc;
     },
-    [idea, log],
+    [idea, log, upsertTask],
   );
 
-  /** The style brief handed to every step, so the whole site stays coherent. */
   const styleBrief = useCallback(
     (p: BuildPlan) =>
       `${p.style.name}. ${p.style.mood} Palette: ${p.style.palette.join(", ")}. ` +
@@ -288,36 +328,28 @@ export function BuilderView() {
     if (!plan || busy) return;
     setPhase("building");
     setError(null);
+    setPane("console");
     log(`building ${plan.title} — ${plan.steps.length} steps`);
 
     let current = files;
 
     for (let i = 0; i < plan.steps.length; i++) {
       const step = plan.steps[i];
-      const turnId = nextTurn.current++;
-      setTurns((t) => [
-        ...t,
-        {
-          id: turnId,
-          role: "agent",
-          text: `Step ${i + 1} of ${plan.steps.length} — ${step.title}`,
-          tasks: [],
-          running: true,
-        },
-      ]);
+      setCurrentStep(i);
+      setStepStates((s) => ({ ...s, [step.id]: "run" }));
 
       try {
-        setStepStates((s) => ({ ...s, [step.id]: "run" }));
-        current = await runStep(step, styleBrief(plan), current, turnId, {
+        current = await runStep(step, styleBrief(plan), current, {
           index: i,
           total: plan.steps.length,
         });
         setStepStates((s) => ({ ...s, [step.id]: "ok" }));
-        setTurns((t) => t.map((x) => (x.id === turnId ? { ...x, running: false } : x)));
+        // Once there is something to look at, look at it.
+        if (current.some((f) => f.path.endsWith(".html"))) setPane("preview");
       } catch (e) {
         const m = e instanceof Error ? e.message : "Step failed.";
         setStepStates((s) => ({ ...s, [step.id]: "fail" }));
-        setTurns((t) => t.map((x) => (x.id === turnId ? { ...x, running: false } : x)));
+        setCurrentStep(-1);
         setError(m);
         log(m, "warn");
         setPhase(current.length ? "ready" : "review");
@@ -325,33 +357,25 @@ export function BuilderView() {
       }
     }
 
+    setCurrentStep(-1);
     setPhase("ready");
     setPane("preview");
     log("build complete", "ok");
   }, [plan, busy, files, runStep, styleBrief, log]);
 
-  /* ---------------- follow-up edits ---------------- */
+  /* ---------------- 4. edits ---------------- */
 
   const edit = useCallback(
-    async (text: string, attachments?: Attachment[]) => {
+    async (text: string, attach?: Attachment[]) => {
       if (!text.trim() || busy || !plan) return;
       setError(null);
-      setTurns((t) => [...t, { id: nextTurn.current++, role: "user", text }]);
       setPhase("building");
-
-      const turnId = nextTurn.current++;
-      setTurns((t) => [
-        ...t,
-        { id: turnId, role: "agent", text: "Applying that change.", tasks: [], running: true },
-      ]);
+      log(`edit — ${text.slice(0, 60)}`);
 
       try {
-        // A one-off step describing the requested change. It reuses the same
-        // executor as a plan step, so an edit gets the same context, the same
-        // task feed and the same file merge.
         const current = await runStep(
           {
-            id: `edit-${turnId}`,
+            id: `edit-${Date.now()}`,
             title: text.slice(0, 40),
             detail: `Apply this change to the existing site, touching only the files it affects: ${text}`,
             skills: [],
@@ -359,18 +383,15 @@ export function BuilderView() {
           },
           styleBrief(plan),
           files,
-          turnId,
           { index: 0, total: 1 },
-          attachments,
+          attach,
         );
         setFiles(current);
-        setTurns((t) => t.map((x) => (x.id === turnId ? { ...x, running: false } : x)));
         setPhase("ready");
       } catch (e) {
         const m = e instanceof Error ? e.message : "Edit failed.";
         setError(m);
         log(m, "warn");
-        setTurns((t) => t.map((x) => (x.id === turnId ? { ...x, running: false } : x)));
         setPhase("ready");
       }
     },
@@ -406,11 +427,14 @@ export function BuilderView() {
     setPhase("idle");
     setPlan(null);
     setFiles([]);
-    setTurns([]);
+    setTasks([]);
     setLogs([]);
     setStepStates({});
+    setCurrentStep(-1);
     setError(null);
     setIdea("");
+    setQuestions([]);
+    setQuestionsOpen(false);
   }
 
   /* ---------------- idle ---------------- */
@@ -424,18 +448,42 @@ export function BuilderView() {
           </span>
           <h1 className="text-[27px] font-semibold text-ink">Website Builder</h1>
           <p className="mt-1.5 text-[14.5px] text-ink-3">
-            Describe a site. It plans it, builds it step by step, then you keep
-            talking to change anything.
+            Describe a site. It asks a couple of questions, plans it, then builds
+            it step by step.
           </p>
         </div>
 
-        <Composer onSend={startPlan} placeholder="Build a website for…" autoFocus />
+        <Composer onSend={ask} placeholder="Build a website for…" autoFocus />
+
+        <div className="mt-3 flex items-center justify-center gap-1.5">
+          {(
+            [
+              { id: "quick" as const, label: "Quick", icon: FiZap, hint: "3-4 steps" },
+              { id: "deep" as const, label: "Deep Build", icon: FiLayers, hint: "5-8 steps" },
+            ]
+          ).map((m) => (
+            <button
+              key={m.id}
+              onClick={() => setDepth(m.id)}
+              className={cn(
+                "flex items-center gap-1.5 rounded-[8px] border px-3 py-1.5 text-[12.5px] transition-colors",
+                depth === m.id
+                  ? "border-accent bg-accent/10 text-ink"
+                  : "border-line text-ink-3 hover:bg-hover hover:text-ink-2",
+              )}
+            >
+              <m.icon size={13} />
+              {m.label}
+              <span className="text-ink-4">{m.hint}</span>
+            </button>
+          ))}
+        </div>
 
         <div className="mt-6 flex flex-wrap justify-center gap-2.5">
           {IDEAS.map((e, i) => (
             <button
               key={e}
-              onClick={() => startPlan(e)}
+              onClick={() => ask(e)}
               className="chip group nx-in"
               style={{ animationDelay: `${80 + i * 50}ms`, animationFillMode: "backwards" }}
             >
@@ -459,20 +507,15 @@ export function BuilderView() {
   return (
     <div className="flex h-screen flex-col">
       <header className="flex shrink-0 items-center gap-3 border-b border-line px-4 py-2.5">
-        <button
-          onClick={reset}
-          className="chip group !px-2.5 !py-1.5 !text-[12.5px]"
-          title="Start a new project"
-        >
+        <button onClick={reset} className="chip group !px-2.5 !py-1.5 !text-[12.5px]">
           <Ico icon={FiRotateCcw} motion="spin" size={13} /> New
         </button>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[14px] font-medium text-ink">
-            {plan?.title ?? "Building"}
+            {plan?.title ?? "New project"}
           </p>
           <p className="truncate text-[11.5px] text-ink-4">{idea}</p>
         </div>
-
         <button
           onClick={openTab}
           disabled={!preview}
@@ -490,7 +533,7 @@ export function BuilderView() {
       </header>
 
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_400px]">
-        {/* ---------- left: the artefact ---------- */}
+        {/* ---------- left ---------- */}
         <section className="flex min-h-0 flex-col border-r border-line">
           <div className="flex shrink-0 items-center gap-1 border-b border-line px-2 py-1.5">
             {PANES.map((p) => (
@@ -504,6 +547,11 @@ export function BuilderView() {
               >
                 <p.icon size={14} />
                 {p.label}
+                {p.id === "files" && files.length ? (
+                  <span className="rounded-[4px] bg-sunk px-1 text-[10px] tabular-nums text-ink-4">
+                    {files.length}
+                  </span>
+                ) : null}
               </button>
             ))}
 
@@ -543,20 +591,26 @@ export function BuilderView() {
               preview ? (
                 <div className="h-full overflow-auto p-4">
                   <iframe
-                    key={files.length + preview.length}
+                    key={preview.length}
                     title="Preview"
                     srcDoc={preview}
                     sandbox="allow-scripts allow-forms allow-modals allow-popups"
-                    className="mx-auto h-full min-h-[560px] rounded-[10px] border border-line bg-white shadow-[var(--elev)]"
+                    className="nx-preview-in mx-auto h-full min-h-[560px] rounded-[10px] border border-line bg-white shadow-[var(--elev-lift)] transition-[width] duration-300 ease-out"
                     style={{ width: DEVICE[device].w, maxWidth: "100%" }}
                   />
                 </div>
               ) : (
                 <div className="grid h-full place-items-center">
                   <div className="text-center">
-                    <LogoMark size={40} animated={busy} />
+                    <span className={cn(busy && "nx-thinking", "inline-grid place-items-center")}>
+                      <LogoMark size={40} animated={busy} />
+                    </span>
                     <p className="mt-3 text-[13.5px] text-ink-3">
-                      {busy ? "Building your site…" : "Nothing built yet."}
+                      {busy ? (
+                        <span className="nx-dots">Building your site</span>
+                      ) : (
+                        "Nothing built yet."
+                      )}
                     </p>
                   </div>
                 </div>
@@ -568,8 +622,12 @@ export function BuilderView() {
                 {files.length === 0 ? (
                   <li className="text-[13px] text-ink-4">No files yet.</li>
                 ) : (
-                  files.map((f) => (
-                    <li key={f.path}>
+                  files.map((f, i) => (
+                    <li
+                      key={f.path}
+                      className="nx-in"
+                      style={{ animationDelay: `${i * 40}ms`, animationFillMode: "backwards" }}
+                    >
                       <button
                         onClick={() => {
                           setOpenFile(f.path);
@@ -598,9 +656,7 @@ export function BuilderView() {
                       onClick={() => setOpenFile(f.path)}
                       className={cn(
                         "shrink-0 rounded-[6px] px-2 py-1 font-mono text-[11.5px] transition-colors",
-                        openFile === f.path
-                          ? "bg-hover text-ink"
-                          : "text-ink-4 hover:text-ink-2",
+                        openFile === f.path ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
                       )}
                     >
                       {f.path}
@@ -633,35 +689,27 @@ export function BuilderView() {
           </div>
         </section>
 
-        {/* ---------- right: the conversation ---------- */}
+        {/* ---------- right ---------- */}
         <section className="flex min-h-0 flex-col">
           <div className="min-h-0 flex-1 space-y-3 overflow-auto p-3.5">
-            {turns.map((t) =>
-              t.role === "user" ? (
-                <div key={t.id} className="flex justify-end">
-                  <p className="max-w-[85%] rounded-[12px] bg-raised px-3.5 py-2 text-[13.5px] text-ink">
-                    {t.text}
-                  </p>
-                </div>
-              ) : (
-                <div key={t.id} className="space-y-2">
-                  <div className="flex items-start gap-2.5">
-                    <LogoMark size={20} animated={Boolean(t.running)} />
-                    <p className="flex-1 pt-0.5 text-[13.5px] leading-relaxed text-ink-2">
-                      {t.text}
-                    </p>
-                  </div>
-                  {t.tasks?.length ? (
-                    <TaskFeed
-                      title="Running task"
-                      tasks={t.tasks}
-                      running={Boolean(t.running)}
-                      defaultOpen={Boolean(t.running)}
-                    />
-                  ) : null}
-                </div>
-              ),
-            )}
+            <div className="flex justify-end">
+              <p className="max-w-[85%] rounded-[12px] bg-raised px-3.5 py-2 text-[13.5px] text-ink">
+                {idea}
+              </p>
+            </div>
+
+            {phase === "asking" || phase === "planning" ? (
+              <Thinking key={phase} phase={phase} />
+            ) : null}
+
+            {questionsOpen && questions.length ? (
+              <QuestionBox
+                questions={questions}
+                busy={busy}
+                onSkip={() => plan_(idea, {})}
+                onSubmit={(a) => void plan_(idea, a)}
+              />
+            ) : null}
 
             {phase === "review" && plan ? (
               <PlanPanel
@@ -674,60 +722,18 @@ export function BuilderView() {
             ) : null}
 
             {plan && (phase === "building" || phase === "ready") ? (
-              <div className="rounded-[10px] border border-line bg-rail/60 p-3">
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="flex-1 text-[13px] font-medium text-ink-2">
-                    Execute Plan
-                  </span>
-                  <span className="text-[12px] tabular-nums text-ink-4">
-                    {doneSteps}/{plan.steps.length}
-                  </span>
-                </div>
-                <ul className="space-y-1">
-                  {plan.steps.map((s) => {
-                    const st = stepStates[s.id] ?? "todo";
-                    return (
-                      <li key={s.id} className="flex items-center gap-2.5 text-[13px]">
-                        <span className="grid h-4 w-4 shrink-0 place-items-center">
-                          {st === "run" ? (
-                            <span className="block h-3.5 w-3.5 animate-spin rounded-full border-[1.5px] border-accent border-t-transparent" />
-                          ) : st === "ok" ? (
-                            <FiCheck size={13} className="text-positive" />
-                          ) : st === "fail" ? (
-                            <FiAlertCircle size={13} className="text-critical" />
-                          ) : (
-                            <span className="block h-3 w-3 rounded-full border border-line-strong" />
-                          )}
-                        </span>
-                        <span
-                          className={cn(
-                            "min-w-0 flex-1 truncate",
-                            st === "run"
-                              ? "text-accent"
-                              : st === "ok"
-                                ? "text-ink-3"
-                                : "text-ink-4",
-                          )}
-                        >
-                          {s.title}
-                        </span>
-                        {s.skills.map((k) => (
-                          <span
-                            key={k}
-                            className="shrink-0 rounded-[5px] bg-sunk px-1.5 py-0.5 text-[10.5px] text-ink-4"
-                          >
-                            {skillLabel(k)}
-                          </span>
-                        ))}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+              <StepsBox
+                steps={plan.steps}
+                states={stepStates}
+                current={currentStep}
+                activity={activity}
+              />
             ) : null}
 
+            <ActivityBox tasks={tasks} running={phase === "building"} />
+
             {error ? (
-              <div className="flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-3 py-2.5">
+              <div className="nx-in flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-3 py-2.5">
                 <FiAlertCircle size={14} className="mt-0.5 shrink-0 text-critical" />
                 <p className="text-[13px] text-ink-2">{error}</p>
               </div>
@@ -739,7 +745,7 @@ export function BuilderView() {
           <div className="shrink-0 border-t border-line p-3">
             {phase === "ready" ? (
               <div className="mb-2 flex flex-wrap gap-1.5">
-                {QUICK.map((q) => (
+                {QUICK_EDITS.map((q) => (
                   <button
                     key={q}
                     onClick={() => edit(q)}
@@ -753,7 +759,7 @@ export function BuilderView() {
             ) : null}
 
             {skillsOpen ? (
-              <div className="mb-2 max-h-[38vh] overflow-auto rounded-[10px] border border-line bg-rail p-2">
+              <div className="nx-in mb-2 max-h-[38vh] overflow-auto rounded-[10px] border border-line bg-rail p-2">
                 {SKILL_LIST.map((s) => (
                   <div key={s.id} className="rounded-[7px] px-2 py-1.5">
                     <p className="text-[12.5px] font-medium text-ink-2">{s.label}</p>
@@ -764,10 +770,8 @@ export function BuilderView() {
             ) : null}
 
             <Composer
-              onSend={phase === "ready" ? edit : startPlan}
-              placeholder={
-                phase === "ready" ? "Describe a change…" : "Build a website for…"
-              }
+              onSend={phase === "ready" ? edit : ask}
+              placeholder={phase === "ready" ? "Describe a change…" : "Build a website for…"}
             />
 
             <button

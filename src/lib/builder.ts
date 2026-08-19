@@ -21,6 +21,16 @@ export interface LogLine {
   at: string;
 }
 
+export interface Question {
+  id: string;
+  label: string;
+  hint: string;
+  options: string[];
+}
+
+/** How much the planner should attempt. Deep costs more and builds more. */
+export type Depth = "quick" | "deep";
+
 export interface PlanStep {
   id: string;
   title: string;

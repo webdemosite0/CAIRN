@@ -60,7 +60,7 @@ Reply with ONE JSON object and nothing else — no prose, no markdown fence.
 }
 
 Rules for steps:
-- Between 5 and 8 steps, ordered so each builds on the last.
+- Between MIN_STEPS and MAX_STEPS steps, ordered so each builds on the last.
 - The FIRST step must establish the design system and produce styles.css.
 - The LAST step must be a review pass that checks the whole site holds together.
 - Every step lists the files it will create or change. Use only flat paths:
@@ -103,7 +103,7 @@ const list = (v: unknown, max: number): string[] =>
  * so every field falls back rather than throwing. The one thing worth failing
  * on is having no steps at all — there would be nothing to execute.
  */
-function normalise(data: unknown, idea: string): BuildPlan | null {
+function normalise(data: unknown, idea: string, maxSteps: number): BuildPlan | null {
   if (!data || typeof data !== "object") return null;
   const d = data as Record<string, unknown>;
   const req = (d.requirements ?? {}) as Record<string, unknown>;
@@ -111,7 +111,7 @@ function normalise(data: unknown, idea: string): BuildPlan | null {
 
   const rawSteps = Array.isArray(d.steps) ? d.steps : [];
   const steps: PlanStep[] = rawSteps
-    .slice(0, 8)
+    .slice(0, maxSteps)
     .map((s, i) => {
       const o = (s ?? {}) as Record<string, unknown>;
       const skills = list(o.skills, 4).filter(
@@ -160,13 +160,36 @@ function normalise(data: unknown, idea: string): BuildPlan | null {
   };
 }
 
+/** Renders the answers as a brief the planner can actually use. */
+function answerBrief(answers: Record<string, unknown>, questions: unknown): string {
+  const labels = new Map<string, string>();
+  if (Array.isArray(questions)) {
+    for (const q of questions) {
+      const o = (q ?? {}) as Record<string, unknown>;
+      if (typeof o.id === "string" && typeof o.label === "string") {
+        labels.set(o.id, o.label);
+      }
+    }
+  }
+  const lines = Object.entries(answers)
+    .filter(([, v]) => typeof v === "string" && v.trim())
+    .map(([k, v]) => `- ${labels.get(k) ?? k}: ${String(v).trim().slice(0, 200)}`);
+  return lines.length ? `\n\nThe client answered:\n${lines.join("\n")}` : "";
+}
+
 export async function POST(req: NextRequest) {
   let idea = "";
   let attachments: Attachment[] = [];
+  let answers: Record<string, unknown> = {};
+  let questions: unknown = null;
+  let depth: "quick" | "deep" = "deep";
   try {
     const body = await req.json();
     idea = String(body?.idea ?? "").trim();
     attachments = Array.isArray(body?.attachments) ? body.attachments : [];
+    answers = body?.answers && typeof body.answers === "object" ? body.answers : {};
+    questions = body?.questions ?? null;
+    depth = body?.depth === "quick" ? "quick" : "deep";
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -188,22 +211,33 @@ export async function POST(req: NextRequest) {
     throw e;
   }
 
+  // Quick trades breadth for cost: fewer steps means fewer generations, which
+  // is what actually drives the credit spend on a build.
+  const bounds = depth === "quick" ? { min: 3, max: 4 } : { min: 5, max: 8 };
+
   const system = SYSTEM.replace(
     "SKILL_IDS_HERE",
     SKILL_LIST.map((s) => `${s.id} (${s.blurb})`).join(", "),
-  );
+  )
+    .replace("MIN_STEPS", String(bounds.min))
+    .replace("MAX_STEPS", String(bounds.max));
 
   try {
     const raw = await generateText({
       onUsage: (u) => account && spend(account.userId, "site", u.totalTokens),
-      turns: [{ role: "user", text: `Idea: ${idea}` }],
+      turns: [
+        {
+          role: "user",
+          text: `Idea: ${idea}${answerBrief(answers, questions)}`,
+        },
+      ],
       system,
       temperature: 0.6,
       maxOutputTokens: 4096,
       extraParts: attachments.length ? toParts(attachments) : undefined,
     });
 
-    const plan = normalise(extractJson(raw), idea);
+    const plan = normalise(extractJson(raw), idea, bounds.max);
     if (!plan) {
       return Response.json(
         { error: "The planner did not return a usable plan. Try rephrasing." },

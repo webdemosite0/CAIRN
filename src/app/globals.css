@@ -1250,3 +1250,104 @@ a[role="button"]:active {
   text-transform: uppercase;
   color: var(--color-ink-4);
 }
+
+/* ------------------------------------------------------------------ */
+/* Builder motion                                                      */
+/* ------------------------------------------------------------------ */
+
+/*
+ * A build is mostly waiting, so the motion here exists to answer "is anything
+ * happening?" rather than to decorate. Everything animates transform and
+ * opacity only, and everything is off under prefers-reduced-motion.
+ */
+
+/* The preview arriving for the first time: a small rise and settle, so a page
+   appearing does not simply blink into existence. */
+@keyframes nx-preview-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-preview-in {
+  animation: nx-preview-in 460ms var(--ease-out) forwards;
+}
+
+/* The active step in the plan: a slow breath along its left edge, so the eye
+   can find what is running without scanning. */
+@keyframes nx-step-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.nx-step-active {
+  position: relative;
+}
+.nx-step-active::before {
+  content: "";
+  position: absolute;
+  inset-block: 4px;
+  left: -2px;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  animation: nx-step-pulse 1.8s ease-in-out infinite;
+}
+
+/* A line of output arriving in the console. Deliberately quick — a log that
+   animates slowly reads as laggy. */
+@keyframes nx-line-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.nx-line-in {
+  animation: nx-line-in 160ms var(--ease-out) forwards;
+}
+
+/* The bar across the top of the steps box, sweeping while work is in flight. */
+@keyframes nx-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+.nx-sweep::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: 33%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--color-accent) 55%, transparent),
+    transparent
+  );
+  animation: nx-sweep 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-preview-in,
+  .nx-line-in {
+    animation: none;
+  }
+  .nx-step-active::before,
+  .nx-sweep::after {
+    animation: none;
+  }
+}

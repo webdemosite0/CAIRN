@@ -51,7 +51,7 @@ export function BuildConsole({
           <p className="text-ink-4">Waiting for the build to start.</p>
         ) : (
           lines.map((l) => (
-            <div key={l.id} className="flex gap-2.5">
+            <div key={l.id} className="nx-line-in flex gap-2.5">
               <span className="shrink-0 text-ink-4 tabular-nums">{l.at}</span>
               <span
                 className={cn(

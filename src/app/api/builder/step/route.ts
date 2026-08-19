@@ -41,16 +41,41 @@ OUTPUT FORMAT — strict. Reply with only file blocks, then one SUMMARY line:
 <<<END>>>
 SUMMARY: one sentence on what this step changed.
 
-Rules:
+HARD RULES
 - Emit the COMPLETE contents of every file you write. Never "..." or
-  "unchanged" — a partial file destroys the project.
+  "unchanged" or "rest of file here" — a partial file destroys the project.
 - Only emit files this step is responsible for. Leave everything else out.
+  Re-emitting an untouched file wastes the step and risks reverting it.
 - Flat paths only: index.html, styles.css, script.js, admin.html, store.js.
-- index.html links siblings with plain relative paths.
-- Zero external requests: no CDN, no web fonts, no remote images. System font
-  stacks, CSS gradients, inline SVG and emoji only.
-- Keep every file you were given consistent with what you write now — same
-  class names, same custom properties, same data shapes.`;
+- index.html links siblings with plain relative paths:
+  <link rel="stylesheet" href="styles.css"> and <script src="script.js" defer>
+- ZERO external requests. No CDN, no web fonts, no remote images, no analytics.
+  System font stacks, CSS gradients, inline SVG and emoji only. A single
+  external URL breaks the offline preview.
+
+CONTINUITY — you are editing a real project, not starting over
+- The files you were given are the source of truth. Reuse their exact class
+  names, custom property names and data shapes. Do not rename or re-theme
+  anything an earlier step established.
+- If an earlier step defined --accent, use var(--accent). Never introduce a
+  second colour system alongside the first.
+- If an earlier step wrote a store module, go through it. Never read or write
+  localStorage directly from a second place.
+- New markup must slot into the existing document structure and keep its
+  heading order intact.
+
+QUALITY BAR — this ships as-is
+- Real, specific copy. No lorem ipsum, no "Product 1", no bracketed
+  placeholders, no empty href="#" on a link that should do something.
+- Every interactive element works. A button that does nothing is worse than no
+  button — either wire it up or leave it out.
+- JavaScript is defensive: guard every querySelector result before using it,
+  wrap JSON.parse and localStorage in try/catch, and handle the empty state.
+  A null reference on line one stops the whole page.
+- Responsive to 360px with no horizontal scroll.
+- Write the code you would be happy to hand to another engineer: named
+  functions over deep nesting, and a short comment wherever the reason for
+  something is not obvious from reading it.`;
 
 function parseFiles(raw: string): { files: ProjectFile[]; summary: string } {
   const files: ProjectFile[] = [];
