@@ -45,7 +45,7 @@ export function ContinuePanel({ items }: { items: Recent[] }) {
   const shown = items.slice(0, 3);
 
   return (
-    <section className="rounded-[12px] border border-line bg-canvas p-4 shadow-[var(--sh-1)]">
+    <section className="min-w-0 rounded-[12px] border border-line bg-canvas p-4 shadow-[var(--sh-1)]">
       <header className="mb-3 flex items-center justify-between">
         <h2 className="text-[14px] font-medium text-ink">Continue where you left off</h2>
         {items.length > 3 ? (
@@ -120,7 +120,7 @@ export function ActivityPanel({ items }: { items: Recent[] }) {
   const shown = items.slice(0, 6);
 
   return (
-    <section className="rounded-[12px] border border-line bg-canvas p-4 shadow-[var(--sh-1)]">
+    <section className="min-w-0 rounded-[12px] border border-line bg-canvas p-4 shadow-[var(--sh-1)]">
       <header className="mb-3 flex items-center justify-between">
         <h2 className="text-[14px] font-medium text-ink">Recent activity</h2>
         {items.length > 6 ? (

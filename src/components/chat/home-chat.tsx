@@ -138,10 +138,12 @@ export function HomeChat({
               </p>
             </div>
 
-            {/* 36px, so the composer reads as the continuation of the
-                hero rather than a separate block below it. */}
+            {/* 36px, so the composer reads as the continuation of the hero
+                rather than a separate block below it. Capped at 1000px: the
+                column is wider than that on a large screen, and a composer
+                spanning the full width stops reading as one object. */}
             <div
-              className="nx-rise mt-9"
+              className="nx-rise mt-9 max-w-[1000px]"
               style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
             >
               {/* Keyed by the draft so a starter card refills an existing
