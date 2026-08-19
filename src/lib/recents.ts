@@ -133,3 +133,40 @@ export async function listRecents(
     return [];
   }
 }
+
+/**
+ * The most recent work across every kind, newest first.
+ *
+ * The home page shows one list of what you were last doing, which is a
+ * different question from "your last six spreadsheets" — hence a separate
+ * query rather than calling listRecents ten times and merging.
+ */
+export async function listAllRecents(limit = 12): Promise<Recent[]> {
+  try {
+    const user = await currentUser();
+    if (!user) return [];
+
+    const rows = await all(
+      `SELECT id, kind, title, href, created_at
+         FROM recents
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT ?`,
+      [user.id, limit],
+    );
+
+    return rows.map((r) => ({
+      id: str(r.id),
+      kind: str(r.kind) as RecentKind,
+      title: str(r.title),
+      href: str(r.href),
+      createdAt: num(r.created_at),
+    }));
+  } catch (e) {
+    rethrowFrameworkErrors(e);
+    console.error("recents: could not read all", e);
+    return [];
+  }
+}
+
+export { relativeTime } from "@/lib/time";

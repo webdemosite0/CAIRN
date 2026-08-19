@@ -5,11 +5,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import { Composer } from "@/components/chat/composer";
 import { Message } from "@/components/chat/message";
-import { Wordmark } from "@/components/brand/logo";
+import { Greeting } from "@/components/chat/greeting";
+import { QuickActions } from "@/components/home/quick-actions";
+import { ContinuePanel, ActivityPanel } from "@/components/home/recent-panels";
 import { Aurora } from "@/components/shell/aurora";
-import { Shortcuts } from "@/components/chat/shortcuts";
 import type { Attachment } from "@/lib/attachments";
-import { Recents } from "@/components/ui/recents";
 import type { Recent } from "@/lib/recents";
 import { useRouter } from "next/navigation";
 import { useSaved } from "@/lib/use-saved";
@@ -22,12 +22,16 @@ interface Turn {
 }
 
 export function HomeChat({
-  recents = [],
   restored = null,
+  name = "there",
+  activity = [],
 }: {
-  recents?: Recent[];
   /** A saved thread, when the URL carries ?c=<id>. */
   restored?: { id: string; title: string; messages: { role: "user" | "model"; text: string }[] } | null;
+  /** First name, for the greeting. */
+  name?: string;
+  /** Everything recent, across kinds, for the two panels below. */
+  activity?: Recent[];
 }) {
   const router = useRouter();
   const { save, reset } = useSaved("chat", restored?.id ?? null);
@@ -116,10 +120,16 @@ export function HomeChat({
 
         <div className="relative flex flex-1 flex-col items-center justify-center px-5 pb-16 pt-12">
           <div className="w-full max-w-[760px]">
-            <div className="nx-rise mb-2 text-center">
-              <Wordmark className="mx-auto" size={58} />
-              <p className="mt-3 text-[14.5px] text-ink-3">
-                Describe what you want. Trove builds it.
+            {/* The wordmark used to sit here at 58px. The reader is already
+                inside Trove, so a logo the size of a headline was telling them
+                where they are instead of what to do next. */}
+            <div className="nx-rise mb-2">
+              <Greeting name={name} />
+              <h1 className="mt-1.5 text-[var(--fs-hero)] font-semibold leading-[var(--lh-tight)] tracking-tight text-ink">
+                What will you build today?
+              </h1>
+              <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-ink-3">
+                Describe an idea, automate a task, or create something new.
               </p>
             </div>
 
@@ -130,16 +140,12 @@ export function HomeChat({
               <Composer onSend={send} autoFocus disabled={busy} />
             </div>
 
-            <div className="mt-5">
-              <Shortcuts />
-            </div>
+            <QuickActions className="mt-6" />
 
-            <Recents
-              className="mt-10"
-              label="Recent chats"
-              items={recents}
-              onPick={(t) => send(t)}
-            />
+            <div className="mt-8 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+              <ContinuePanel items={activity} />
+              <ActivityPanel items={activity} />
+            </div>
 
             {error ? <ErrorNote message={error} onRetry={() => run(turns)} /> : null}
           </div>

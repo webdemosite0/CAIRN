@@ -1,5 +1,6 @@
 import { Sidebar } from "@/components/shell/sidebar";
-import { MobileBar } from "@/components/shell/mobile-bar";
+import { TopBar } from "@/components/shell/top-bar";
+import { CommandPalette } from "@/components/shell/command-palette";
 import { NavProvider } from "@/components/shell/nav-state";
 import { Backdrop } from "@/components/shell/backdrop";
 import { SetupNeeded } from "@/components/shell/setup-needed";
@@ -45,13 +46,14 @@ export default async function ShellLayout({
   return (
     <NavProvider>
       <Backdrop />
+      <CommandPalette />
       <div className="flex min-h-screen">
         <Sidebar user={user} balance={balance} />
         {/* children are NOT wrapped in a re-keying client component: combined
             with the loading.tsx Suspense boundary that left page content
             server-rendered but never hydrated, so nothing was clickable. */}
         <main className="flex min-w-0 flex-1 flex-col">
-          <MobileBar />
+          <TopBar initial={user?.name?.slice(0, 1)} />
           {children}
         </main>
       </div>

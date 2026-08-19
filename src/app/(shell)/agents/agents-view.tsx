@@ -111,7 +111,16 @@ export function AgentsView({
 
               <Bot size={48} accent={a.accent} />
               <h3 className="mt-3.5 text-[15px] font-semibold text-ink">{a.name}</h3>
-              <p className="text-[12.5px]" style={{ color: a.accent }}>
+              {/* The agent's colour identifies it on the avatar and the dot,
+                  but never sets text. It is chosen from a palette picked for
+                  looking distinct against each other, not for carrying 4.5:1
+                  as body copy — the default blue measured 3.4:1 here. */}
+              <p className="flex items-center gap-1.5 text-[12.5px] text-ink-3">
+                <span
+                  aria-hidden
+                  className="h-1.5 w-1.5 shrink-0 rounded-full"
+                  style={{ background: a.accent }}
+                />
                 {a.role}
               </p>
               <p className="mt-2.5 line-clamp-3 flex-1 text-[13px] leading-relaxed text-ink-3">

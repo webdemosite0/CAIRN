@@ -6,23 +6,23 @@
 
 @theme {
   --color-canvas: #08090d;
-  --color-rail: #0d1017;
-  --color-sunk: #0b0d13;
-  --color-raised: #161b29;
-  --color-hover: #1b2130;
+  --color-rail: #0d0f14;
+  --color-sunk: #0a0c11;
+  --color-raised: #11141b;
+  --color-hover: #171b25;
 
   /* Raised from #ededed/#b4b4b4/#8a8a8a/#5c5c5c — the old ramp read as dull,
      and ink-4 sat at ~2.9:1 on canvas, under the 4.5:1 minimum. */
-  --color-ink: #eef1f8;
-  --color-ink-2: #c6cdda;
-  --color-ink-3: #99a3b5;
-  --color-ink-4: #8b94a7;
+  --color-ink: #f5f7fa;
+  --color-ink-2: #c2c9d6;
+  --color-ink-3: #8b92a3;
+  --color-ink-4: #838b9c;
 
-  --color-line: #252d3d;
-  --color-line-strong: #333c50;
+  --color-line: #202532;
+  --color-line-strong: #2c3344;
 
-  --color-accent: #4d8dff;
-  --color-accent-soft: #142544;
+  --color-accent: #7c6fff;
+  --color-accent-soft: #171334;
   --color-violet: #a78bfa;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
@@ -45,18 +45,18 @@
    effect that needs to know what it is sitting on. */
 :root {
   --color-canvas: #08090d;
-  --color-rail: #0d1017;
-  --color-sunk: #0b0d13;
-  --color-raised: #161b29;
-  --color-hover: #1b2130;
-  --color-ink: #eef1f8;
-  --color-ink-2: #c6cdda;
-  --color-ink-3: #99a3b5;
-  --color-ink-4: #8b94a7;
-  --color-line: #252d3d;
-  --color-line-strong: #333c50;
-  --color-accent: #4d8dff;
-  --color-accent-soft: #142544;
+  --color-rail: #0d0f14;
+  --color-sunk: #0a0c11;
+  --color-raised: #11141b;
+  --color-hover: #171b25;
+  --color-ink: #f5f7fa;
+  --color-ink-2: #c2c9d6;
+  --color-ink-3: #8b92a3;
+  --color-ink-4: #838b9c;
+  --color-line: #202532;
+  --color-line-strong: #2c3344;
+  --color-accent: #7c6fff;
+  --color-accent-soft: #171334;
   --color-violet: #a78bfa;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
@@ -109,10 +109,10 @@
      to ~1.6:1. This mixes black into any such tint, and is 0% on dark. */
   /* Dark mode separates surfaces by lightness, so it needs no shadow. */
   --bezel: rgb(190 214 255 / 0.075);
-  --btn-a: #8cc2ff;
-  --btn-b: #5a9bff;
-  --btn-ink: #08152f;
-  --btn-glow: rgb(90 155 255 / 0.35);
+  --btn-a: #7264fc;
+  --btn-b: #5348ee;
+  --btn-ink: #ffffff;
+  --btn-glow: rgb(107 92 250 / 0.38);
   --bezel-under: rgb(0 0 0 / 0.42);
   --bezel-ring: rgb(150 180 235 / 0.04);
   --hairline: rgb(190 214 255 / 0.26);
@@ -135,25 +135,25 @@
    ============================================================ */
 :root[data-theme="light"] {
   --color-canvas: #ffffff;
-  --color-rail: #f6f8fa;
-  --color-sunk: #f0f3f7;
+  --color-rail: #f5f6f9;
+  --color-sunk: #f8f9fc;
   --color-raised: #ffffff;
-  --color-hover: #eef1f6;
+  --color-hover: #eef0f6;
 
-  --color-ink: #1a1f36;
+  --color-ink: #171a2b;
   --color-ink-2: #3c4257;
-  --color-ink-3: #545a69;
+  --color-ink-3: #626a7d;
   --color-ink-4: #5b6373;
 
-  --color-line: #e6e9ef;
+  --color-line: #e4e7ef;
   --color-line-strong: #d5dbe4;
 
   /* Darker, saturated variants — the dark-mode hues are pastels tuned to glow
      on black and go muddy on white. */
-  --color-accent: #5b51f5;
+  --color-accent: #5b50f5;
   --color-accent-soft: #f0efff;
   --color-violet: #6c47ff;
-  --color-positive: #0e7c66;
+  --color-positive: #0b6553;
   --color-positive-soft: #e8f7f3;
   --color-caution: #9a6700;
   --color-critical: #c2325a;
@@ -199,10 +199,10 @@
   --tag-e: #875616;
   --tag-f: #ad2b48;
   --bezel: rgb(255 255 255 / 0.9);
-  --btn-a: #7db8ff;
-  --btn-b: #4f8bff;
-  --btn-ink: #06122a;
-  --btn-glow: rgb(79 139 255 / 0.30);
+  --btn-a: #6a5cfa;
+  --btn-b: #5348ee;
+  --btn-ink: #ffffff;
+  --btn-glow: rgb(91 80 245 / 0.32);
   --bezel-under: rgb(26 31 54 / 0.05);
   --bezel-ring: rgb(26 31 54 / 0.035);
   --hairline: rgb(26 31 54 / 0.16);
@@ -220,20 +220,20 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
     --color-canvas: #ffffff;
-    --color-rail: #f6f8fa;
-    --color-sunk: #f0f3f7;
+    --color-rail: #f5f6f9;
+    --color-sunk: #f8f9fc;
     --color-raised: #ffffff;
-    --color-hover: #eef1f6;
-    --color-ink: #1a1f36;
+    --color-hover: #eef0f6;
+    --color-ink: #171a2b;
     --color-ink-2: #3c4257;
-    --color-ink-3: #545a69;
+    --color-ink-3: #626a7d;
     --color-ink-4: #5b6373;
-    --color-line: #e6e9ef;
+    --color-line: #e4e7ef;
     --color-line-strong: #d5dbe4;
-    --color-accent: #5b51f5;
+    --color-accent: #5b50f5;
     --color-accent-soft: #f0efff;
     --color-violet: #6c47ff;
-    --color-positive: #0e7c66;
+    --color-positive: #0b6553;
     --color-positive-soft: #e8f7f3;
     --color-caution: #9a6700;
     --color-critical: #c2325a;
@@ -277,10 +277,10 @@
     --tag-e: #875616;
     --tag-f: #ad2b48;
     --bezel: rgb(255 255 255 / 0.9);
-    --btn-a: #7db8ff;
-    --btn-b: #4f8bff;
-    --btn-ink: #06122a;
-    --btn-glow: rgb(79 139 255 / 0.30);
+    --btn-a: #6a5cfa;
+    --btn-b: #5348ee;
+    --btn-ink: #ffffff;
+    --btn-glow: rgb(91 80 245 / 0.32);
     --bezel-under: rgb(26 31 54 / 0.05);
     --bezel-ring: rgb(26 31 54 / 0.035);
     --hairline: rgb(26 31 54 / 0.16);
@@ -410,13 +410,17 @@ select:focus-visible,
   }
 }
 
+/* Active row: a purple wash and a purple icon, but the LABEL stays ink.
+   Purple text on a purple tint measured 4.34:1 and failed AA; ink on the
+   same tint is far clearer, and the icon alone carries the colour. */
 @utility rail-item-active {
   background: color-mix(in oklab, var(--color-accent) 10%, transparent);
-  color: var(--color-accent);
+  color: var(--color-ink);
+  font-weight: 500;
 
   &:hover {
     background: color-mix(in oklab, var(--color-accent) 14%, transparent);
-    color: var(--color-accent);
+    color: var(--color-ink);
   }
 }
 
@@ -1656,4 +1660,57 @@ a[role="button"]:active {
   .lift:active {
     transform: none;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Type, spacing and elevation scales                                  */
+/* ------------------------------------------------------------------ */
+
+/*
+ * One scale per dimension. Sizes had been written inline as arbitrary
+ * values, so a heading could be 27px on one page and 26px on another for no
+ * reason. These are the only steps; anything not on the scale is a mistake.
+ */
+:root {
+  /* type — fluid where it needs to be, fixed where it does not */
+  --fs-hero: clamp(2.25rem, 1.4rem + 2.6vw, 3.5rem); /* 36 -> 56 */
+  --fs-h1: clamp(1.5rem, 1.2rem + 0.9vw, 1.75rem);   /* 24 -> 28 */
+  --fs-h2: 1.25rem;                                   /* 20 */
+  --fs-body-lg: 1rem;                                 /* 16 */
+  --fs-body: 0.875rem;                                /* 14 */
+  --fs-nav: 0.9375rem;                                /* 15 */
+  --fs-meta: 0.8125rem;                               /* 13 */
+  --fs-label: 0.6875rem;                              /* 11 */
+
+  --lh-tight: 1.12;
+  --lh-snug: 1.35;
+  --lh-body: 1.6;
+
+  /* spacing — a 4px base, no values between the steps */
+  --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+  --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px; --sp-20: 80px;
+
+  /* radius — five steps, matching the utilities */
+  --r-sm: 6px;  --r-md: 8px;  --r-lg: 12px;  --r-xl: 16px;  --r-hero: 18px;
+
+  /* elevation — restrained, and never more than two layers */
+  --sh-1: 0 1px 2px rgb(16 20 34 / 0.05);
+  --sh-2: 0 1px 2px rgb(16 20 34 / 0.06), 0 4px 12px -4px rgb(16 20 34 / 0.08);
+  --sh-3: 0 2px 4px rgb(16 20 34 / 0.06), 0 12px 32px -12px rgb(16 20 34 / 0.14);
+}
+
+/* Shadows have to carry further on a dark ground to read at all. */
+:root:not([data-theme="light"]) {
+  @media (prefers-color-scheme: dark) {
+    --sh-1: 0 1px 2px rgb(0 0 0 / 0.40);
+    --sh-2: 0 1px 2px rgb(0 0 0 / 0.45), 0 4px 12px -4px rgb(0 0 0 / 0.55);
+    --sh-3: 0 2px 4px rgb(0 0 0 / 0.45), 0 14px 36px -12px rgb(0 0 0 / 0.65);
+  }
+}
+
+:root[data-theme="dark"] {
+  --sh-1: 0 1px 2px rgb(0 0 0 / 0.40);
+  --sh-2: 0 1px 2px rgb(0 0 0 / 0.45), 0 4px 12px -4px rgb(0 0 0 / 0.55);
+  --sh-3: 0 2px 4px rgb(0 0 0 / 0.45), 0 14px 36px -12px rgb(0 0 0 / 0.65);
 }

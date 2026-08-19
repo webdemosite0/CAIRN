@@ -1,6 +1,7 @@
 import { HomeChat } from "@/components/chat/home-chat";
-import { listRecents } from "@/lib/recents";
+import { listAllRecents } from "@/lib/recents";
 import { loadConversation } from "@/lib/conversations";
+import { currentUser } from "@/lib/auth";
 
 export default async function HomePage({
   searchParams,
@@ -8,14 +9,16 @@ export default async function HomePage({
   searchParams: Promise<{ c?: string }>;
 }) {
   const { c } = await searchParams;
-  const [recents, saved] = await Promise.all([
-    listRecents("chat"),
+  const [saved, user, activity] = await Promise.all([
     c ? loadConversation(c) : Promise.resolve(null),
+    currentUser(),
+    listAllRecents(12),
   ]);
 
   return (
     <HomeChat
-      recents={recents}
+      name={user?.name?.split(" ")[0] ?? "there"}
+      activity={activity}
       restored={
         saved ? { id: saved.id, title: saved.title, messages: saved.messages } : null
       }
