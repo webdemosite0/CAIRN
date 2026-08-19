@@ -5,7 +5,7 @@ import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { FiAlertCircle, FiLoader } from "react-icons/fi";
 import { logIn, signUp, type AuthState } from "@/app/actions/auth";
-import { LogoMark } from "@/components/brand/logo";
+import { TroveOrb } from "@/components/brand/orb";
 
 const field =
   "h-12 w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 text-[14.5px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent";
@@ -20,7 +20,7 @@ export function AuthCard({ mode }: { mode: "login" | "signup" }) {
   return (
     <div className="nx-in w-full max-w-[420px] rounded-[12px] border border-line bg-rail p-7 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)]">
       <div className="mb-6 flex flex-col items-center">
-        <LogoMark size={40} />
+        <TroveOrb size={40} state="idle" />
         <h1 className="mt-4 text-[17px] font-semibold text-ink">
           {isLogin ? "Log in to Trove" : "Create your Trove account"}
         </h1>

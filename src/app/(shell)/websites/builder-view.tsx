@@ -19,7 +19,7 @@ import {
 import { TbWorld, TbPuzzle, TbTerminal2, TbCode, TbFiles } from "react-icons/tb";
 import { Composer } from "@/components/chat/composer";
 import { useNav } from "@/components/shell/nav-state";
-import { LogoMark } from "@/components/brand/logo";
+import { TroveOrb } from "@/components/brand/orb";
 import { Ico, type Motion } from "@/components/ui/ico";
 import { ActivityBox } from "@/components/builder/task-feed";
 import { StepsBox, type StepState } from "@/components/builder/steps-box";
@@ -94,7 +94,7 @@ function Thinking({ phase }: { phase: "asking" | "planning" }) {
   return (
     <div className="flex items-center gap-3">
       <span className="nx-thinking relative grid place-items-center">
-        <LogoMark size={26} animated />
+        <TroveOrb size={26} state="thinking" />
       </span>
       <span key={i} className="nx-in nx-dots text-[13.5px] text-ink-2">
         {lines[i]}
@@ -659,7 +659,7 @@ export function BuilderView() {
                 <div className="grid h-full place-items-center">
                   <div className="text-center">
                     <span className={cn(busy && "nx-thinking", "inline-grid place-items-center")}>
-                      <LogoMark size={40} animated={busy} />
+                      <TroveOrb size={40} state={busy ? "working" : "idle"} />
                     </span>
                     <p className="mt-3 text-[13.5px] text-ink-3">
                       {busy ? (
@@ -689,7 +689,7 @@ export function BuilderView() {
                 <div className="grid h-full place-items-center">
                   <div className="text-center">
                     <span className={cn(busy && "nx-thinking", "inline-grid place-items-center")}>
-                      <LogoMark size={40} animated={busy} />
+                      <TroveOrb size={40} state={busy ? "working" : "idle"} />
                     </span>
                     <p className="mt-3 text-[13.5px] text-ink-3">
                       {busy ? (

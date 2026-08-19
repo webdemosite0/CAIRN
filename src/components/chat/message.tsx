@@ -10,7 +10,7 @@ import {
   FiThumbsDown,
   FiFile,
 } from "react-icons/fi";
-import { LogoMark } from "@/components/brand/logo";
+import { TroveOrb } from "@/components/brand/orb";
 import { Ico, type Motion } from "@/components/ui/ico";
 import { humanSize, type Attachment } from "@/lib/attachments";
 import { highlight, TOKEN_VAR } from "@/lib/highlight";
@@ -274,10 +274,11 @@ export function Message({
       {/* The mark orbits while the model is working and settles when it stops,
           so the brand itself is the activity indicator. */}
       <span className={cn("relative mt-0.5 shrink-0", pending && "nx-thinking")}>
-        {/* Boolean(), not the bare prop: pending is undefined on a finished
-            message, and LogoMark defaults animated to true — so passing it
-            through left completed replies orbiting forever. */}
-        <LogoMark size={26} animated={Boolean(pending)} />
+        {/* State is passed explicitly rather than as a boolean that defaults
+            to on. The previous mark defaulted `animated` to true, so an
+            undefined `pending` on a finished message left completed replies
+            orbiting forever. */}
+        <TroveOrb size={26} state={pending ? "thinking" : "idle"} />
       </span>
       <div className="min-w-0 flex-1">
         <div className="space-y-3.5 text-[15px] text-ink-2">

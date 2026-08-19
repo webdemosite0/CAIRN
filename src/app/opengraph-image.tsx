@@ -57,20 +57,23 @@ export default function OpengraphImage() {
         />
 
         <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
+          {/* The Trove orb. Matches TroveOrb and the favicon; drawn literally
+              rather than imported because Satori renders this without CSS
+              custom properties or access to the component. At 72px there is
+              room for both orbits, unlike the 32px favicon. */}
           <svg width="72" height="72" viewBox="0 0 40 40" fill="none">
-            <path
-              d="M20 3.5 A16.5 16.5 0 1 1 3.5 20"
-              stroke="#7dcfff"
-              strokeWidth="3"
+            <circle
+              cx="20"
+              cy="20"
+              r="15.5"
+              stroke="#7c6fff"
+              strokeWidth="1.9"
               strokeLinecap="round"
+              strokeDasharray="58 39"
             />
-            <path
-              d="M20 9.5 A10.5 10.5 0 0 1 30.5 20"
-              stroke="#bb9af7"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
-            <circle cx="20" cy="20" r="4.6" fill="#7aa2f7" />
+            <circle cx="20" cy="4.5" r="2.4" fill="#a78bfa" />
+            <circle cx="20" cy="9.6" r="1.7" fill="#5eead4" />
+            <circle cx="20" cy="20" r="5" fill="#7c6fff" />
           </svg>
           <div
             style={{
