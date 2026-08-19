@@ -109,7 +109,7 @@
      to ~1.6:1. This mixes black into any such tint, and is 0% on dark. */
   /* Dark mode separates surfaces by lightness, so it needs no shadow. */
   --bezel: rgb(190 214 255 / 0.075);
-  --btn-a: #7264fc;
+  --btn-a: #6a5cfa;
   --btn-b: #5348ee;
   --btn-ink: #ffffff;
   --btn-glow: rgb(107 92 250 / 0.38);
