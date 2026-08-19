@@ -3,6 +3,8 @@ import { generateText } from "@/lib/gemini";
 import { toParts, type Attachment } from "@/lib/attachments";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 import { skillPrompts, skillLabel } from "@/lib/skills";
+import { targetFor } from "@/lib/targets";
+import { safeProjectPath } from "@/lib/builder";
 
 export const runtime = "nodejs";
 export const maxDuration = 180;
@@ -30,9 +32,9 @@ type Event =
 
 type TaskKind = "skill" | "read" | "write" | "check" | "think";
 
-const BASE = `You are Trove's web engineer, executing ONE step of an agreed
-plan. The project is a small static site that runs from a folder of files with
-no server and no build step.
+const BASE = `You are Trove's engineer, executing ONE step of an agreed plan.
+The stack is described further down; follow it exactly, including its required
+file names and versions.
 
 OUTPUT FORMAT — strict. Reply with only file blocks, then one SUMMARY line:
 
@@ -46,12 +48,10 @@ HARD RULES
   "unchanged" or "rest of file here" — a partial file destroys the project.
 - Only emit files this step is responsible for. Leave everything else out.
   Re-emitting an untouched file wastes the step and risks reverting it.
-- Flat paths only: index.html, styles.css, script.js, admin.html, store.js.
-- index.html links siblings with plain relative paths:
-  <link rel="stylesheet" href="styles.css"> and <script src="script.js" defer>
-- ZERO external requests. No CDN, no web fonts, no remote images, no analytics.
-  System font stacks, CSS gradients, inline SVG and emoji only. A single
-  external URL breaks the offline preview.
+- Use the paths the stack requires. Nested paths are fine where the stack
+  expects them; never write outside the project folder.
+- ZERO external network requests at runtime. No CDN, no web fonts, no remote
+  images, no analytics, no third-party API.
 
 CONTINUITY — you are editing a real project, not starting over
 - The files you were given are the source of truth. Reuse their exact class
@@ -87,26 +87,68 @@ function parseFiles(raw: string): { files: ProjectFile[]; summary: string } {
     let content = m[2];
     const fenced = content.match(/^\s*```[a-z]*\n([\s\S]*?)```\s*$/i);
     if (fenced) content = fenced[1];
-    if (path) files.push({ path, content: content.replace(/\s+$/, "") + "\n" });
+    const safe = safeProjectPath(path);
+    if (safe) files.push({ path: safe, content: content.replace(/\s+$/, "") + "\n" });
   }
 
   const summary = raw.match(/SUMMARY:\s*(.+)/);
   return { files, summary: summary ? summary[1].trim() : "Step complete." };
 }
 
-/** Cheap sanity checks on generated markup, reported to the console. */
+/**
+ * Cheap static checks, reported to the console.
+ *
+ * These catch the mistakes that make a generated project fail on first run —
+ * a package.json that will not install, Pydantic v1 syntax against v2, a
+ * placeholder version — none of which are visible by reading the preview.
+ */
 function checkFile(f: ProjectFile): string[] {
   const notes: string[] = [];
+  const c = f.content;
+
   if (f.path.endsWith(".html")) {
-    if (!/<!DOCTYPE html>/i.test(f.content)) notes.push("missing <!DOCTYPE html>");
-    if (!/<html[\s>]/i.test(f.content)) notes.push("missing <html>");
-    if (!/<h1[\s>]/i.test(f.content)) notes.push("no <h1>");
-    const ext = f.content.match(/(?:src|href)=["']https?:\/\/[^"']+/gi);
-    if (ext) notes.push(`${ext.length} external request(s) — offline preview will break`);
+    if (!/<!DOCTYPE html>/i.test(c)) notes.push("missing <!DOCTYPE html>");
+    if (!/<html[\s>]/i.test(c)) notes.push("missing <html>");
+    const ext = c.match(/(?:src|href)=["']https?:\/\/[^"']+/gi);
+    if (ext) notes.push(`${ext.length} external request(s)`);
   }
-  if (f.path.endsWith(".css") && !/:root/.test(f.content)) {
+
+  if (f.path.endsWith(".css") && !/:root/.test(c)) {
     notes.push("no :root custom properties");
   }
+
+  if (f.path.endsWith("package.json")) {
+    try {
+      const pkg = JSON.parse(c) as Record<string, unknown>;
+      const deps = {
+        ...((pkg.dependencies as Record<string, string>) ?? {}),
+        ...((pkg.devDependencies as Record<string, string>) ?? {}),
+      };
+      // "*" and "latest" install whatever exists on the day, which is how a
+      // project that worked once stops working without anything changing.
+      const loose = Object.entries(deps)
+        .filter(([, v]) => v === "*" || v === "latest" || !v)
+        .map(([k]) => k);
+      if (loose.length) notes.push(`unpinned dependency: ${loose.join(", ")}`);
+      if (!pkg.scripts) notes.push("no scripts — nothing to run");
+    } catch {
+      notes.push("package.json is not valid JSON — npm install will fail");
+    }
+  }
+
+  if (f.path.endsWith(".py")) {
+    // Pydantic v1 spellings raise on v2 rather than warning.
+    if (/@validator\b/.test(c)) notes.push("@validator is Pydantic v1 — use @field_validator");
+    if (/class\s+Config\b/.test(c)) notes.push("class Config is Pydantic v1 — use model_config");
+    if (/\.dict\(\)/.test(c)) notes.push(".dict() is Pydantic v1 — use .model_dump()");
+  }
+
+  if (f.path.endsWith(".jsx") || f.path.endsWith(".tsx")) {
+    if (/\bkey=\{(?:i|idx|index)\}/.test(c)) {
+      notes.push("list key is the array index — use a stable id");
+    }
+  }
+
   return notes;
 }
 
@@ -118,6 +160,7 @@ export async function POST(req: NextRequest) {
   let attachments: Attachment[] = [];
   let index = 0;
   let total = 0;
+  let target = targetFor("static");
 
   try {
     const body = await req.json();
@@ -128,6 +171,7 @@ export async function POST(req: NextRequest) {
     attachments = Array.isArray(body?.attachments) ? body.attachments : [];
     index = Number(body?.index ?? 0);
     total = Number(body?.total ?? 0);
+    target = targetFor(body?.target);
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -191,6 +235,7 @@ export async function POST(req: NextRequest) {
 
         const system = [
           BASE,
+          target.prompt,
           styleNote ? `STYLE DIRECTION: ${styleNote}` : "",
           skillPrompts(skills),
         ]

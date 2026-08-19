@@ -3,6 +3,8 @@ import { generateText } from "@/lib/gemini";
 import { toParts, type Attachment } from "@/lib/attachments";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 import { SKILL_LIST, SKILLS, type SkillId } from "@/lib/skills";
+import { targetFor } from "@/lib/targets";
+import { safeProjectPath } from "@/lib/builder";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -63,14 +65,15 @@ Rules for steps:
 - Between MIN_STEPS and MAX_STEPS steps, ordered so each builds on the last.
 - The FIRST step must establish the design system and produce styles.css.
 - The LAST step must be a review pass that checks the whole site holds together.
-- Every step lists the files it will create or change. Use only flat paths:
-  index.html, styles.css, script.js, admin.html, store.js and similar.
+- Every step lists the files it will create or change, using the paths the
+  stack below requires.
 - "skills" may only contain ids from this list: SKILL_IDS_HERE
 - Pick skills honestly — list one only when that step really needs it.
 
-There is no server, no database and no payment processing. Anything that would
-need one is done in the browser with localStorage, and the plan must say so
-rather than implying a backend exists.`;
+The plan must fit the stack described below, and must never assume a hosted
+database, a payment processor or an email service exists.
+
+STACK_PROMPT_HERE`;
 
 /** Pulls the first JSON object out of a reply, tolerating fences and prose. */
 function extractJson(raw: string): unknown {
@@ -122,9 +125,11 @@ function normalise(data: unknown, idea: string, maxSteps: number): BuildPlan | n
         title: str(o.title, `Step ${i + 1}`),
         detail: str(o.detail, ""),
         skills,
-        files: list(o.files, 6).map((f) =>
-          f.replace(/^[./]+/, "").replace(/[^a-zA-Z0-9._-]/g, ""),
-        ).filter(Boolean),
+        // Nested paths are required for React and Python projects; a path
+        // that cannot be made safe is dropped rather than mangled.
+        files: list(o.files, 6)
+          .map((f) => safeProjectPath(f))
+          .filter((f): f is string => Boolean(f)),
       };
     })
     .filter((s) => s.title);
@@ -183,6 +188,7 @@ export async function POST(req: NextRequest) {
   let answers: Record<string, unknown> = {};
   let questions: unknown = null;
   let depth: "quick" | "deep" = "deep";
+  let target = targetFor("static");
   try {
     const body = await req.json();
     idea = String(body?.idea ?? "").trim();
@@ -190,6 +196,7 @@ export async function POST(req: NextRequest) {
     answers = body?.answers && typeof body.answers === "object" ? body.answers : {};
     questions = body?.questions ?? null;
     depth = body?.depth === "quick" ? "quick" : "deep";
+    target = targetFor(body?.target);
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -220,7 +227,8 @@ export async function POST(req: NextRequest) {
     SKILL_LIST.map((s) => `${s.id} (${s.blurb})`).join(", "),
   )
     .replace("MIN_STEPS", String(bounds.min))
-    .replace("MAX_STEPS", String(bounds.max));
+    .replace("MAX_STEPS", String(bounds.max))
+    .replace("STACK_PROMPT_HERE", target.prompt);
 
   try {
     const raw = await generateText({

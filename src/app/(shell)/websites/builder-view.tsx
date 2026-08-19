@@ -25,8 +25,10 @@ import { StepsBox, type StepState } from "@/components/builder/steps-box";
 import { BuildConsole } from "@/components/builder/console";
 import { PlanPanel } from "@/components/builder/plan-panel";
 import { QuestionBox } from "@/components/builder/question-box";
+import { RunPanel } from "@/components/builder/run-panel";
 import { strip, type Attachment } from "@/lib/attachments";
 import { SKILL_LIST } from "@/lib/skills";
+import { TARGET_LIST, targetFor, type TargetId } from "@/lib/targets";
 import {
   bundle,
   mergeFiles,
@@ -104,6 +106,7 @@ export function BuilderView() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [idea, setIdea] = useState("");
   const [depth, setDepth] = useState<Depth>("deep");
+  const [targetId, setTargetId] = useState<TargetId>("static");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [plan, setPlan] = useState<BuildPlan | null>(null);
   const [storage, setStorage] = useState<"local" | "none">("local");
@@ -140,7 +143,11 @@ export function BuilderView() {
     setLogs((l) => [...l.slice(-400), { id: nextLog.current++, text, level, at }]);
   }, []);
 
-  const preview = useMemo(() => bundle(files), [files]);
+  const target = useMemo(() => targetFor(targetId), [targetId]);
+  const preview = useMemo(
+    () => (target.previewable ? bundle(files) : ""),
+    [files, target.previewable],
+  );
 
   /** The task currently running, shown inside the active step. */
   const activity = useMemo(
@@ -220,6 +227,7 @@ export function BuilderView() {
             answers: given,
             questions,
             depth,
+            target: targetId,
           }),
         });
         const data = await res.json().catch(() => null);
@@ -237,7 +245,7 @@ export function BuilderView() {
         log(m, "warn");
       }
     },
-    [questions, depth, log],
+    [questions, depth, targetId, log],
   );
 
   /* ---------------- 3. execute ---------------- */
@@ -264,6 +272,7 @@ export function BuilderView() {
           style,
           index: position.index,
           total: position.total,
+          target: targetId,
           attachments: strip(attach),
         }),
       });
@@ -315,7 +324,7 @@ export function BuilderView() {
       }
       return acc;
     },
-    [idea, log, upsertTask],
+    [idea, log, upsertTask, targetId],
   );
 
   const styleBrief = useCallback(
@@ -346,8 +355,11 @@ export function BuilderView() {
           total: plan.steps.length,
         });
         setStepStates((s) => ({ ...s, [step.id]: "ok" }));
-        // Once there is something to look at, look at it.
-        if (current.some((f) => f.path.endsWith(".html"))) setPane("preview");
+        // Only swap to the preview for a stack this app can actually render.
+        // For the others the console is more useful than an empty frame.
+        if (target.previewable && current.some((f) => f.path.endsWith(".html"))) {
+          setPane("preview");
+        }
       } catch (e) {
         const m = e instanceof Error ? e.message : "Step failed.";
         setStepStates((s) => ({ ...s, [step.id]: "fail" }));
@@ -362,8 +374,13 @@ export function BuilderView() {
     setCurrentStep(-1);
     setPhase("ready");
     setPane("preview");
-    log("build complete", "ok");
-  }, [plan, busy, files, runStep, styleBrief, log]);
+    log(
+      target.previewable
+        ? "build complete"
+        : `build complete — ${target.commands[0]} to run it`,
+      "ok",
+    );
+  }, [plan, busy, files, runStep, styleBrief, log, target]);
 
   /* ---------------- 4. edits ---------------- */
 
@@ -456,6 +473,46 @@ export function BuilderView() {
         </div>
 
         <Composer onSend={ask} placeholder="Build a website for…" autoFocus />
+
+        {/* What to build it with. Only the static target previews in-app; the
+            others produce a real project you download and run. */}
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {TARGET_LIST.map((t, i) => (
+            <button
+              key={t.id}
+              onClick={() => setTargetId(t.id)}
+              className={cn(
+                "nx-in rounded-[10px] border p-3 text-left transition-colors",
+                targetId === t.id
+                  ? "border-accent bg-accent/[0.06]"
+                  : "border-line hover:bg-hover",
+              )}
+              style={{ animationDelay: `${i * 45}ms`, animationFillMode: "backwards" }}
+            >
+              <span className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full border",
+                    targetId === t.id ? "border-accent" : "border-line-strong",
+                  )}
+                >
+                  {targetId === t.id ? (
+                    <span className="block h-1.5 w-1.5 rounded-full bg-accent" />
+                  ) : null}
+                </span>
+                <span className="text-[13.5px] font-medium text-ink">{t.label}</span>
+                {t.previewable ? (
+                  <span className="rounded-[5px] bg-positive/12 px-1.5 py-0.5 text-[10.5px] text-positive">
+                    previews here
+                  </span>
+                ) : null}
+              </span>
+              <span className="mt-1 block text-[12px] leading-snug text-ink-4">
+                {t.blurb}
+              </span>
+            </button>
+          ))}
+        </div>
 
         <div className="mt-3 flex items-center justify-center gap-1.5">
           {(
@@ -589,7 +646,28 @@ export function BuilderView() {
           </div>
 
           <div className="min-h-0 flex-1 overflow-hidden bg-sunk">
-            {pane === "preview" ? (
+            {pane === "preview" && !target.previewable ? (
+              files.length ? (
+                <RunPanel target={target} fileCount={files.length} onDownload={download} />
+              ) : (
+                <div className="grid h-full place-items-center">
+                  <div className="text-center">
+                    <span className={cn(busy && "nx-thinking", "inline-grid place-items-center")}>
+                      <LogoMark size={40} animated={busy} />
+                    </span>
+                    <p className="mt-3 text-[13.5px] text-ink-3">
+                      {busy ? (
+                        <span className="nx-dots">Writing your {target.label}</span>
+                      ) : (
+                        "Nothing built yet."
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )
+            ) : null}
+
+            {pane === "preview" && target.previewable ? (
               preview ? (
                 <div className="h-full overflow-auto p-4">
                   <iframe

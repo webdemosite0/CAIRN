@@ -96,6 +96,29 @@ export function mergeFiles(prev: ProjectFile[], next: ProjectFile[]): ProjectFil
   return out;
 }
 
+/**
+ * Normalises a generated file path.
+ *
+ * Nested paths are required now that a React project needs src/App.jsx, so
+ * slashes have to survive — the previous rule stripped every character outside
+ * [A-Za-z0-9._-] and quietly turned src/App.jsx into srcApp.jsx.
+ *
+ * Traversal is still refused rather than sanitised: a path containing ".." or
+ * an absolute root is rejected outright, because a "cleaned" traversal is the
+ * kind of thing that looks handled and is not. These paths are written into a
+ * zip the user extracts, so an escaping entry would land outside the folder.
+ */
+export function safeProjectPath(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const p = raw.trim().replace(/\\/g, "/").replace(/^\.\//, "");
+  if (!p || p.length > 120) return null;
+  if (p.startsWith("/") || /^[a-zA-Z]:/.test(p)) return null;
+  if (p.split("/").some((seg) => seg === ".." || seg === "" || seg === ".")) return null;
+  if (!/^[A-Za-z0-9._/-]+$/.test(p)) return null;
+  if (p.split("/").length > 5) return null;
+  return p;
+}
+
 /** A stable, filename-safe stem for downloads. */
 export function projectSlug(title: string): string {
   return (
