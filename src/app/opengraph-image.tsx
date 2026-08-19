@@ -57,23 +57,39 @@ export default function OpengraphImage() {
         />
 
         <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
-          {/* The Trove orb. Matches TroveOrb and the favicon; drawn literally
-              rather than imported because Satori renders this without CSS
-              custom properties or access to the component. At 72px there is
-              room for both orbits, unlike the 32px favicon. */}
-          <svg width="72" height="72" viewBox="0 0 40 40" fill="none">
-            <circle
-              cx="20"
-              cy="20"
-              r="15.5"
-              stroke="#7c6fff"
-              strokeWidth="1.9"
-              strokeLinecap="round"
-              strokeDasharray="58 39"
-            />
-            <circle cx="20" cy="4.5" r="2.4" fill="#a78bfa" />
-            <circle cx="20" cy="9.6" r="1.7" fill="#5eead4" />
-            <circle cx="20" cy="20" r="5" fill="#7c6fff" />
+          {/* The Trove planet. Matches TroveOrb and the favicon; drawn
+              literally rather than imported because Satori renders this
+              without CSS custom properties or access to the component. At
+              84px there is room for the moon, unlike the 32px favicon. */}
+          <svg width="84" height="84" viewBox="0 0 48 48" fill="none">
+            <defs>
+              <linearGradient id="ogRing" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stopColor="#5eead4" />
+                <stop offset="0.45" stopColor="#7dd3fc" />
+                <stop offset="1" stopColor="#a78bfa" />
+              </linearGradient>
+              <linearGradient id="ogPlanet" x1="0.2" y1="0" x2="0.9" y2="1">
+                <stop offset="0" stopColor="#8b7cff" />
+                <stop offset="0.55" stopColor="#6c5ce7" />
+                <stop offset="1" stopColor="#2e2a5c" />
+              </linearGradient>
+            </defs>
+            <g transform="rotate(-22 24 25)">
+              <path
+                d="M4.5 25 A19.5 7.4 0 0 1 43.5 25"
+                stroke="url(#ogRing)"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+              <circle cx="24" cy="25" r="11.4" fill="url(#ogPlanet)" />
+              <path
+                d="M43.5 25 A19.5 7.4 0 0 1 4.5 25"
+                stroke="url(#ogRing)"
+                strokeWidth="2.6"
+                strokeLinecap="round"
+              />
+            </g>
+            <circle cx="24" cy="6.4" r="3.1" fill="#5eead4" />
           </svg>
           <div
             style={{

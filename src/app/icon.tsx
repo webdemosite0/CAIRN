@@ -5,15 +5,16 @@ export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 
 /**
- * Favicon — the Trove orb, flattened for 32px.
+ * Favicon — the Trove planet, flattened for 32px.
  *
- * The same shape as TroveOrb: a core, an open orbit ring, and the particle
- * riding it. Kept in sync by hand because this renders through Satori, which
- * has no access to the component or to CSS custom properties. The colours are
- * the literal values behind --color-accent (dark) and its violet partner.
+ * The same shape as TroveOrb, kept in sync by hand because this renders
+ * through Satori, which has no access to the component or to CSS custom
+ * properties. Colours are the literal values behind the ring and planet
+ * gradients.
  *
- * Detail is dropped rather than scaled: the inner orbit and the second
- * particle turn to mud below about 20px, so only the outer ring survives.
+ * Detail is dropped rather than scaled: the moon and the terminator stroke
+ * turn to mud below about 20px, so the icon is the planet and its ring only,
+ * and the ring is thickened to survive the size.
  */
 export default function Icon() {
   return new ImageResponse(
@@ -25,25 +26,26 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#08090d",
+          background: "#0a0a0c",
           borderRadius: 7,
         }}
       >
-        <svg width="26" height="26" viewBox="0 0 40 40" fill="none">
-          {/* Open orbit — the gap is what makes it read as motion. */}
-          <circle
-            cx="20"
-            cy="20"
-            r="15"
-            stroke="#7c6fff"
-            strokeWidth="2.6"
-            strokeLinecap="round"
-            strokeDasharray="56 38"
-          />
-          {/* The particle on the path. */}
-          <circle cx="20" cy="5" r="3.1" fill="#a78bfa" />
-          {/* Core. */}
-          <circle cx="20" cy="20" r="5.6" fill="#7c6fff" />
+        <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
+          <defs>
+            <linearGradient id="r" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0" stopColor="#5eead4" />
+              <stop offset="1" stopColor="#a78bfa" />
+            </linearGradient>
+            <linearGradient id="p" x1="0.2" y1="0" x2="0.9" y2="1">
+              <stop offset="0" stopColor="#8b7cff" />
+              <stop offset="1" stopColor="#3b2f7a" />
+            </linearGradient>
+          </defs>
+          <g transform="rotate(-22 24 25)">
+            <path d="M4.5 25 A19.5 7.4 0 0 1 43.5 25" stroke="url(#r)" strokeWidth="3" strokeLinecap="round" />
+            <circle cx="24" cy="25" r="12.4" fill="url(#p)" />
+            <path d="M43.5 25 A19.5 7.4 0 0 1 4.5 25" stroke="url(#r)" strokeWidth="3.4" strokeLinecap="round" />
+          </g>
         </svg>
       </div>
     ),

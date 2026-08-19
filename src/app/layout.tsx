@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import { site } from "@/lib/site";
 import { THEME_SCRIPT } from "@/components/shell/theme";
 import "./globals.css";
@@ -7,6 +7,15 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// The wordmark only. High-contrast serif, which is what gives TROVE its
+// weight next to an otherwise sans interface.
+const serif = Playfair_Display({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["500", "600"],
   display: "swap",
 });
 
@@ -155,7 +164,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${serif.variable} ${mono.variable}`}>
       <head>
         {/* Must run before the first paint — see THEME_SCRIPT. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
