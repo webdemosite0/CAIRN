@@ -5,30 +5,31 @@
    ============================================================ */
 
 @theme {
-  --color-canvas: #08090d;
-  --color-rail: #0a0c14;
-  --color-sunk: #0c1020;
-  --color-raised: #10131f;
-  --color-hover: #161a28;
+  --color-canvas: #0a0a0b;
+  --color-rail: #0e0e10;
+  --color-sunk: #121214;
+  --color-raised: #17171a;
+  --color-hover: #1e1e22;
 
-  /* A real three-step ramp again. It was flattened to pure white at every
-     tier on request, which removed the hierarchy entirely — a caption and a
-     heading looked equally important. Measured on canvas: 18.3, 8.4, 4.9.
+  /* A real three-step ramp. It was flattened to pure white at every tier on
+     request, which removed the hierarchy entirely — a caption and a heading
+     carried identical weight.
 
-     ink-4 is #7a7e90, not the #717586 the brief names: that measured 4.35:1
-     here, under the 4.5 the same brief asks for. The lift is imperceptible;
-     the difference is whether muted text is readable at all.
+     Measured on the canvas: 18.0, 8.5, 5.8. The number that actually decides
+     ink-4 is the one on --color-hover, the lightest surface muted text can
+     land on, where it holds 4.84 — a value chosen against the canvas alone
+     would fail the moment the row it sits in is hovered.
 
-     --color-accent carries text and icons at 8.11:1 on the canvas and 7.05
-     on the lightest surface it can sit on. The button face is a deeper
-     blue because it has white on it — see --btn-a, 5.17:1. */
-  --color-ink: #f5f5f7;
-  --color-ink-2: #f5f5f7;
-  --color-ink-3: #a5a8b8;
-  --color-ink-4: #82869a;
+     --color-accent carries text and icons: 8.06 on the canvas, 6.77 on that
+     same hover surface. The button face is a deeper blue because it has
+     white on it — see --btn-a. */
+  --color-ink: #f4f4f4;
+  --color-ink-2: #f4f4f4;
+  --color-ink-3: #a9a9ae;
+  --color-ink-4: #8a8a90;
 
-  --color-line: #1c2030;
-  --color-line-strong: #2a3042;
+  --color-line: #26262b;
+  --color-line-strong: #34343a;
 
   --color-accent: #5aa9ff;
   --color-accent-soft: #0d1b33;
@@ -54,17 +55,17 @@
    all: --shade, the direction elevation travels, and --ground, used by any
    effect that needs to know what it is sitting on. */
 :root {
-  --color-canvas: #08090d;
-  --color-rail: #0a0c14;
-  --color-sunk: #0c1020;
-  --color-raised: #10131f;
-  --color-hover: #161a28;
-  --color-ink: #f5f5f7;
-  --color-ink-2: #f5f5f7;
-  --color-ink-3: #a5a8b8;
-  --color-ink-4: #82869a;
-  --color-line: #1c2030;
-  --color-line-strong: #2a3042;
+  --color-canvas: #0a0a0b;
+  --color-rail: #0e0e10;
+  --color-sunk: #121214;
+  --color-raised: #17171a;
+  --color-hover: #1e1e22;
+  --color-ink: #f4f4f4;
+  --color-ink-2: #f4f4f4;
+  --color-ink-3: #a9a9ae;
+  --color-ink-4: #8a8a90;
+  --color-line: #26262b;
+  --color-line-strong: #34343a;
   --color-accent: #5aa9ff;
   --color-accent-soft: #0d1b33;
   --color-violet: #7cc0ff;
@@ -92,7 +93,7 @@
   --orb-c: rgb(124 192 255 / 0.07);
   --sweep-base: #d3e6ff;
   --sweep-hi: #ffffff;
-  --grad-sky: rgb(12 16 32 / 0.5);
+  --grad-sky: rgb(18 18 20 / 0.5);
   --floor: rgb(0 0 0 / 0.6);
   --aurora-a: rgb(37 99 235 / 0.26);
   --aurora-b: rgb(124 192 255 / 0.20);

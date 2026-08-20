@@ -6,11 +6,10 @@ import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import { Composer } from "@/components/chat/composer";
 import { Message } from "@/components/chat/message";
 import { Greeting } from "@/components/chat/greeting";
-import { QuickActions } from "@/components/home/quick-actions";
 import { StarterCards } from "@/components/home/starter-cards";
 import { DEFAULT_MODE, type ModeId } from "@/lib/modes";
 import { useChatThread } from "@/lib/use-chat-thread";
-import { ContinuePanel, ActivityPanel } from "@/components/home/recent-panels";
+import { ContinuePanel } from "@/components/home/recent-panels";
 import { Aurora } from "@/components/shell/aurora";
 import type { Recent } from "@/lib/recents";
 
@@ -82,16 +81,16 @@ export function HomeChat({
               />
             </div>
 
-            <QuickActions className="mt-6" />
+            {/* One row of starters, not two. QuickActions and StarterCards
+                were both "ways to begin something" stacked on top of each
+                other, which made the page long without making it more
+                useful. These fill the composer, so the next thing you do is
+                still typing rather than navigating away. */}
+            <StarterCards className="mt-8" onPick={setDraft} />
 
-            {/* Always shown. These are shortcuts, not filler — someone
-                with a full workspace still wants a one-tap way to start the
-                next thing. */}
-            <StarterCards className="mt-10" onPick={setDraft} />
-
-            <div className="mt-8 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+            {/* One list of recent work, not two panels of it. */}
+            <div className="mt-10">
               <ContinuePanel items={activity} />
-              <ActivityPanel items={activity} />
             </div>
 
             {error ? <ErrorNote message={error} onRetry={retry} /> : null}

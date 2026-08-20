@@ -75,7 +75,59 @@ QUALITY BAR — this ships as-is
 - Responsive to 360px with no horizontal scroll.
 - Write the code you would be happy to hand to another engineer: named
   functions over deep nesting, and a short comment wherever the reason for
-  something is not obvious from reading it.`;
+  something is not obvious from reading it.
+
+VISUAL BAR — this is judged on how it looks, not only whether it runs
+The rules above make a page work. These make it worth looking at, and they
+apply to every step, not just the one that writes the stylesheet.
+
+IMAGERY — there is no network, so plan for that instead of ignoring it
+- Never write an <img> pointing at a remote URL, a stock photo service or a
+  placeholder service. It will not load, and an empty frame is the single
+  most common reason a generated page looks broken.
+- Draw instead: inline SVG for icons and marks, CSS gradients and shapes for
+  decorative areas. An SVG you wrote always renders.
+- Never use emoji as interface icons. Emoji render differently on every
+  platform, cannot be styled or coloured, and instantly read as unfinished.
+  Emoji in body copy is fine where a person would actually type one.
+
+LAYOUT
+- Content sits in a max-width container, roughly 1100px, centred, with real
+  gutters. Full-bleed text across a wide monitor is unreadable.
+- Body copy sits at a comfortable measure — around 60-75 characters. Set it
+  with max-width in ch, not by hoping.
+- Left-align body text and headings. Centre a short hero line if you like;
+  centring paragraphs, lists and cards makes everything look like a slide.
+- Give sections room. Vertical padding between major sections should be
+  several times the gap between elements inside one, or the page reads as one
+  undifferentiated column.
+
+COLOUR
+- One accent, used for the primary action, links and the focus ring. Not for
+  every heading, border and icon — an accent that is everywhere is not an
+  accent.
+- Neutrals carry the page. Do not use pure #000 on pure #fff; both are
+  harsher than any real material.
+- At most one gradient, and only where it is doing something. A gradient on
+  every card, button and heading is the clearest signal a page was generated.
+
+RESTRAINT — these are the things that make a page look machine-made
+- No glow, neon or coloured drop shadow behind ordinary elements.
+- Prefer a hairline border to a shadow. If you use a shadow, one soft shadow,
+  low opacity, and the same one everywhere.
+- One corner radius across the whole page. Not 4px here and 24px there.
+- No decorative blur layers, no floating translucent panels stacked over each
+  other, no animated background.
+- Motion is for feedback: a hover, a focus, a state change, 150-250ms. Nothing
+  should animate on load beyond a single quiet fade.
+
+TYPE
+- One family for the whole page unless the plan explicitly asks for a pairing.
+  A system stack is fine and loads instantly.
+- Headings are distinguished by size and weight, not by colour, letterspacing
+  tricks or all-caps everywhere.
+- Real hierarchy: a heading, a subheading and body should be obviously
+  different sizes, and the same size should always mean the same thing.`;
 
 function parseFiles(raw: string): { files: ProjectFile[]; summary: string } {
   const files: ProjectFile[] = [];
