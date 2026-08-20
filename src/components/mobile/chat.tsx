@@ -102,7 +102,7 @@ export function MobileChat({
               <Link
                 key={t.href}
                 href={t.href}
-                className="press flex shrink-0 items-center gap-2 rounded-full border border-line bg-raised px-3.5 py-2 text-[13.5px] text-ink-2 transition-colors active:bg-hover"
+                className="press flex h-[42px] shrink-0 items-center gap-2 rounded-full border border-line bg-raised px-4 text-[13.5px] text-ink-2 transition-colors active:bg-hover"
               >
                 <t.icon size={16} className="shrink-0 text-ink" />
                 {t.label}
@@ -165,7 +165,9 @@ export function MobileChat({
         <div ref={bottom} />
       </div>
 
-      <div className="sticky bottom-0 bg-gradient-to-t from-canvas via-canvas to-transparent px-3 pb-3 pt-3">
+      {/* Docked. The safe-area padding matters here: without it the send
+          button sits under the home indicator on a gesture-nav phone. */}
+      <div className="sticky bottom-0 bg-gradient-to-t from-canvas via-canvas to-transparent px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+12px)]">
         <MobileComposer
           onSend={send}
           disabled={busy}

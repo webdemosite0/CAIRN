@@ -139,7 +139,7 @@ export function MobileShell({
           {balance ? (
             <Link
               href="/plans"
-              className="press shrink-0 rounded-full border border-line px-3 py-1.5 text-[12.5px] font-medium tabular-nums text-ink-2 transition-colors active:bg-hover"
+              className="press flex h-[38px] shrink-0 items-center gap-1 rounded-full border border-line px-3.5 text-[12.5px] font-medium tabular-nums text-ink-2 transition-colors active:bg-hover"
             >
               <span className="text-accent">✦</span>{" "}
               {balance.remaining > 999

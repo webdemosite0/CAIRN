@@ -30,11 +30,15 @@ export function ModePicker({
   onChange,
   disabled,
   compact = false,
+  touch = false,
 }: {
   value: ModeId;
   onChange: (id: ModeId) => void;
   disabled?: boolean;
+  /** Tighter, for a narrow side panel. */
   compact?: boolean;
+  /** 44px tall, for a finger. Wins over compact when both are set. */
+  touch?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
@@ -65,24 +69,47 @@ export function ModePicker({
         className={cn(
           "group flex items-center gap-1.5 rounded-[7px] text-ink-3 transition-colors",
           "hover:bg-hover hover:text-ink disabled:opacity-40",
-          compact ? "px-1.5 py-1 text-[11.5px]" : "px-2 py-1.5 text-[12.5px]",
+          touch
+            ? "h-11 rounded-full px-3.5 text-[13.5px]"
+            : compact
+              ? "px-1.5 py-1 text-[11.5px]"
+              : "px-2 py-1.5 text-[12.5px]",
         )}
       >
         {(() => {
           const Glyph = ICON[value];
-          return <Glyph size={compact ? 13 : 15} className="shrink-0 text-accent" />;
+          return <Glyph size={touch ? 16 : compact ? 13 : 15} className="shrink-0 text-accent" />;
         })()}
-        <span className="hidden sm:inline">{MODES[value].label}</span>
+        <span className={touch ? "" : "hidden sm:inline"}>{MODES[value].label}</span>
         <FiChevronDown
           size={12}
           className={cn("transition-transform duration-200", open && "rotate-180")}
         />
       </button>
 
+      {open && touch ? (
+        <button
+          type="button"
+          aria-hidden
+          tabIndex={-1}
+          onClick={() => setOpen(false)}
+          className="nx-fade fixed inset-0 z-40 cursor-default bg-[rgba(4,5,10,0.6)]"
+        />
+      ) : null}
+
       {open ? (
         <div
           role="menu"
-          className="nx-in absolute bottom-full left-0 z-50 mb-2 w-[264px] overflow-hidden rounded-[12px] border border-line bg-raised shadow-[var(--sh-3)]"
+          className={cn(
+            "nx-in z-50 overflow-hidden border border-line bg-raised shadow-[var(--sh-3)]",
+            touch
+              ? // Anchored to the viewport, not the trigger. The trigger sits
+                // partway across the composer, so a 264px panel hung off its
+                // left edge ran 17px past the screen at 320px wide. Pinning it
+                // to the bottom always fits and puts the options under a thumb.
+                "fixed inset-x-3 bottom-3 rounded-[16px]"
+              : "absolute bottom-full left-0 mb-2 w-[264px] rounded-[12px]",
+          )}
         >
           {MODE_LIST.map((m) => (
             <button
