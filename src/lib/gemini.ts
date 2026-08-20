@@ -362,6 +362,8 @@ export async function generateText({
   extraParts,
   onUsage,
   onAttempt,
+  search = false,
+  onSources,
 }: {
   turns: Turn[];
   system: string;
@@ -373,6 +375,10 @@ export async function generateText({
   onUsage?: OnUsage;
   /** Fires on each failed model attempt, so a slow fallback is visible. */
   onAttempt?: OnAttempt;
+  /** Let the model search the web first. See streamText for the reasoning. */
+  search?: boolean;
+  /** Fires with the pages the model consulted, before the text is returned. */
+  onSources?: OnSources;
 }) {
   const contents = turns.map((t) => ({
     role: t.role,
@@ -391,6 +397,9 @@ export async function generateText({
       contents,
       systemInstruction: { parts: [{ text: system }] },
       generationConfig: { temperature, maxOutputTokens },
+      // Omitted rather than sent as false — an unknown field fails the whole
+      // request and the fallback chain would walk every model on a 400.
+      ...(search ? { tools: [{ google_search: {} }] } : {}),
     },
     onAttempt,
   );
@@ -403,6 +412,17 @@ export async function generateText({
       onUsage?.(usage);
     } catch (e) {
       console.error("Gemini usage callback failed", e);
+    }
+  }
+
+  if (onSources) {
+    const g = readGrounding(json?.candidates?.[0]?.groundingMetadata);
+    if (g && (g.sources.length || g.queries.length)) {
+      try {
+        onSources(g.sources, g.queries);
+      } catch (e) {
+        console.error("Gemini sources callback failed", e);
+      }
     }
   }
 
