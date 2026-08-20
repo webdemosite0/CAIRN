@@ -23,12 +23,11 @@ import { join } from "path";
 const OUT = process.env.OUT_DIR ?? "brand";
 mkdirSync(OUT, { recursive: true });
 
-const RING_A = "#5eead4";
-const RING_B = "#7dd3fc";
-const RING_C = "#a78bfa";
-const PLANET_A = "#8b7cff";
-const PLANET_B = "#6c5ce7";
-const PLANET_C = "#2e2a5c";
+const RING = ["#f0abfc", "#c084fc", "#7c6cff", "#38bdf8", "#5eead4"];
+const RIM = ["#f0abfc", "#8b5cf6", "#38bdf8"];
+const BODY = ["#2a1b5e", "#140c33", "#05030f"];
+const MOON = ["#c4b5fd", "#3b2a6b", "#08050f"];
+const OUTER = ["#a99cff", "#7c6cff"];
 
 /**
  * The planet, at whatever size, on a transparent ground.
@@ -41,8 +40,33 @@ const PLANET_C = "#2e2a5c";
 function Planet({ size, id, moon = true }) {
   const s = size;
   const ring = `ring-${id}`;
-  const planet = `planet-${id}`;
-  const k = s / 48; // stroke widths scale with the mark
+  const outer = `outer-${id}`;
+  const body = `body-${id}`;
+  const rim = `rim-${id}`;
+  const moonG = `moon-${id}`;
+
+  const lin = (id_, coords, stops) => ({
+    type: "linearGradient",
+    props: {
+      id: id_,
+      x1: coords[0], y1: coords[1], x2: coords[2], y2: coords[3],
+      children: stops.map(([offset, stopColor]) => ({
+        type: "stop",
+        props: { offset, stopColor },
+      })),
+    },
+  });
+
+  const rad = (id_, cx, cy, r, stops) => ({
+    type: "radialGradient",
+    props: {
+      id: id_, cx, cy, r,
+      children: stops.map(([offset, stopColor]) => ({
+        type: "stop",
+        props: { offset, stopColor },
+      })),
+    },
+  });
 
   return {
     type: "div",
@@ -60,31 +84,36 @@ function Planet({ size, id, moon = true }) {
               type: "defs",
               props: {
                 children: [
-                  {
-                    type: "linearGradient",
-                    props: {
-                      id: ring, x1: "0", y1: "1", x2: "1", y2: "0",
-                      children: [
-                        { type: "stop", props: { offset: "0", stopColor: RING_A } },
-                        { type: "stop", props: { offset: "0.45", stopColor: RING_B } },
-                        { type: "stop", props: { offset: "1", stopColor: RING_C } },
-                      ],
-                    },
-                  },
-                  {
-                    type: "linearGradient",
-                    props: {
-                      id: planet, x1: "0.2", y1: "0", x2: "0.9", y2: "1",
-                      children: [
-                        { type: "stop", props: { offset: "0", stopColor: PLANET_A } },
-                        { type: "stop", props: { offset: "0.55", stopColor: PLANET_B } },
-                        { type: "stop", props: { offset: "1", stopColor: PLANET_C } },
-                      ],
-                    },
-                  },
+                  lin(ring, ["0.05", "0.95", "0.95", "0.05"], [
+                    ["0", RING[0]], ["0.28", RING[1]], ["0.58", RING[2]],
+                    ["0.82", RING[3]], ["1", RING[4]],
+                  ]),
+                  lin(outer, ["0", "1", "1", "0"], [["0", OUTER[0]], ["1", OUTER[1]]]),
+                  lin(rim, ["0.15", "0.1", "0.85", "0.95"], [
+                    ["0", RIM[0]], ["0.4", RIM[1]], ["1", RIM[2]],
+                  ]),
+                  lin(moonG, ["0.2", "0", "0.85", "1"], [
+                    ["0", MOON[0]], ["0.5", MOON[1]], ["1", MOON[2]],
+                  ]),
+                  rad(body, "0.36", "0.3", "0.85", [
+                    ["0", BODY[0]], ["0.45", BODY[1]], ["1", BODY[2]],
+                  ]),
                 ],
               },
             },
+
+            // the moon's orbit, behind everything
+            {
+              type: "g",
+              props: { transform: "rotate(14 24 24)", children: {
+                type: "ellipse",
+                props: {
+                  cx: 24, cy: 24, rx: 21, ry: 8.2,
+                  stroke: `url(#${outer})`, strokeWidth: 1.1, opacity: 0.55,
+                },
+              } },
+            },
+
             {
               type: "g",
               props: {
@@ -95,25 +124,40 @@ function Planet({ size, id, moon = true }) {
                     props: {
                       d: "M4.5 25 A19.5 7.4 0 0 1 43.5 25",
                       stroke: `url(#${ring})`,
-                      strokeWidth: 2 / k > 0 ? 2 : 2,
-                      strokeLinecap: "round",
+                      strokeWidth: 1.8, strokeLinecap: "round", opacity: 0.65,
                     },
                   },
-                  { type: "circle", props: { cx: 24, cy: 25, r: 11.4, fill: `url(#${planet})` } },
+                  { type: "circle", props: { cx: 24, cy: 25, r: 11.4, fill: `url(#${body})` } },
+                  {
+                    type: "circle",
+                    props: {
+                      cx: 24, cy: 25, r: 11.4,
+                      fill: "none", stroke: `url(#${rim})`, strokeWidth: 1.3,
+                    },
+                  },
                   {
                     type: "path",
                     props: {
                       d: "M43.5 25 A19.5 7.4 0 0 1 4.5 25",
                       stroke: `url(#${ring})`,
-                      strokeWidth: 2.4,
-                      strokeLinecap: "round",
+                      strokeWidth: 2.6, strokeLinecap: "round",
                     },
                   },
                 ],
               },
             },
+
             moon
-              ? { type: "circle", props: { cx: 24, cy: 6.4, r: 3.1, fill: RING_A } }
+              ? { type: "circle", props: { cx: 24, cy: 6.2, r: 3.4, fill: `url(#${moonG})` } }
+              : null,
+            moon
+              ? {
+                  type: "circle",
+                  props: {
+                    cx: 24, cy: 6.2, r: 3.4,
+                    fill: "none", stroke: MOON[0], strokeWidth: 0.6, opacity: 0.7,
+                  },
+                }
               : null,
           ].filter(Boolean),
         },
@@ -121,7 +165,6 @@ function Planet({ size, id, moon = true }) {
     },
   };
 }
-
 /** Planet plus wordmark, laid out horizontally. */
 function Lockup({ width, ink, bg, id }) {
   const mark = Math.round(width * 0.24);
@@ -167,7 +210,7 @@ function Tile({ size, id }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0a0a0c",
+        background: "#08090d",
         borderRadius: Math.round(size * 0.22),
       },
       children: Planet({ size: Math.round(size * 0.66), id }),
@@ -192,7 +235,7 @@ const jobs = [
   },
   {
     name: "trove-lockup-on-dark-1024.png",
-    el: Lockup({ width: 1024, ink: "#ffffff", bg: "#0a0a0c", id: "g" }),
+    el: Lockup({ width: 1024, ink: "#ffffff", bg: "#08090d", id: "g" }),
     w: 1024, h: 307,
   },
 ];

@@ -5,15 +5,20 @@ import { cn } from "@/lib/utils";
 /**
  * The wordmark.
  *
- * Set in a high-contrast serif rather than the interface sans. That contrast
- * is the point: the mark reads as a name rather than as another label in the
- * UI, and it is the only serif anywhere in the product.
+ * Heavy geometric sans, near-circular bowls, set tight — matching the supplied
+ * artwork. It was a high-contrast serif before; the reference settles that.
+ *
+ * The letters are filled with a gradient rather than a flat colour: white at
+ * the top left falling to violet at the bottom right, which is what makes the
+ * word read as the same material as the planet instead of a caption next to
+ * it. Done with background-clip, so it stays live text — selectable, and
+ * legible to a screen reader — rather than becoming an image.
+ *
+ * On a light background the same gradient would vanish, so there the fill
+ * collapses to ink and only the final letters keep the accent. The mark still
+ * reads as the mark; it just stops pretending there is a light source.
  *
  * The symbol lives in components/brand/orb.tsx.
- *
- * A light sweep travels across the letters on a slow loop — the only
- * decorative motion on an otherwise still screen. Set `sweep={false}` wherever
- * the mark sits next to something already moving, which is most places.
  */
 export function Wordmark({
   className,
@@ -22,20 +27,19 @@ export function Wordmark({
 }: {
   className?: string;
   size?: number;
+  /** A slow light sweep across the letters. Off wherever something else moves. */
   sweep?: boolean;
 }) {
   return (
     <span
-      className={cn("block leading-none", sweep ? "nx-sweep-text" : "wordmark", className)}
+      className={cn("wordmark-gradient block leading-none", sweep && "nx-sweep-text", className)}
       style={{
         fontFamily: "var(--font-display)",
         fontSize: size,
-        fontWeight: 500,
-        // Serifs need far less tracking than the old bold sans did; 0.08em
-        // pulled the letters apart into separate objects.
-        letterSpacing: "0.14em",
-        // The trailing letter-space pushes the word off-centre otherwise.
-        textIndent: "0.14em",
+        fontWeight: 800,
+        // Geometric caps need almost no tracking — the circular O already
+        // opens the word up, and the reference sets them nearly touching.
+        letterSpacing: "0.005em",
       }}
     >
       TROVE

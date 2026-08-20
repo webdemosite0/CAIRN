@@ -60,7 +60,7 @@ export function LandingNav() {
       >
         <Link href="/" aria-label="Trove" className="flex shrink-0 items-center gap-2">
           <TroveOrb size={22} state="idle" />
-          <Wordmark size={16} sweep={false} className="text-ink" />
+          <Wordmark size={16} sweep={false} />
         </Link>
 
         <nav aria-label="Sections" className="ml-6 hidden items-center gap-1 md:flex">

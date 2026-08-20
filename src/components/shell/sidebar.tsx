@@ -258,7 +258,7 @@ function RailBody({
           className="group inline-flex items-center gap-2"
         >
           <TroveOrb size={24} state="idle" />
-          <Wordmark size={15} sweep={false} className="text-ink" />
+          <Wordmark size={15} sweep={false} />
         </Link>
         {onCollapse ? (
           <button
