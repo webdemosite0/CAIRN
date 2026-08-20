@@ -5,7 +5,16 @@
    ============================================================ */
 
 @theme {
-  --color-canvas: #08090d;
+  /* True black, and flat: no orbs, no grid, no floor fade. The decorative
+     layers are still rendered by Backdrop and Aurora, but every token they
+     paint with is transparent in this block, so neither component needed
+     changing and light mode keeps its own washes.
+
+     The raised surfaces below stay tinted. They are solid fills, not
+     gradients, and without them a panel on a black page has no edge — they
+     sit between 1.08:1 and 1.21:1 against the canvas, which is the whole
+     job. */
+  --color-canvas: #000000;
   --color-rail: #0a0c14;
   --color-sunk: #0c1020;
   --color-raised: #10131f;
@@ -13,7 +22,7 @@
 
   /* A real three-step ramp again. It was flattened to pure white at every
      tier on request, which removed the hierarchy entirely — a caption and a
-     heading looked equally important. Measured on canvas: 18.3, 8.4, 4.9.
+     heading looked equally important. Measured on the black canvas: 19.3, 8.9, 5.8.
 
      ink-4 is #7a7e90, not the #717586 the brief names: that measured 4.35:1
      here, under the 4.5 the same brief asks for. The lift is imperceptible;
@@ -54,7 +63,7 @@
    all: --shade, the direction elevation travels, and --ground, used by any
    effect that needs to know what it is sitting on. */
 :root {
-  --color-canvas: #08090d;
+  --color-canvas: #000000;
   --color-rail: #0a0c14;
   --color-sunk: #0c1020;
   --color-raised: #10131f;
@@ -85,18 +94,18 @@
   --wordmark-to: #8b7bff;
   --chip-hover-line: #3a4258;
   --shimmer: rgb(255 255 255 / 0.07);
-  --grid-line: rgb(255 255 255 / 0.022);
-  --sky: rgb(124 108 255 / 0.08);
-  --orb-a: rgb(109 93 251 / 0.16);
-  --orb-b: rgb(124 108 255 / 0.10);
-  --orb-c: rgb(169 156 255 / 0.07);
+  --grid-line: transparent;
+  --sky: transparent;
+  --orb-a: transparent;
+  --orb-b: transparent;
+  --orb-c: transparent;
   --sweep-base: #d9d5ff;
   --sweep-hi: #ffffff;
-  --grad-sky: rgb(12 16 32 / 0.5);
-  --floor: rgb(0 0 0 / 0.6);
-  --aurora-a: rgb(109 93 251 / 0.26);
-  --aurora-b: rgb(169 156 255 / 0.20);
-  --aurora-c: rgb(94 234 212 / 0.10);
+  --grad-sky: transparent;
+  --floor: transparent;
+  --aurora-a: transparent;
+  --aurora-b: transparent;
+  --aurora-c: transparent;
   --tint-darken: 0%;
   /* Syntax palette. Code blocks used to paint every token one dull grey. */
   --sx-plain: #d6d9df;
