@@ -1,5 +1,6 @@
 import "server-only";
 import type { Turn, Usage, OnUsage } from "@/lib/gemini";
+import { site } from "@/lib/site";
 
 /**
  * One adapter for every provider that speaks the OpenAI chat format.
@@ -70,7 +71,10 @@ function headersFor(p: CompatProvider) {
   // OpenRouter asks callers to identify themselves; it affects rate limits and
   // shows up in the dashboard, which is worth having when debugging spend.
   if (p.id === "openrouter") {
-    h["HTTP-Referer"] = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://trove.app";
+    // site.url, not the raw variable: NEXT_PUBLIC_SITE_URL is unset on both
+    // deployments, and site.url falls back to Vercel own URL rather than to a
+    // domain this app is not actually served from.
+    h["HTTP-Referer"] = site.url;
     h["X-Title"] = "Trove";
   }
   return h;
