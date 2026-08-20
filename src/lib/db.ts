@@ -27,6 +27,23 @@ const authToken = process.env.TURSO_AUTH_TOKEN?.trim();
 /** True when talking to a hosted database rather than a file on disk. */
 export const isRemote = Boolean(url);
 
+/**
+ * Which Turso variables the running process can actually see.
+ *
+ * Read fresh rather than reported from the module consts, and returned as
+ * booleans only — this is surfaced in the UI and must never echo a token.
+ *
+ * The distinction matters because the two failure modes look nothing alike:
+ * with no URL the app never tries Turso at all and silently uses throwaway
+ * local storage, whereas a URL without a token does try, and fails to connect.
+ */
+export function tursoVars(): { url: boolean; token: boolean } {
+  return {
+    url: Boolean(process.env.TURSO_DATABASE_URL?.trim()),
+    token: Boolean(process.env.TURSO_AUTH_TOKEN?.trim()),
+  };
+}
+
 /** Whether the database file lives somewhere that survives a restart. */
 export let ephemeral = false;
 
@@ -222,7 +239,20 @@ export async function storageIsEphemeral(): Promise<boolean> {
     // Unreachable is a different failure, already reported by the caller.
     return false;
   }
-  return ephemeral && process.env.NODE_ENV === "production";
+  if (!ephemeral || process.env.NODE_ENV !== "production") return false;
+
+  // Deliberate opt-out, for a demo or a preview that is meant to be
+  // disposable. It does not make the data survive — it only says you already
+  // know it will not, so the app stops arguing.
+  if (process.env.TROVE_ALLOW_EPHEMERAL === "1") {
+    console.warn(
+      "Trove: running on throwaway storage because TROVE_ALLOW_EPHEMERAL=1. " +
+        "Accounts and everything in them are lost whenever the instance recycles.",
+    );
+    return false;
+  }
+
+  return true;
 }
 
 export type Row = Record<string, unknown>;

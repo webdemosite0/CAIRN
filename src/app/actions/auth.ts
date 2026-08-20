@@ -11,7 +11,7 @@ import {
   startSession,
   verifyPassword,
 } from "@/lib/auth";
-import { storageIsEphemeral } from "@/lib/db";
+import { storageIsEphemeral, tursoVars } from "@/lib/db";
 import { sendMail, verificationEmail, verificationEnforced } from "@/lib/mail";
 import { site } from "@/lib/site";
 
@@ -68,10 +68,25 @@ export async function signUp(_prev: AuthState, form: FormData): Promise<AuthStat
   // Taking a password for an account that the next restart deletes is worse
   // than refusing. The shell shows the same problem in full.
   if (await storageIsEphemeral()) {
+    // Name what is actually missing. "set both of these" is no help to
+    // someone who believes they already did — the useful fact is which one
+    // this process cannot see, since a variable saved in a dashboard does
+    // not reach a build that already happened.
+    const { url, token } = tursoVars();
+    const missing = [
+      url ? null : "TURSO_DATABASE_URL",
+      token ? null : "TURSO_AUTH_TOKEN",
+    ].filter(Boolean);
+
     return {
       error:
         "This deployment has no permanent database, so an account created now " +
-        "would be lost. It needs TURSO_DATABASE_URL and TURSO_AUTH_TOKEN set.",
+        "would be lost. This server cannot see " +
+        missing.join(" or ") +
+        ". If you have already set " +
+        (missing.length > 1 ? "them" : "it") +
+        ", the deployment still needs rebuilding — environment variables only " +
+        "apply to new builds. Check /api/health to see what this server sees.",
     };
   }
 

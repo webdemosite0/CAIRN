@@ -24,14 +24,19 @@ export async function GET() {
 
   // "ephemeral" is the important one to surface: the app works, but every
   // account and saved conversation disappears when the instance recycles.
-  const mode = isRemote ? "turso" : ephemeral ? "ephemeral-tmp" : "local-file";
+  // Resolved lazily, because `ephemeral` is only set once a connection has
+  // actually been attempted. Read eagerly, the first request after a cold
+  // start reported "local-file" for a database that had fallen back to /tmp
+  // — wrong on the one endpoint whose entire job is to be trusted.
+  const modeNow = () =>
+    isRemote ? "turso" : ephemeral ? "ephemeral-tmp" : "local-file";
 
   try {
     // Cheapest possible round trip that still proves the schema applied.
     await one(`SELECT COUNT(*) AS n FROM users`);
     return Response.json({
       ok: true,
-      database: { mode, reachable: true, durable: isRemote || !ephemeral },
+      database: { mode: modeNow(), reachable: true, durable: isRemote || !ephemeral },
       configured,
       ...(ephemeral
         ? {
@@ -50,7 +55,7 @@ export async function GET() {
       : "No Turso credentials are set, so Trove tried to write a SQLite file to local disk. That fails on Vercel and every other read-only host. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN.";
 
     return Response.json(
-      { ok: false, database: { mode, reachable: false }, configured, error: message, hint },
+      { ok: false, database: { mode: modeNow(), reachable: false }, configured, error: message, hint },
       { status: 503 },
     );
   }

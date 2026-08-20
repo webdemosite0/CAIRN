@@ -8,7 +8,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { redirect } from "next/navigation";
 import { currentUser, type User } from "@/lib/auth";
 import { myBalance } from "@/lib/credits";
-import { storageIsEphemeral } from "@/lib/db";
+import { storageIsEphemeral, tursoVars } from "@/lib/db";
 import type { Balance } from "@/lib/credits";
 
 export default async function ShellLayout({
@@ -38,10 +38,22 @@ export default async function ShellLayout({
     // wrong instead — the cause otherwise only exists in the host's logs.
     const message = e instanceof Error ? e.message : String(e);
     console.error("shell layout: database unavailable —", message);
+
+    // Which variables were visible matters more than the driver's wording.
+    // A URL with no token is the commonest way to land here: the app does
+    // try Turso, and Turso rejects it.
+    const seen = tursoVars();
     return (
       <>
         <Backdrop />
-        <SetupNeeded detail={message} />
+        <SetupNeeded
+          detail={[
+            message,
+            "",
+            `TURSO_DATABASE_URL: ${seen.url ? "set" : "NOT SET"}`,
+            `TURSO_AUTH_TOKEN:   ${seen.token ? "set" : "NOT SET"}`,
+          ].join("\n")}
+        />
       </>
     );
   }
@@ -58,8 +70,8 @@ export default async function ShellLayout({
           reason="ephemeral"
           detail={[
             "database mode: ephemeral-tmp",
-            "TURSO_DATABASE_URL: not set",
-            "TURSO_AUTH_TOKEN:   not set",
+            `TURSO_DATABASE_URL: ${tursoVars().url ? "set" : "NOT SET"}`,
+            `TURSO_AUTH_TOKEN:   ${tursoVars().token ? "set" : "NOT SET"}`,
           ].join("\n")}
         />
       </>
