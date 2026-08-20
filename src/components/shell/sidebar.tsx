@@ -59,6 +59,16 @@ interface Item {
  * and Workflows would read well here and land on a 404, so they are left out
  * until there is something behind them — a nav item is a promise.
  */
+/**
+ * Navigation, grouped by what the user is trying to do rather than by
+ * feature.
+ *
+ * Three labelled sections and nothing outside them. There used to be a
+ * fourth, unlabelled block under a divider holding the routes that did not
+ * fit — which is a sign the grouping was wrong, not that those routes were
+ * special. Every entry points at a route that exists; a nav item is a
+ * promise, and sections for Projects, Files or Knowledge would land on a 404.
+ */
 const GROUPS: { label: string; items: Item[] }[] = [
   {
     label: "Workspace",
@@ -67,42 +77,32 @@ const GROUPS: { label: string; items: Item[] }[] = [
       // Route stays /chat — only the label changes, so nothing breaks.
       { href: "/chat", label: "AI Workspace", icon: TbMessageCircle, motion: "lift" },
       { href: "/team", label: "AI Team", icon: TbUsers, motion: "tilt" },
+      { href: "/agents", label: "Agents", icon: TbRobot, motion: "tilt" },
+      { href: "/research", label: "Research", icon: TbSearch, motion: "scan" },
     ],
   },
   {
     label: "Build",
     items: [
       { href: "/websites", label: "Websites", icon: TbWorld, motion: "spin" },
-      { href: "/agents", label: "Agents", icon: TbRobot, motion: "tilt" },
       { href: "/code", label: "Code", icon: TbCode, motion: "type" },
       { href: "/documents", label: "Documents", icon: TbFileText, motion: "lift" },
       { href: "/spreadsheets", label: "Spreadsheets", icon: TbTable, motion: "pop" },
       { href: "/slides", label: "Slides", icon: TbPresentation, motion: "grow" },
+      { href: "/design", label: "Design", icon: TbPalette, motion: "hue" },
     ],
   },
   {
-    label: "Explore",
+    label: "Connect",
     items: [
-      { href: "/research", label: "Research", icon: TbSearch, motion: "scan" },
+      { href: "/integrations", label: "Integrations", icon: TbPlugConnected, motion: "open" },
+      { href: "/workflows", label: "Automation", icon: TbRefreshDot, motion: "spin", badge: "Soon" },
+      { href: "/reminders", label: "Reminders", icon: TbBell, motion: "ring" },
     ],
   },
 ];
 
-/**
- * Reachable, but not part of the three groups above.
- *
- * The brief lists Workspace, Build and Explore only, which leaves four
- * routes that exist and work with nothing linking to them. Deleting the link
- * does not delete the page — it just makes it unreachable — so they sit here,
- * under a divider, rather than being dropped.
- */
-const EXTRA: Item[] = [
-  { href: "/design", label: "Design", icon: TbPalette, motion: "hue" },
-  { href: "/reminders", label: "Reminders", icon: TbBell, motion: "ring" },
-  { href: "/workflows", label: "Workflows", icon: TbRefreshDot, motion: "spin", badge: "Soon" },
-];
-
-const ALL = [...GROUPS.flatMap((g) => g.items), ...EXTRA];
+const ALL = GROUPS.flatMap((g) => g.items);
 
 /** Reached rarely, so they get icons at the foot rather than nav rows. */
 const SECONDARY: { href: string; label: string; icon: IconType }[] = [
@@ -180,13 +180,13 @@ function UserMenu({ user, onNavigate }: { user: User; onNavigate?: () => void })
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="group flex w-full items-center gap-2.5 rounded-[6px] px-2 py-1.5 transition-colors hover:bg-hover"
+        className="group flex w-full items-center gap-2.5 rounded-[12px] border border-line bg-raised px-2.5 py-2 transition-colors hover:bg-hover"
       >
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-raised text-[11.5px] font-semibold text-ink-2">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-violet/25 text-[12.5px] font-semibold text-ink">
           {user.name.slice(0, 1).toUpperCase()}
         </span>
         <span className="min-w-0 flex-1 text-left">
-          <span className="block truncate text-[13px] text-ink">{user.name}</span>
+          <span className="block truncate text-[13px] font-medium text-ink">{user.name}</span>
           <span className="block truncate text-[11px] capitalize text-ink-4">
             {user.plan} plan
           </span>
@@ -300,17 +300,9 @@ function RailBody({
           </div>
         ))}
 
-        {/* Routes outside the three groups. Divided rather than labelled: a
-            fourth heading would imply they belong together, and they do not —
-            the only thing they share is not fitting the brief's nav. */}
-        <div className="mt-5 space-y-0.5 border-t border-line pt-3">
-          {EXTRA.map((it) => (
-            <NavRow key={it.href} item={it} pathname={pathname} onNavigate={onNavigate} />
-          ))}
-        </div>
       </nav>
 
-      <div className="space-y-1 border-t border-line p-2.5">
+      <div className="space-y-2 border-t border-line p-2.5">
         <CreditMeter balance={balance} />
 
         {user ? (

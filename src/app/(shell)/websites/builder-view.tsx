@@ -18,6 +18,7 @@ import {
 } from "react-icons/fi";
 import { TbWorld, TbPuzzle, TbTerminal2, TbCode, TbFiles } from "react-icons/tb";
 import { Composer } from "@/components/chat/composer";
+import { MobileComposer } from "@/components/mobile/composer";
 import { useNav } from "@/components/shell/nav-state";
 import { TroveOrb } from "@/components/brand/orb";
 import { Ico, type Motion } from "@/components/ui/ico";
@@ -103,7 +104,7 @@ function Thinking({ phase }: { phase: "asking" | "planning" }) {
   );
 }
 
-export function BuilderView() {
+export function BuilderView({ mobile = false }: { mobile?: boolean }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [idea, setIdea] = useState("");
   const [depth, setDepth] = useState<Depth>("deep");
@@ -121,6 +122,11 @@ export function BuilderView() {
 
   const [error, setError] = useState<string | null>(null);
   const [pane, setPane] = useState<Pane>("preview");
+
+  // A phone cannot show the workspace and the conversation side by side, and
+  // stacking them means scrolling past a 560px preview to reach the box you
+  // type into. One at a time, switched explicitly.
+  const [half, setHalf] = useState<"build" | "chat">("chat");
   const [device, setDevice] = useState<keyof typeof DEVICE>("desktop");
   const [openFile, setOpenFile] = useState("index.html");
   const [copied, setCopied] = useState(false);
@@ -343,6 +349,7 @@ export function BuilderView() {
     setPhase("building");
     setError(null);
     setPane("console");
+    setHalf("build");
     // The preview is what matters from here; the nav is not.
     setCollapsed(true);
     log(`building ${plan.title} — ${plan.steps.length} steps`);
@@ -364,6 +371,7 @@ export function BuilderView() {
         // For the others the console is more useful than an empty frame.
         if (target.previewable && current.some((f) => f.path.endsWith(".html"))) {
           setPane("preview");
+          setHalf("build");
         }
       } catch (e) {
         const m = e instanceof Error ? e.message : "Step failed.";
@@ -379,6 +387,7 @@ export function BuilderView() {
     setCurrentStep(-1);
     setPhase("ready");
     setPane("preview");
+    setHalf("build");
     log(
       target.previewable
         ? "build complete"
@@ -478,7 +487,15 @@ export function BuilderView() {
           </p>
         </div>
 
-        <Composer onSend={ask} placeholder="Build a website for…" autoFocus />
+        {/* The phone gets the phone composer here too. Leaving the desktop
+            one meant the builder opened with a different text box from the
+            chat screen, with labelled Attach and Voice buttons that do not fit
+            the width. */}
+        {mobile ? (
+          <MobileComposer onSend={ask} placeholder="Build a website for…" />
+        ) : (
+          <Composer onSend={ask} placeholder="Build a website for…" autoFocus />
+        )}
 
         {/* What to build it with. Only the static target previews in-app; the
             others produce a real project you download and run. */}
@@ -597,9 +614,38 @@ export function BuilderView() {
         </button>
       </header>
 
+      {mobile ? (
+        <div className="flex shrink-0 gap-1 border-b border-line px-3 py-2">
+          {([
+            ["chat", "Chat"],
+            ["build", "Workspace"],
+          ] as const).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setHalf(id)}
+              aria-pressed={half === id}
+              className={cn(
+                "h-9 flex-1 rounded-[10px] text-[13.5px] font-medium transition-colors",
+                half === id
+                  ? "rail-item-active"
+                  : "text-ink-3 active:bg-hover",
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_400px]">
         {/* ---------- left ---------- */}
-        <section className="flex min-h-0 flex-col border-r border-line">
+        <section
+          className={cn(
+            "flex min-h-0 flex-col border-r border-line",
+            mobile && half !== "build" && "hidden",
+          )}
+        >
           <div className="flex shrink-0 items-center gap-1 border-b border-line px-2 py-1.5">
             {PANES.map((p) => (
               <button
@@ -776,7 +822,12 @@ export function BuilderView() {
         </section>
 
         {/* ---------- right ---------- */}
-        <section className="flex min-h-0 flex-col">
+        <section
+          className={cn(
+            "flex min-h-0 flex-col",
+            mobile && half !== "chat" && "hidden",
+          )}
+        >
           <div className="min-h-0 flex-1 space-y-3 overflow-auto p-3.5">
             <div className="flex justify-end">
               <p className="max-w-[85%] rounded-[10px] bg-raised px-3.5 py-2 text-[13.5px] text-ink">
@@ -855,10 +906,17 @@ export function BuilderView() {
               </div>
             ) : null}
 
-            <Composer
-              onSend={phase === "ready" ? edit : ask}
-              placeholder={phase === "ready" ? "Describe a change…" : "Build a website for…"}
-            />
+            {mobile ? (
+              <MobileComposer
+                onSend={phase === "ready" ? edit : ask}
+                placeholder={phase === "ready" ? "Describe a change…" : "Build a website for…"}
+              />
+            ) : (
+              <Composer
+                onSend={phase === "ready" ? edit : ask}
+                placeholder={phase === "ready" ? "Describe a change…" : "Build a website for…"}
+              />
+            )}
 
             <button
               onClick={() => setSkillsOpen((s) => !s)}
