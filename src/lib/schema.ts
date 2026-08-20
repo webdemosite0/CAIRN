@@ -180,6 +180,56 @@ PRAGMA journal_mode = WAL;
  * its own without taking the rest down.
  */
 export const MIGRATIONS: string[] = [
+  /* ---------------------------------------------------------------
+     Missions
+     ---------------------------------------------------------------
+     A mission is one piece of work given to Trove: a goal, the tasks it was
+     broken into, and a record of what happened. Everything the mission UI
+     shows is read from these three tables, so a screen can only display work
+     that actually ran.
+
+     Status values are fixed and small: planning, running, waiting,
+     reviewing, completed, failed. A free-text status column drifts into six
+     spellings of the same thing within a month. */
+  `CREATE TABLE IF NOT EXISTS missions (
+      id         TEXT PRIMARY KEY,
+      user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      goal       TEXT NOT NULL,
+      title      TEXT NOT NULL DEFAULT '',
+      status     TEXT NOT NULL DEFAULT 'planning',
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    )`,
+  `CREATE INDEX IF NOT EXISTS missions_by_user ON missions (user_id, created_at DESC)`,
+
+  /* One row per unit of work, in the order the plan put them. `seq` rather
+     than relying on insertion order: a retried task keeps its place. */
+  `CREATE TABLE IF NOT EXISTS mission_tasks (
+      id          TEXT PRIMARY KEY,
+      mission_id  TEXT NOT NULL REFERENCES missions(id) ON DELETE CASCADE,
+      seq         INTEGER NOT NULL,
+      role        TEXT NOT NULL,
+      title       TEXT NOT NULL,
+      status      TEXT NOT NULL DEFAULT 'waiting',
+      output      TEXT NOT NULL DEFAULT '',
+      started_at  INTEGER,
+      finished_at INTEGER
+    )`,
+  `CREATE INDEX IF NOT EXISTS mission_tasks_by_mission ON mission_tasks (mission_id, seq)`,
+
+  /* The activity timeline. Append-only: it is the record of what happened,
+     and a log you can edit is not a log. */
+  `CREATE TABLE IF NOT EXISTS mission_events (
+      id         TEXT PRIMARY KEY,
+      mission_id TEXT NOT NULL REFERENCES missions(id) ON DELETE CASCADE,
+      at         INTEGER NOT NULL,
+      kind       TEXT NOT NULL,
+      actor      TEXT NOT NULL DEFAULT '',
+      text       TEXT NOT NULL
+    )`,
+  `CREATE INDEX IF NOT EXISTS mission_events_by_mission ON mission_events (mission_id, at)`,
+
+
   /* New tables belong here, not only in SCHEMA. SCHEMA is skipped wholesale
      once the database has its tables, so a table added to it later reaches
      exactly the databases that do not need it — the empty ones. IF NOT EXISTS

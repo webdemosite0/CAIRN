@@ -124,6 +124,9 @@ const TABLES = [
   "integrations",
   "connections",
   "auth_tokens",
+  "missions",
+  "mission_tasks",
+  "mission_events",
 ];
 
 /**
