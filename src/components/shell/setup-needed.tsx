@@ -1,14 +1,28 @@
 import { FiDatabase, FiExternalLink } from "react-icons/fi";
 
 /**
- * Shown instead of a blank 500 when the database cannot be reached.
+ * Shown instead of a blank 500 when the database cannot be reached, and
+ * instead of the app when the database will not survive the next restart.
  *
  * A misconfigured deploy previously rendered Vercel's generic "This page
  * couldn't load", which says nothing actionable — the real cause only existed
  * in the function logs. Every page in the app reads the account and credit
  * balance, so one missing variable took the whole site down silently.
+ *
+ * The "ephemeral" case is worse than being down, which is why it stops here
+ * too. The app appears to work: you sign up, you use it, and then a refresh
+ * lands on a different instance whose /tmp was never written to, so the
+ * account and everything in it is simply gone. Better to say so than to keep
+ * accepting data it is going to lose.
  */
-export function SetupNeeded({ detail }: { detail: string }) {
+export function SetupNeeded({
+  detail,
+  reason = "unreachable",
+}: {
+  detail: string;
+  reason?: "unreachable" | "ephemeral";
+}) {
+  const ephemeral = reason === "ephemeral";
   const steps = [
     "turso db create trove",
     "turso db show trove --url      # -> TURSO_DATABASE_URL",
@@ -22,12 +36,27 @@ export function SetupNeeded({ detail }: { detail: string }) {
       </span>
 
       <h1 className="mt-6 text-[26px] font-semibold tracking-tight text-ink">
-        Trove needs a database
+        {ephemeral
+          ? "Trove needs a database that lasts"
+          : "Trove needs a database"}
       </h1>
 
       <p className="mt-3 text-[14.5px] leading-relaxed text-ink-3">
-        The app is deployed and running, but it cannot reach a database — so
-        there is nowhere to keep accounts, saved conversations or credits.
+        {ephemeral ? (
+          <>
+            This host has a read-only filesystem, so Trove fell back to a
+            temporary database inside the server instance. Every instance gets
+            its own copy and they are thrown away constantly — which is why a
+            refresh signs you out and the account looks empty. Nothing is
+            recoverable, so the app stops here rather than take more data it is
+            going to lose.
+          </>
+        ) : (
+          <>
+            The app is deployed and running, but it cannot reach a database — so
+            there is nowhere to keep accounts, saved conversations or credits.
+          </>
+        )}
       </p>
 
       <pre className="mt-5 overflow-x-auto rounded-[10px] border border-line bg-sunk px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">

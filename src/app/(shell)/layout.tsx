@@ -8,6 +8,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { redirect } from "next/navigation";
 import { currentUser, type User } from "@/lib/auth";
 import { myBalance } from "@/lib/credits";
+import { storageIsEphemeral } from "@/lib/db";
 import type { Balance } from "@/lib/credits";
 
 export default async function ShellLayout({
@@ -41,6 +42,26 @@ export default async function ShellLayout({
       <>
         <Backdrop />
         <SetupNeeded detail={message} />
+      </>
+    );
+  }
+
+  // Storage that does not survive a restart is worse than storage that is
+  // down: the app works, then a refresh lands on a fresh instance and the
+  // account is gone. Checked after the queries above, because the flag is only
+  // set once a connection has actually been attempted.
+  if (await storageIsEphemeral()) {
+    return (
+      <>
+        <Backdrop />
+        <SetupNeeded
+          reason="ephemeral"
+          detail={[
+            "database mode: ephemeral-tmp",
+            "TURSO_DATABASE_URL: not set",
+            "TURSO_AUTH_TOKEN:   not set",
+          ].join("\n")}
+        />
       </>
     );
   }

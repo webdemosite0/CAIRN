@@ -147,7 +147,7 @@ The storage layer decides where this can run, and it now runs almost anywhere.
 
 | Host | Works |
 | --- | --- |
-| **Vercel / Netlify / Workers** | **Yes, with no configuration.** Add Turso for durable data — see below |
+| **Vercel / Netlify / Workers** | **Yes, with Turso.** Their filesystems are read-only, so without it data does not survive a refresh — see below |
 | A VPS / container with a mounted volume (Fly, Railway, a droplet) | **Yes**, durable out of the box |
 | **GitHub Pages, S3, any static host** | **No, and it never can be** — see below |
 
@@ -169,22 +169,30 @@ Static routes (`/robots.txt`, `/llms.txt`, `/login`) do not touch the database,
 so if those return 200 while pages return 500, the problem is the database and
 not the build.
 
-## Deploying with no configuration
+## Deploying: a database is required in production
 
-Push to Vercel, set `GEMINI_API_KEY`, done — the app runs. It does not need a
-database configured to start.
+The app builds and boots with no database configured. It will not *serve* the
+app that way in production, and that is deliberate.
 
-When the data directory is not writable (Vercel's bundle is read-only), Trove
-falls back to the OS temp directory instead of refusing to boot. Everything
-works: chat, documents, spreadsheets, agents, credits.
+When the data directory is not writable — Vercel's bundle is read-only — Trove
+falls back to the OS temp directory. Each serverless instance has its own
+`/tmp` and they are recycled freely, so a request can land on an instance whose
+database has never been written to. The symptom is unmistakable once you know
+it: **you sign in, refresh the page, and you are signed out with an empty
+account.** Nothing is recoverable.
 
-**What that costs you is durability.** Each serverless instance has its own
-`/tmp` and they are recycled freely, so accounts and saved conversations come
-and go. This is stated rather than hidden — `/api/health` reports
-`"mode":"ephemeral-tmp"`, `"durable":false` and a warning.
+That used to be a console warning while the app kept accepting sign-ups it was
+going to lose. It now stops instead: in production on ephemeral storage the
+shell renders a setup screen explaining the problem, and sign-up refuses rather
+than take a password for an account the next restart deletes. Development is
+unaffected — a local `.data/` file is durable, so this never fires there.
 
-Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` to make it permanent. No code
-change; the same client handles both.
+`/api/health` reports it either way: `"mode":"ephemeral-tmp"`,
+`"durable":false`, plus a warning.
+
+Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` and redeploy — environment
+variables only apply to new builds. No code change; the same client handles
+both destinations.
 
 ## The database
 

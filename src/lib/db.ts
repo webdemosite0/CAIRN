@@ -200,6 +200,31 @@ function connect(): Promise<Client> {
 type Args = InValue[];
 
 /** A row as a plain object. libSQL hands back a hybrid array/object shape. */
+/**
+ * True when the database will not survive the next restart, on a deploy where
+ * that means real data loss.
+ *
+ * A serverless host has a read-only filesystem, so the local-file fallback
+ * lands in /tmp — and every instance has its own /tmp and is recycled freely.
+ * The symptom is that refreshing a page signs you out and empties the account:
+ * the request landed on an instance whose database had never been written to.
+ *
+ * That used to be a console warning, which nobody reads, while the app carried
+ * on accepting sign-ups it was going to lose. Callers use this to say so.
+ *
+ * Connects first, because the flag is only set when the fallback is taken.
+ */
+export async function storageIsEphemeral(): Promise<boolean> {
+  if (isRemote) return false;
+  try {
+    await connect();
+  } catch {
+    // Unreachable is a different failure, already reported by the caller.
+    return false;
+  }
+  return ephemeral && process.env.NODE_ENV === "production";
+}
+
 export type Row = Record<string, unknown>;
 
 function plain(row: unknown): Row {

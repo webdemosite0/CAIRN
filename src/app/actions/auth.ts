@@ -11,6 +11,7 @@ import {
   startSession,
   verifyPassword,
 } from "@/lib/auth";
+import { storageIsEphemeral } from "@/lib/db";
 import { sendMail, verificationEmail, verificationEnforced } from "@/lib/mail";
 import { site } from "@/lib/site";
 
@@ -62,6 +63,16 @@ export async function signUp(_prev: AuthState, form: FormData): Promise<AuthStat
   }
   if (await findByEmail(email)) {
     return { error: "An account with that email already exists." };
+  }
+
+  // Taking a password for an account that the next restart deletes is worse
+  // than refusing. The shell shows the same problem in full.
+  if (await storageIsEphemeral()) {
+    return {
+      error:
+        "This deployment has no permanent database, so an account created now " +
+        "would be lost. It needs TURSO_DATABASE_URL and TURSO_AUTH_TOKEN set.",
+    };
   }
 
   // Without a mailer there is no way to prove the address, and refusing to let
