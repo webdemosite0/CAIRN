@@ -123,6 +123,7 @@ const TABLES = [
   "credit_spends",
   "integrations",
   "connections",
+  "auth_tokens",
 ];
 
 /**
