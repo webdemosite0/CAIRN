@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { streamText } from "@/lib/gemini";
+import { streamText, type Source } from "@/lib/gemini";
 import { toParts, type Attachment } from "@/lib/attachments";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 
@@ -36,15 +36,30 @@ behaviour. Be decisive — pick values, do not offer options.`,
 
   research: `You are Trove's research analyst. Structure the answer as: a
 two-sentence summary, then "## Findings" with substantiated points, then
-"## Open questions" listing what you could not determine. You have no web
-access, so distinguish clearly between what you know and what would need
-verification. Never invent statistics, dates, or citations.`,
+"## Open questions" listing what you could not determine.
+
+You can search the web. Prefer what you find there to what you remember,
+and say when a claim comes from a source rather than from prior knowledge.
+Anything you could not verify belongs under Open questions rather than being
+stated confidently. Never invent statistics, dates, or citations — the
+sources you actually used are listed under your answer, so a citation that
+is not among them is visibly wrong.`,
 
   code: `You are Trove's engineer. Lead with the code in a fenced block with the
 correct language tag. It must be complete and runnable — no placeholders, no
 "// implementation here". Follow with a short explanation of the important
 decisions and any edge cases the caller must handle.`,
 };
+
+/**
+ * Tools allowed to search the web.
+ *
+ * Only research. The others take what you gave them and produce something
+ * from it — a document, a spreadsheet, some code — and a search on those is
+ * latency and cost spent on a question nobody asked. Grounded requests are
+ * also billed differently, so this is deliberately a short list.
+ */
+const SEARCHES = new Set(["research"]);
 
 export async function POST(req: NextRequest) {
   let tool = "";
@@ -81,6 +96,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Collected during the stream and appended after it. The client renders
+    // markdown, so this needs no protocol of its own.
+    let sources: Source[] = [];
+
     const stream = await streamText({
       onUsage: (u) =>
         account && spend(account.userId, tool, u.totalTokens),
@@ -89,9 +108,25 @@ export async function POST(req: NextRequest) {
       temperature: 0.75,
       maxOutputTokens: 4096,
       extraParts: attachments.length ? toParts(attachments) : undefined,
+      search: SEARCHES.has(tool),
+      onSources: (s) => {
+        sources = s;
+      },
     });
 
-    return new Response(stream, {
+    const withSources = stream.pipeThrough(
+      new TransformStream<Uint8Array, Uint8Array>({
+        flush(controller) {
+          if (!sources.length) return;
+          const lines = sources.map((s) => `- [${s.title}](${s.url})`).join("\n");
+          controller.enqueue(
+            new TextEncoder().encode(`\n\n## Sources\n${lines}\n`),
+          );
+        },
+      }),
+    );
+
+    return new Response(withSources, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "no-store",

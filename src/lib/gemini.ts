@@ -187,6 +187,44 @@ function readUsage(meta: unknown): Usage | null {
   return { promptTokens: prompt, responseTokens: response, totalTokens: total };
 }
 
+/**
+ * A page the model actually consulted.
+ *
+ * These come from Gemini's own grounding metadata, not from anything Trove
+ * scraped — the search happens inside the API call. Showing them is not
+ * decoration: an answer that cites nothing is indistinguishable from one the
+ * model invented, which is exactly the failure the research prompt has been
+ * warning about while it had no web access at all.
+ */
+export interface Source {
+  title: string;
+  url: string;
+}
+
+export type OnSources = (sources: Source[], queries: string[]) => void;
+
+/** Pulls the sources out of one SSE frame, if it carries any. */
+function readGrounding(meta: unknown): { sources: Source[]; queries: string[] } | null {
+  const g = meta as {
+    groundingChunks?: Array<{ web?: { uri?: string; title?: string } }>;
+    webSearchQueries?: string[];
+  } | null;
+  if (!g) return null;
+
+  const sources: Source[] = [];
+  for (const chunk of g.groundingChunks ?? []) {
+    const url = chunk.web?.uri;
+    if (!url) continue;
+    // Same page can be cited by several passages; one entry each.
+    if (sources.some((s) => s.url === url)) continue;
+    sources.push({ url, title: chunk.web?.title?.trim() || new URL(url).hostname });
+  }
+
+  const queries = g.webSearchQueries ?? [];
+  if (!sources.length && !queries.length) return null;
+  return { sources, queries };
+}
+
 /** Streams plain text deltas out of Gemini's SSE response. */
 export async function streamText({
   turns,
@@ -195,6 +233,8 @@ export async function streamText({
   maxOutputTokens = 4096,
   extraParts,
   onUsage,
+  search = false,
+  onSources,
 }: {
   turns: Turn[];
   system: string;
@@ -204,6 +244,16 @@ export async function streamText({
   extraParts?: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }>;
   /** Fires once, when the stream ends, with the real token counts. */
   onUsage?: OnUsage;
+  /**
+   * Let the model search the web before answering.
+   *
+   * Google runs the search inside the API call and returns which pages it
+   * used; Trove never fetches a URL itself, so there is no request this
+   * server can be tricked into making on someone else's behalf.
+   */
+  search?: boolean;
+  /** Fires when grounding metadata arrives, before the stream ends. */
+  onSources?: OnSources;
 }) {
   const contents = turns.map((t) => ({
     role: t.role,
@@ -220,6 +270,10 @@ export async function streamText({
     contents,
     systemInstruction: { parts: [{ text: system }] },
     generationConfig: { temperature, maxOutputTokens },
+    // Omitted entirely rather than sent as false: a model that does not know
+    // this tool rejects the whole request for an unknown field, and the
+    // fallback chain would then burn through every model on a 400.
+    ...(search ? { tools: [{ google_search: {} }] } : {}),
   });
 
   if (!upstream.body) {
@@ -232,6 +286,7 @@ export async function streamText({
   // Gemini repeats usageMetadata on successive SSE frames, each one cumulative,
   // so the last frame that carries it is the authoritative total.
   let usage: Usage | null = null;
+  let grounded: { sources: Source[]; queries: string[] } = { sources: [], queries: [] };
 
   return new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -251,6 +306,12 @@ export async function streamText({
               const json = JSON.parse(payload);
               const seen = readUsage(json?.usageMetadata);
               if (seen) usage = seen;
+
+              if (onSources) {
+                const g = readGrounding(json?.candidates?.[0]?.groundingMetadata);
+                // Later frames carry the fuller set, so the last one wins.
+                if (g && g.sources.length >= grounded.sources.length) grounded = g;
+              }
               for (const part of json?.candidates?.[0]?.content?.parts ?? []) {
                 if (typeof part?.text === "string" && part.text) {
                   controller.enqueue(encoder.encode(part.text));
@@ -264,6 +325,18 @@ export async function streamText({
       } catch (err) {
         console.error("Gemini stream error", err);
       } finally {
+        // Reported before the stream closes, not after: a caller that appends
+        // the sources to the end of the answer runs its flush the moment the
+        // readable closes, and would otherwise race this callback and append
+        // an empty list.
+        if (onSources && (grounded.sources.length || grounded.queries.length)) {
+          try {
+            onSources(grounded.sources, grounded.queries);
+          } catch (e) {
+            console.error("Gemini sources callback failed", e);
+          }
+        }
+
         controller.close();
         reader.releaseLock();
         // Billed from what the model reported. If the stream died before any
