@@ -56,6 +56,27 @@ function shouldFallOver(message: string): boolean {
   );
 }
 
+/**
+ * The error to raise when nothing in the chain could answer.
+ *
+ * This used to rethrow Gemini's error verbatim, on the reasoning that naming
+ * a fallback would send someone to debug "an account they did not know
+ * existed". That was wrong: whoever configured OPENROUTER_API_KEY knows the
+ * account exists, and hiding the fallback failure means a page that says
+ * "Gemini quota used up" while two other providers were tried and also
+ * failed — which is unactionable and reads as the fallback never running.
+ *
+ * Naming every provider and why each failed is the difference between
+ * "wait until tomorrow" and "your OpenRouter account has no credit".
+ */
+function chainFailure(primary: unknown, attempts: { label: string; reason: string }[]): Error {
+  const first = primary instanceof Error ? primary.message : String(primary);
+  if (!attempts.length) return primary instanceof Error ? primary : new Error(first);
+
+  const tail = attempts.map((a) => `${a.label}: ${a.reason}`).join(" · ");
+  return new Error(`${first} Fallbacks were tried and also failed — ${tail}`);
+}
+
 function describe(p: CompatProvider) {
   return `${p.label} (${p.model})`;
 }
@@ -82,6 +103,8 @@ export async function generateText(
     // the user wait three times as long for the same error.
     if (!chain.length || !shouldFallOver(message)) throw e;
 
+    const attempts: { label: string; reason: string }[] = [];
+
     for (const provider of chain) {
       console.warn(`ai: Gemini unavailable (${message.slice(0, 120)}) — trying ${describe(provider)}`);
       try {
@@ -94,17 +117,13 @@ export async function generateText(
           onUsage: opts.onUsage,
         });
       } catch (err) {
-        console.warn(
-          `ai: ${describe(provider)} failed —`,
-          err instanceof Error ? err.message.slice(0, 160) : String(err),
-        );
+        const reason = err instanceof Error ? err.message : String(err);
+        console.warn(`ai: ${describe(provider)} failed —`, reason.slice(0, 240));
+        attempts.push({ label: describe(provider), reason: reason.slice(0, 160) });
       }
     }
 
-    // Report the original failure, not the last fallback's. Gemini is the
-    // configured provider; "Grok returned 402" would send someone to debug an
-    // account they did not know existed.
-    throw e;
+    throw chainFailure(e, attempts);
   }
 }
 
@@ -125,6 +144,8 @@ export async function streamText(
     const chain = compatProviders();
     if (!chain.length || !shouldFallOver(message)) throw e;
 
+    const attempts: { label: string; reason: string }[] = [];
+
     for (const provider of chain) {
       console.warn(`ai: Gemini unavailable (${message.slice(0, 120)}) — trying ${describe(provider)}`);
       try {
@@ -137,14 +158,13 @@ export async function streamText(
           onUsage: opts.onUsage,
         });
       } catch (err) {
-        console.warn(
-          `ai: ${describe(provider)} failed —`,
-          err instanceof Error ? err.message.slice(0, 160) : String(err),
-        );
+        const reason = err instanceof Error ? err.message : String(err);
+        console.warn(`ai: ${describe(provider)} failed —`, reason.slice(0, 240));
+        attempts.push({ label: describe(provider), reason: reason.slice(0, 160) });
       }
     }
 
-    throw e;
+    throw chainFailure(e, attempts);
   }
 }
 

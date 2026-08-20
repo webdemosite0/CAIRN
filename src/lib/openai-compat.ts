@@ -33,7 +33,12 @@ export function compatProviders(): CompatProvider[] {
       label: "OpenRouter",
       baseUrl: "https://openrouter.ai/api/v1",
       apiKey: openrouter,
-      model: process.env.OPENROUTER_MODEL?.trim() || "google/gemini-2.0-flash-001",
+      // A zero-priced model by default. The previous default was a paid
+      // one, so a fresh OpenRouter key with no balance failed on every
+      // request — the fallback existed and could never fire, which is worse
+      // than not having one because it looks configured.
+      // Verified zero-priced and text->text against OpenRouter own model list.
+      model: process.env.OPENROUTER_MODEL?.trim() || "nvidia/nemotron-3.5-lightning:free",
     });
   }
 
