@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { streamText, type Turn } from "@/lib/gemini";
+import { streamText, type Turn } from "@/lib/ai";
 import { currentUser } from "@/lib/auth";
 import { one, str } from "@/lib/db";
 import { toParts, type Attachment } from "@/lib/attachments";

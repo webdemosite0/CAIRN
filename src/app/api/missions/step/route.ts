@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { generateText, type Source } from "@/lib/gemini";
+import { generateText, type Source } from "@/lib/ai";
 import { currentUser } from "@/lib/auth";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 import {

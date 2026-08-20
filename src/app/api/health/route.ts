@@ -1,4 +1,5 @@
 import { one, isRemote, ephemeral } from "@/lib/db";
+import { providerChain } from "@/lib/ai";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,6 +18,10 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const configured = {
     gemini: Boolean(process.env.GEMINI_API_KEY?.trim()),
+    // Which providers could answer if the one in front of them is out. Worth
+    // reporting: a deployment running entirely on a fallback still looks
+    // healthy from the outside, and the bill arrives from somewhere else.
+    aiProviders: providerChain(),
     tursoUrl: Boolean(process.env.TURSO_DATABASE_URL?.trim()),
     tursoToken: Boolean(process.env.TURSO_AUTH_TOKEN?.trim()),
     siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL?.trim()),

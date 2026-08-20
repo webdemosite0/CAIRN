@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { generateText } from "@/lib/gemini";
+import { generateText } from "@/lib/ai";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 
 export const runtime = "nodejs";

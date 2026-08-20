@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { generateText } from "@/lib/gemini";
+import { generateText } from "@/lib/ai";
 import { currentUser } from "@/lib/auth";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 import { createMission, setTasks, logEvent, loadMission } from "@/lib/missions";

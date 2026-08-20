@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { streamText, type Source } from "@/lib/gemini";
+import { streamText, type Source } from "@/lib/ai";
 import { toParts, type Attachment } from "@/lib/attachments";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 
