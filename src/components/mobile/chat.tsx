@@ -2,10 +2,21 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { FiAlertCircle, FiPlus, FiRefreshCw } from "react-icons/fi";
-import { TbWorld, TbFileText, TbTable, TbRobot } from "react-icons/tb";
+import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
+import {
+  TbWorld,
+  TbRobot,
+  TbFileText,
+  TbTable,
+  TbPresentation,
+  TbPalette,
+  TbCode,
+  TbSearch,
+} from "react-icons/tb";
+import type { IconType } from "react-icons";
 import { Message } from "@/components/chat/message";
 import { MobileComposer } from "@/components/mobile/composer";
+import { Wordmark } from "@/components/brand/logo";
 import { DEFAULT_MODE, type ModeId } from "@/lib/modes";
 import { useChatThread } from "@/lib/use-chat-thread";
 import type { Recent } from "@/lib/recents";
@@ -13,24 +24,30 @@ import type { Recent } from "@/lib/recents";
 /**
  * Chat, for a phone.
  *
- * Two states, and they are laid out differently rather than one hiding parts
- * of the other. Empty is a short pitch, a composer, and a few things worth
- * tapping. In a thread it is the transcript and nothing else, with the
- * composer docked at the bottom where the thumb already is.
+ * Two states, laid out differently rather than one hiding parts of the other.
+ * Empty is the wordmark, the composer, and a row of tools you can reach with a
+ * thumb. In a thread it is the transcript and nothing else, with the composer
+ * docked at the bottom.
  *
- * The desktop screen puts the composer in the middle of the page surrounded by
- * panels of recent work. That is a good use of a wide screen and a bad use of
- * a tall one, which is why this is a separate component and not a breakpoint.
+ * The desktop screen puts the composer mid-page surrounded by panels of recent
+ * work — a good use of a wide screen and a poor use of a tall one, which is
+ * why this is a separate component and not a breakpoint.
  *
  * Streaming, saving and error handling come from useChatThread, shared with
- * the desktop screen — the parts that can be wrong are not duplicated.
+ * the desktop screen, so the parts that can be wrong are not duplicated.
  */
 
-const STARTERS = [
-  { icon: TbWorld, label: "Build a landing page", prompt: "Build me a landing page for " },
-  { icon: TbFileText, label: "Write a document", prompt: "Write a document about " },
-  { icon: TbTable, label: "Make a spreadsheet", prompt: "Make a spreadsheet that tracks " },
-  { icon: TbRobot, label: "Create an agent", prompt: "Create an agent that " },
+/** The tool row under the composer. Horizontal, because a phone has one
+    column and this is a shortcut list, not a menu that needs reading. */
+const TOOLS: { href: string; label: string; icon: IconType }[] = [
+  { href: "/websites", label: "Websites", icon: TbWorld },
+  { href: "/agents", label: "Agents", icon: TbRobot },
+  { href: "/documents", label: "Docs", icon: TbFileText },
+  { href: "/spreadsheets", label: "Sheets", icon: TbTable },
+  { href: "/slides", label: "Slides", icon: TbPresentation },
+  { href: "/code", label: "Code", icon: TbCode },
+  { href: "/design", label: "Design", icon: TbPalette },
+  { href: "/research", label: "Deep Research", icon: TbSearch },
 ];
 
 export function MobileChat({
@@ -47,7 +64,6 @@ export function MobileChat({
   activity?: Recent[];
 }) {
   const [mode, setMode] = React.useState<ModeId>(DEFAULT_MODE);
-  const [draft, setDraft] = React.useState("");
   const { turns, busy, error, send, retry, clear, bottom } = useChatThread({
     restored,
     mode,
@@ -57,21 +73,18 @@ export function MobileChat({
 
   if (turns.length === 0) {
     return (
-      <div className="flex min-h-full flex-col px-4 pb-4 pt-6">
-        <h1 className="text-[26px] font-semibold leading-tight tracking-tight text-ink">
-          Hi {name}.
-          <br />
-          What are we making?
-        </h1>
-        <p className="mt-2 text-[14.5px] leading-relaxed text-ink-3">
-          Describe it and Trove builds it — sites, documents, spreadsheets and
-          agents you can download.
-        </p>
+      <div className="flex min-h-full flex-col px-4 pb-6">
+        {/* The mark, centred and large. It is the only thing above the
+            composer, so it carries the whole "what is this" job. */}
+        <div className="nx-rise flex flex-col items-center pb-7 pt-10">
+          <Wordmark size={44} sweep={false} />
+          <p className="mt-3 text-center text-[13.5px] text-ink-3">
+            Hi {name} — describe it and Trove builds it.
+          </p>
+        </div>
 
-        <div className="mt-5">
+        <div className="nx-rise-slow">
           <MobileComposer
-            key={draft}
-            initialValue={draft}
             onSend={send}
             disabled={busy}
             mode={mode}
@@ -81,44 +94,41 @@ export function MobileChat({
 
         {error ? <Problem message={error} onRetry={retry} /> : null}
 
-        <ul className="mt-5 space-y-2">
-          {STARTERS.map((s) => (
-            <li key={s.label}>
-              <button
-                type="button"
-                onClick={() => setDraft(s.prompt)}
-                className="flex w-full items-center gap-3 rounded-[14px] border border-line bg-raised px-3.5 py-3 text-left active:bg-hover"
+        {/* Tool row — scrolls sideways, fading at the edge so it is obviously
+            a strip rather than a clipped grid. */}
+        <div className="nx-rise-slow -mx-4 mt-4">
+          <div className="flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none">
+            {TOOLS.map((t) => (
+              <Link
+                key={t.href}
+                href={t.href}
+                className="press flex shrink-0 items-center gap-2 rounded-full border border-line bg-raised px-3.5 py-2 text-[13.5px] text-ink-2 transition-colors active:bg-hover"
               >
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunk text-ink">
-                  <s.icon size={17} />
-                </span>
-                <span className="min-w-0 flex-1 truncate text-[14.5px] text-ink">
-                  {s.label}
-                </span>
-                <FiPlus size={15} className="shrink-0 text-ink-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
+                <t.icon size={16} className="shrink-0 text-ink" />
+                {t.label}
+              </Link>
+            ))}
+          </div>
+        </div>
 
         {activity.length ? (
-          <>
-            <h2 className="mb-2 mt-7 text-[12px] font-semibold uppercase tracking-[0.07em] text-ink-4">
+          <div className="mt-7">
+            <h2 className="mb-1.5 px-1 text-[11.5px] font-medium uppercase tracking-[0.1em] text-ink-4">
               Recent
             </h2>
-            <ul className="space-y-1">
+            <ul className="nx-stagger space-y-0.5">
               {activity.slice(0, 6).map((r) => (
                 <li key={`${r.kind}-${r.href}-${r.title}`}>
                   <Link
                     href={r.href}
-                    className="block truncate rounded-[12px] px-3 py-2.5 text-[14.5px] text-ink-2 active:bg-hover"
+                    className="block truncate rounded-[10px] px-3 py-2.5 text-[14.5px] text-ink-2 transition-colors active:bg-hover"
                   >
                     {r.title}
                   </Link>
                 </li>
               ))}
             </ul>
-          </>
+          </div>
         ) : null}
       </div>
     );
@@ -135,7 +145,7 @@ export function MobileChat({
         <button
           type="button"
           onClick={clear}
-          className="shrink-0 rounded-full border border-line px-3 py-1.5 text-[12.5px] font-medium text-ink-2 active:bg-hover"
+          className="press shrink-0 rounded-full border border-line px-3 py-1.5 text-[12.5px] font-medium text-ink-2 transition-colors active:bg-hover"
         >
           New
         </button>
@@ -155,9 +165,7 @@ export function MobileChat({
         <div ref={bottom} />
       </div>
 
-      {/* Docked, not sticky-inside-the-page: the tab bar is fixed, so this sits
-          just above it and stays put while the transcript scrolls under. */}
-      <div className="sticky bottom-0 -mx-0 bg-gradient-to-t from-canvas via-canvas to-transparent px-3 pb-2 pt-3">
+      <div className="sticky bottom-0 bg-gradient-to-t from-canvas via-canvas to-transparent px-3 pb-3 pt-3">
         <MobileComposer
           onSend={send}
           disabled={busy}

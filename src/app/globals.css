@@ -1712,19 +1712,23 @@ a[role="button"]:active {
   overflow-wrap: anywhere;
 }
 
-/* A bottom sheet arriving. Travels its own height rather than a fixed
-   distance, so a tall sheet and a short one take the same time and neither
-   appears to start already halfway up. */
-@keyframes nx-sheet-in {
+/* The navigation drawer, arriving from the edge it is docked to. */
+@keyframes nx-drawer-in {
   from {
-    transform: translateY(100%);
+    transform: translateX(-100%);
   }
   to {
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
-.nx-sheet-in {
-  animation: nx-sheet-in 0.26s var(--ease-out);
+.nx-drawer-in {
+  animation: nx-drawer-in 0.24s var(--ease-out);
+}
+
+/* Same rise as .nx-rise, one beat later. Used where two blocks should arrive
+   in order — the mark, then the composer under it — rather than together. */
+.nx-rise-slow {
+  animation: nx-rise 0.55s var(--ease-out) 0.09s backwards;
 }
 
 /* A hero element, drifting up as the page settles. */
@@ -1776,7 +1780,8 @@ a[role="button"]:active {
   .nx-reveal,
   .nx-fade,
   .nx-slide-up,
-  .nx-sheet-in,
+  .nx-drawer-in,
+  .nx-rise-slow,
   .nx-rise-big,
   .nx-drift,
   .nx-stagger > * {
