@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiArrowRight, FiLoader } from "react-icons/fi";
-import { TbCrown } from "react-icons/tb";
 import type { Balance, UsageRow } from "@/lib/credits";
 import { kindLabel } from "@/lib/kind-label";
 import { cn } from "@/lib/utils";
@@ -193,59 +192,39 @@ export function CreditMeter({
 
   return (
     <div ref={wrap} className="relative">
-      {/* A card rather than a bare bar. The bar alone read as chrome and got
-          skipped; a bordered block with the plan on it is the thing people
-          actually look at when they want to know where they stand. */}
-      <div className="rounded-[12px] border border-line bg-raised p-2.5">
-        <button
-          type="button"
-          onClick={toggle}
-          aria-expanded={open}
-          aria-haspopup="dialog"
-          title={title}
-          className="block w-full text-left"
+      <button
+        type="button"
+        onClick={toggle}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        title={title}
+        className="group block w-full rounded-[6px] px-2 py-1.5 text-left transition-colors hover:bg-hover"
+      >
+        <div className="flex items-baseline gap-1.5">
+          <span aria-hidden className="text-[11px] leading-none text-accent">
+            ✦
+          </span>
+          <span className={cn("text-[12.5px] font-medium tabular-nums", tone)}>
+            {remaining.toLocaleString()}
+            <span className="text-ink-4"> / {granted.toLocaleString()}</span>
+          </span>
+          <span className="text-[12px] text-ink-4">credits</span>
+        </div>
+
+        <div
+          className="mt-1.5 h-[3px] overflow-hidden rounded-full bg-raised"
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Credits used"
         >
-          <div className="flex items-center gap-2">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
-              <TbCrown size={15} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[12.5px] font-medium capitalize text-ink">
-                Trove {plan.name}
-              </span>
-              <span className={cn("block text-[11.5px] tabular-nums", tone)}>
-                {remaining.toLocaleString()}
-                <span className="text-ink-4"> / {granted.toLocaleString()} credits</span>
-              </span>
-            </span>
-          </div>
-
           <div
-            className="mt-2 h-[5px] overflow-hidden rounded-full bg-sunk"
-            role="progressbar"
-            aria-valuenow={pct}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Credits used"
-          >
-            <div
-              className={cn("h-full rounded-full transition-[width] duration-500 ease-out", fill)}
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-        </button>
-
-        {/* Only shown when there is something to upgrade to. On the top plan
-            it would be a button that does nothing. */}
-        {plan.id === "free" ? (
-          <Link
-            href="/plans"
-            className="press mt-2 flex h-8 items-center justify-center rounded-[8px] btn-grad text-[12.5px] font-semibold"
-          >
-            Upgrade
-          </Link>
-        ) : null}
-      </div>
+            className={cn("h-full rounded-full transition-[width] duration-500 ease-out", fill)}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </button>
       {open ? popover : null}
     </div>
   );

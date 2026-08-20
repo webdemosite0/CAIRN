@@ -137,7 +137,7 @@ function NavRow({
         motion={item.motion}
         active={active}
         size={18}
-        className="shrink-0 text-ink transition-colors duration-150"
+        className="shrink-0 transition-colors duration-150"
       />
       <span className="truncate">{item.label}</span>
       {item.badge ? (
@@ -180,13 +180,13 @@ function UserMenu({ user, onNavigate }: { user: User; onNavigate?: () => void })
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="group flex w-full items-center gap-2.5 rounded-[12px] border border-line bg-raised px-2.5 py-2 transition-colors hover:bg-hover"
+        className="group flex w-full items-center gap-2.5 rounded-[6px] px-2 py-1.5 transition-colors hover:bg-hover"
       >
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-violet/25 text-[12.5px] font-semibold text-ink">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-raised text-[11.5px] font-semibold text-ink-2">
           {user.name.slice(0, 1).toUpperCase()}
         </span>
         <span className="min-w-0 flex-1 text-left">
-          <span className="block truncate text-[13px] font-medium text-ink">{user.name}</span>
+          <span className="block truncate text-[13px] text-ink">{user.name}</span>
           <span className="block truncate text-[11px] capitalize text-ink-4">
             {user.plan} plan
           </span>
@@ -272,24 +272,29 @@ function RailBody({
         ) : null}
       </div>
 
-      <div className="px-3 pt-3.5">
+      {/* A 52px full-bleed gradient slab was the loudest thing in the rail,
+          competing with the page for attention every time you looked at the
+          navigation. It is a quiet surface now, on the same left edge and the
+          same 4px rhythm as the rows below it; the accent survives in the
+          icon, which is all the emphasis a always-available action needs. */}
+      <div className="px-2.5 pt-3">
         <Link
           href="/chat"
           onClick={onNavigate}
-          className="btn-grad group flex h-[52px] items-center justify-center gap-2 rounded-[10px] px-4 text-[14.5px] font-medium"
+          className="group flex h-9 items-center gap-2.5 rounded-[8px] border border-line bg-raised px-2.5 text-[13.5px] font-medium text-ink transition-colors hover:bg-hover hover:border-line-strong"
         >
-          <Ico icon={FiPlus} motion="open" size={16} />
-          New
+          <Ico icon={FiPlus} motion="open" size={15} className="text-accent" />
+          New chat
         </Link>
       </div>
 
       <nav
         aria-label="Workspace"
-        className="mt-4 flex-1 overflow-y-auto px-3 pb-3 scrollbar-none"
+        className="mt-4 flex-1 overflow-y-auto px-2.5 pb-3 scrollbar-none"
       >
         {GROUPS.map((g, i) => (
-          <div key={g.label} className={cn(i > 0 && "mt-5")}>
-            <div className="px-3 pb-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-4">
+          <div key={g.label} className={cn(i > 0 && "mt-6")}>
+            <div className="px-2.5 pb-1 pt-1 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-ink-4">
               {g.label}
             </div>
             <div className="space-y-0.5">
@@ -302,7 +307,7 @@ function RailBody({
 
       </nav>
 
-      <div className="space-y-2 border-t border-line p-2.5">
+      <div className="space-y-1 border-t border-line p-2.5">
         <CreditMeter balance={balance} />
 
         {user ? (

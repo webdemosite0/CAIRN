@@ -19,9 +19,9 @@
      here, under the 4.5 the same brief asks for. The lift is imperceptible;
      the difference is whether muted text is readable at all.
 
-     --color-accent carries text and icons at 5.16:1. The brief's #6d5dfb is
-     4.37 as text, so it is used only as a button face — see --btn-a, where
-     white on it measures 4.56. */
+     --color-accent carries text and icons at 8.11:1 on the canvas and 7.05
+     on the lightest surface it can sit on. The button face is a deeper
+     blue because it has white on it — see --btn-a, 5.17:1. */
   --color-ink: #f5f5f7;
   --color-ink-2: #f5f5f7;
   --color-ink-3: #a5a8b8;
@@ -30,9 +30,9 @@
   --color-line: #1c2030;
   --color-line-strong: #2a3042;
 
-  --color-accent: #7c6cff;
-  --color-accent-soft: #171634;
-  --color-violet: #a99cff;
+  --color-accent: #5aa9ff;
+  --color-accent-soft: #0d1b33;
+  --color-violet: #7cc0ff;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
   --color-caution: #fbbf24;
@@ -65,9 +65,9 @@
   --color-ink-4: #82869a;
   --color-line: #1c2030;
   --color-line-strong: #2a3042;
-  --color-accent: #7c6cff;
-  --color-accent-soft: #171634;
-  --color-violet: #a99cff;
+  --color-accent: #5aa9ff;
+  --color-accent-soft: #0d1b33;
+  --color-violet: #7cc0ff;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
   --color-caution: #fbbf24;
@@ -79,23 +79,23 @@
   --ground: #000000;
   --scrollbar: #262c3d;
   --scrollbar-hover: #343b52;
-  --selection: #2a2168;
+  --selection: #0f2a52;
   --selection-ink: #ffffff;
   --wordmark-from: #ffffff;
-  --wordmark-to: #8b7bff;
+  --wordmark-to: #5aa9ff;
   --chip-hover-line: #3a4258;
   --shimmer: rgb(255 255 255 / 0.07);
   --grid-line: rgb(255 255 255 / 0.022);
-  --sky: rgb(124 108 255 / 0.08);
-  --orb-a: rgb(109 93 251 / 0.16);
-  --orb-b: rgb(124 108 255 / 0.10);
-  --orb-c: rgb(169 156 255 / 0.07);
-  --sweep-base: #d9d5ff;
+  --sky: rgb(90 169 255 / 0.08);
+  --orb-a: rgb(37 99 235 / 0.18);
+  --orb-b: rgb(90 169 255 / 0.10);
+  --orb-c: rgb(124 192 255 / 0.07);
+  --sweep-base: #d3e6ff;
   --sweep-hi: #ffffff;
   --grad-sky: rgb(12 16 32 / 0.5);
   --floor: rgb(0 0 0 / 0.6);
-  --aurora-a: rgb(109 93 251 / 0.26);
-  --aurora-b: rgb(169 156 255 / 0.20);
+  --aurora-a: rgb(37 99 235 / 0.26);
+  --aurora-b: rgb(124 192 255 / 0.20);
   --aurora-c: rgb(94 234 212 / 0.10);
   --tint-darken: 0%;
   /* Syntax palette. Code blocks used to paint every token one dull grey. */
@@ -119,16 +119,16 @@
      to ~1.6:1. This mixes black into any such tint, and is 0% on dark. */
   /* Dark mode separates surfaces by lightness, so it needs no shadow. */
   --bezel: rgb(190 214 255 / 0.05);
-  --grad-text-from: #a99cff;
-  --grad-text-to: #7c6cff;
+  --grad-text-from: #7cc0ff;
+  --grad-text-to: #5aa9ff;
 
-  /* The primary action. #6d5dfb is the brief's purple and is used here, as a
-     face rather than as text: white on it measures 4.56:1, where the same
-     colour as text on the canvas is 4.37. */
-  --btn-a: #6d5dfb;
-  --btn-b: #5b4be8;
+  /* The primary action. Deeper than --color-accent because it carries white
+     text: 5.17:1 at #2563eb and 6.70:1 at the far end of the gradient. The
+     bright #5aa9ff would be 2.6 under white and unreadable. */
+  --btn-a: #2563eb;
+  --btn-b: #1d4ed8;
   --btn-ink: #ffffff;
-  --btn-glow: rgb(109 93 251 / 0.28);
+  --btn-glow: rgb(37 99 235 / 0.30);
 
   --bezel-under: rgb(0 0 0 / 0.34);
   --bezel-ring: rgb(150 180 235 / 0.04);
@@ -142,8 +142,8 @@
 
   /* Focus. One ring definition for every control, so a focused input, button
      and card cannot drift apart. */
-  --focus-ring: rgb(124 108 255 / 0.34);
-  --focus-line: rgb(124 108 255 / 0.75);
+  --focus-ring: rgb(90 169 255 / 0.32);
+  --focus-line: rgb(90 169 255 / 0.80);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-code), ui-monospace, monospace;
@@ -177,9 +177,9 @@
 
   /* Darker, saturated variants — the dark-mode hues are pastels tuned to glow
      on black and go muddy on white. */
-  --color-accent: #5b50f5;
-  --color-accent-soft: #f0efff;
-  --color-violet: #6c47ff;
+  --color-accent: #1d4ed8;
+  --color-accent-soft: #eaf2ff;
+  --color-violet: #2563eb;
   --color-positive: #0b6553;
   --color-positive-soft: #e8f7f3;
   --color-caution: #9a6700;
@@ -191,23 +191,23 @@
   --ground: #ffffff;
   --scrollbar: #cdd4e0;
   --scrollbar-hover: #b4bdcd;
-  --selection: #d7d4ff;
+  --selection: #d6e6ff;
   --selection-ink: #1a1f36;
   --wordmark-from: #1a1f36;
-  --wordmark-to: #5b50f5;
+  --wordmark-to: #1d4ed8;
   --chip-hover-line: #c3cad6;
   --shimmer: rgb(26 31 54 / 0.05);
   --grid-line: rgb(26 31 54 / 0.04);
   --sky: rgb(99 91 255 / 0.07);
-  --orb-a: rgb(96 128 250 / 0.14);
-  --orb-b: rgb(132 108 250 / 0.105);
-  --orb-c: rgb(70 176 245 / 0.09);
+  --orb-a: rgb(59 130 246 / 0.14);
+  --orb-b: rgb(96 165 250 / 0.105);
+  --orb-c: rgb(125 211 252 / 0.09);
   --sweep-base: #3c4257;
-  --sweep-hi: #635bff;
+  --sweep-hi: #2563eb;
   --grad-sky: rgb(226 235 255 / 0.35);
   --floor: rgb(26 31 54 / 0.04);
-  --aurora-a: rgb(99 91 255 / 0.13);
-  --aurora-b: rgb(122 90 248 / 0.11);
+  --aurora-a: rgb(37 99 235 / 0.13);
+  --aurora-b: rgb(96 165 250 / 0.11);
   --aurora-c: rgb(0 191 191 / 0.08);
   --tint-darken: 50%;
   /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
@@ -226,17 +226,17 @@
   --tag-e: #875616;
   --tag-f: #ad2b48;
   --bezel: rgb(255 255 255 / 0.9);
-  --grad-text-from: #5b50f5;
+  --grad-text-from: #1d4ed8;
   --grad-text-to: #0d8fc4;
-  --btn-a: #6d5dfb;
-  --btn-b: #5b4be8;
+  --btn-a: #2563eb;
+  --btn-b: #1d4ed8;
   --btn-ink: #ffffff;
-  --btn-glow: rgb(109 93 251 / 0.26);
+  --btn-glow: rgb(37 99 235 / 0.24);
 
   /* Same ring in both themes, so a focused control is recognisably the same
      control. Slightly stronger here because it sits on white. */
-  --focus-ring: rgb(109 93 251 / 0.26);
-  --focus-line: rgb(109 93 251 / 0.85);
+  --focus-ring: rgb(37 99 235 / 0.24);
+  --focus-line: rgb(37 99 235 / 0.85);
   --bezel-under: rgb(26 31 54 / 0.05);
   --bezel-ring: rgb(26 31 54 / 0.035);
   --hairline: rgb(26 31 54 / 0.16);
@@ -264,9 +264,9 @@
     --color-ink-4: #676c7c;
     --color-line: #e6e6ec;
     --color-line-strong: #d5dbe4;
-    --color-accent: #5b50f5;
-    --color-accent-soft: #f0efff;
-    --color-violet: #6c47ff;
+    --color-accent: #1d4ed8;
+    --color-accent-soft: #eaf2ff;
+    --color-violet: #2563eb;
     --color-positive: #0b6553;
     --color-positive-soft: #e8f7f3;
     --color-caution: #9a6700;
@@ -276,23 +276,23 @@
     --ground: #ffffff;
     --scrollbar: #cdd4e0;
     --scrollbar-hover: #b4bdcd;
-    --selection: #d7d4ff;
+    --selection: #d6e6ff;
     --selection-ink: #1a1f36;
     --wordmark-from: #1a1f36;
-    --wordmark-to: #5b50f5;
+    --wordmark-to: #1d4ed8;
     --chip-hover-line: #c3cad6;
     --shimmer: rgb(26 31 54 / 0.05);
     --grid-line: rgb(26 31 54 / 0.04);
     --sky: rgb(99 91 255 / 0.07);
-    --orb-a: rgb(96 128 250 / 0.14);
-    --orb-b: rgb(132 108 250 / 0.105);
-    --orb-c: rgb(70 176 245 / 0.09);
+    --orb-a: rgb(59 130 246 / 0.14);
+    --orb-b: rgb(96 165 250 / 0.105);
+    --orb-c: rgb(125 211 252 / 0.09);
     --sweep-base: #3c4257;
-    --sweep-hi: #635bff;
+    --sweep-hi: #2563eb;
     --grad-sky: rgb(226 235 255 / 0.35);
     --floor: rgb(26 31 54 / 0.04);
-    --aurora-a: rgb(99 91 255 / 0.13);
-    --aurora-b: rgb(122 90 248 / 0.11);
+    --aurora-a: rgb(37 99 235 / 0.13);
+    --aurora-b: rgb(96 165 250 / 0.11);
     --aurora-c: rgb(0 191 191 / 0.08);
     --tint-darken: 50%;
     /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
@@ -311,12 +311,12 @@
     --tag-e: #875616;
     --tag-f: #ad2b48;
     --bezel: rgb(255 255 255 / 0.9);
-    --grad-text-from: #5b50f5;
+    --grad-text-from: #1d4ed8;
     --grad-text-to: #0d8fc4;
-    --btn-a: #6c5ce7;
-    --btn-b: #5a4bd6;
+    --btn-a: #2563eb;
+    --btn-b: #1d4ed8;
     --btn-ink: #ffffff;
-    --btn-glow: rgb(91 80 245 / 0.32);
+    --btn-glow: rgb(37 99 235 / 0.24);
     --bezel-under: rgb(26 31 54 / 0.05);
     --bezel-ring: rgb(26 31 54 / 0.035);
     --hairline: rgb(26 31 54 / 0.16);
@@ -452,19 +452,29 @@ select:focus-visible,
   color: transparent;
 }
 
+/* One row of the rail.
+
+   Every number here is on the 4px grid the rest of the app uses — the
+   previous 11px gap, 11px padding and 7px height were arbitrary, and a
+   column of rows is exactly where that shows: nothing lines up with the
+   group headings or the panels beside it.
+
+   Weight is 450, not 500. At 13px a medium weight on every row in a list of
+   fourteen makes the whole column shout, and leaves nothing left to mark the
+   active one with. */
 @utility rail-item {
   display: flex;
   align-items: center;
-  gap: 11px;
-  border-radius: 6px;
-  padding: 7px 11px;
+  gap: 10px;
+  border-radius: 8px;
+  padding: 6px 10px;
+  min-height: 32px;
   font-size: 13.5px;
-  font-weight: 500;
-  color: var(--color-ink-2);
+  font-weight: 450;
+  color: var(--color-ink-3);
   transition:
-    background-color 0.18s var(--ease-out),
-    color 0.18s var(--ease-out),
-    box-shadow 0.18s var(--ease-out);
+    background-color 0.15s var(--ease-out),
+    color 0.15s var(--ease-out);
 
   &:hover {
     background: var(--color-hover);
@@ -472,22 +482,37 @@ select:focus-visible,
   }
 }
 
-/* Active row: a purple wash and a purple icon, but the LABEL stays ink.
-   Purple text on a purple tint measured 4.34:1 and failed AA; ink on the
-   same tint is far clearer, and the icon alone carries the colour. */
+/* The active row.
+
+   One signal: a flat surface a step above the rail, and the label at full
+   ink. It used to carry three at once — a purple wash, an inset hairline
+   ring and an outer bloom — which is a lot of decoration to say "you are
+   here", and read as effects piled on rather than as a considered state.
+
+   The colour moved to a 2px marker on the leading edge. It is the smallest
+   amount of accent that still scans down a column of fourteen, and it does
+   not tint the label — purple text on a purple tint measured 4.34:1 and
+   failed AA, which is what the wash was there to work around. */
 @utility rail-item-active {
-  background: color-mix(in oklab, var(--color-accent) 12%, transparent);
+  position: relative;
+  background: var(--color-hover);
   color: var(--color-ink);
-  font-weight: 500;
-  /* An inset hairline picks out the row edge, and a low bloom under it makes
-     the wash read as lit rather than painted. Both are small enough that the
-     row still sits quietly in the column. */
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklab, var(--color-accent) 16%, transparent),
-    0 4px 14px -8px var(--btn-glow);
+  font-weight: 550;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: 50%;
+    height: 16px;
+    width: 2px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: var(--color-accent);
+  }
 
   &:hover {
-    background: color-mix(in oklab, var(--color-accent) 16%, transparent);
+    background: var(--color-hover);
     color: var(--color-ink);
   }
 }
