@@ -106,7 +106,7 @@ export function MobileShell({
     [...TABS, ...MORE, ...CREATE].find((d) => isActive(pathname, d.href))?.label ?? "Trove";
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-canvas">
+    <div className="nx-mobile flex min-h-[100dvh] flex-col bg-canvas">
       {/* ---------------- top bar ---------------- */}
       <header className="nx-no-print sticky top-0 z-30 border-b border-line bg-canvas/90 pt-[env(safe-area-inset-top)] backdrop-blur-md">
         <div className="flex h-13 items-center gap-2.5 px-4">
@@ -148,7 +148,7 @@ export function MobileShell({
             onClick={() => setSheet("create")}
             aria-label="Create something"
             aria-haspopup="dialog"
-            className="relative -mt-4 grid h-[52px] w-[52px] shrink-0 place-items-center self-start rounded-full btn-grad shadow-[0_8px_20px_-6px_rgba(108,92,231,0.7)] active:scale-95"
+            className="relative -mt-4 grid h-[52px] w-[52px] shrink-0 place-items-center self-start rounded-full btn-grad shadow-[0_8px_22px_-6px_var(--btn-glow)] active:scale-95"
           >
             <FiPlus size={24} />
           </button>

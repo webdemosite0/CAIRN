@@ -12,6 +12,7 @@ import { ConnectDialog } from "@/components/integrations/connect-dialog";
 import { CATEGORIES, SERVICES, type Category } from "@/lib/services";
 import { IntegrationsHero } from "@/components/integrations/hero";
 import { Ico } from "@/components/ui/ico";
+import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
 
 export interface ConnectedService {
@@ -111,9 +112,11 @@ export function IntegrationsView({
       </div>
 
       {results.length === 0 ? (
-        <p className="rounded-[10px] border border-dashed border-line-strong py-16 text-center text-[13.5px] text-ink-4">
-          Nothing matches “{query}”.
-        </p>
+        <EmptyState
+          icon={FiSearch}
+          title={`No integration matches “${query}”`}
+          body="Try a shorter word, or clear the filter to see everything Trove can connect to."
+        />
       ) : (
         <div className="grid min-w-0 gap-x-8 gap-y-1 lg:grid-cols-2">
           {results.map((s, i) => {

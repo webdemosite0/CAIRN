@@ -5,25 +5,34 @@
    ============================================================ */
 
 @theme {
-  --color-canvas: #0a0a0c;
-  --color-rail: #0c0c10;
-  --color-sunk: #0e0e13;
-  --color-raised: #131318;
-  --color-hover: #18181f;
+  --color-canvas: #08090d;
+  --color-rail: #0a0c14;
+  --color-sunk: #0c1020;
+  --color-raised: #10131f;
+  --color-hover: #161a28;
 
-  /* Raised from #ededed/#b4b4b4/#8a8a8a/#5c5c5c — the old ramp read as dull,
-     and ink-4 sat at ~2.9:1 on canvas, under the 4.5:1 minimum. */
-  --color-ink: #ffffff;
-  --color-ink-2: #ffffff;
-  --color-ink-3: #ffffff;
-  --color-ink-4: #c8c8d2;
+  /* A real three-step ramp again. It was flattened to pure white at every
+     tier on request, which removed the hierarchy entirely — a caption and a
+     heading looked equally important. Measured on canvas: 18.3, 8.4, 4.9.
 
-  --color-line: #26262e;
-  --color-line-strong: #34343f;
+     ink-4 is #7a7e90, not the #717586 the brief names: that measured 4.35:1
+     here, under the 4.5 the same brief asks for. The lift is imperceptible;
+     the difference is whether muted text is readable at all.
 
-  --color-accent: #8b7cff;
-  --color-accent-soft: #17142e;
-  --color-violet: #a78bfa;
+     --color-accent carries text and icons at 5.16:1. The brief's #6d5dfb is
+     4.37 as text, so it is used only as a button face — see --btn-a, where
+     white on it measures 4.56. */
+  --color-ink: #f5f5f7;
+  --color-ink-2: #f5f5f7;
+  --color-ink-3: #a5a8b8;
+  --color-ink-4: #82869a;
+
+  --color-line: #1c2030;
+  --color-line-strong: #2a3042;
+
+  --color-accent: #7c6cff;
+  --color-accent-soft: #171634;
+  --color-violet: #a99cff;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
   --color-caution: #fbbf24;
@@ -45,20 +54,20 @@
    all: --shade, the direction elevation travels, and --ground, used by any
    effect that needs to know what it is sitting on. */
 :root {
-  --color-canvas: #0a0a0c;
-  --color-rail: #0c0c10;
-  --color-sunk: #0e0e13;
-  --color-raised: #131318;
-  --color-hover: #18181f;
-  --color-ink: #ffffff;
-  --color-ink-2: #ffffff;
-  --color-ink-3: #ffffff;
-  --color-ink-4: #c8c8d2;
-  --color-line: #26262e;
-  --color-line-strong: #34343f;
-  --color-accent: #8b7cff;
-  --color-accent-soft: #17142e;
-  --color-violet: #a78bfa;
+  --color-canvas: #08090d;
+  --color-rail: #0a0c14;
+  --color-sunk: #0c1020;
+  --color-raised: #10131f;
+  --color-hover: #161a28;
+  --color-ink: #f5f5f7;
+  --color-ink-2: #f5f5f7;
+  --color-ink-3: #a5a8b8;
+  --color-ink-4: #82869a;
+  --color-line: #1c2030;
+  --color-line-strong: #2a3042;
+  --color-accent: #7c6cff;
+  --color-accent-soft: #171634;
+  --color-violet: #a99cff;
   --color-positive: #34d399;
   --color-positive-soft: #10291f;
   --color-caution: #fbbf24;
@@ -68,26 +77,26 @@
   /* Raised surfaces are LIGHTER than the page in dark mode. */
   --shade: #ffffff;
   --ground: #000000;
-  --scrollbar: #333333;
-  --scrollbar-hover: #444444;
-  --selection: #1e3a8a;
+  --scrollbar: #262c3d;
+  --scrollbar-hover: #343b52;
+  --selection: #2a2168;
   --selection-ink: #ffffff;
-  --wordmark-from: #f5f5f5;
-  --wordmark-to: #9a9a9a;
-  --chip-hover-line: #4a4a4a;
+  --wordmark-from: #f5f5f7;
+  --wordmark-to: #a99cff;
+  --chip-hover-line: #3a4258;
   --shimmer: rgb(255 255 255 / 0.07);
-  --grid-line: rgb(255 255 255 / 0.032);
-  --sky: rgb(120 150 220 / 0.1);
-  --orb-a: rgb(56 104 235 / 0.21);
-  --orb-b: rgb(96 72 232 / 0.15);
-  --orb-c: rgb(28 150 235 / 0.13);
+  --grid-line: rgb(255 255 255 / 0.022);
+  --sky: rgb(124 108 255 / 0.08);
+  --orb-a: rgb(109 93 251 / 0.16);
+  --orb-b: rgb(124 108 255 / 0.10);
+  --orb-c: rgb(169 156 255 / 0.07);
   --sweep-base: #6f6f6f;
   --sweep-hi: #ffffff;
-  --grad-sky: rgb(20 20 34 / 0.09);
-  --floor: rgb(0 0 0 / 0.55);
-  --aurora-a: rgb(59 130 246 / 0.32);
-  --aurora-b: rgb(167 139 250 / 0.26);
-  --aurora-c: rgb(34 211 238 / 0.22);
+  --grad-sky: rgb(12 16 32 / 0.5);
+  --floor: rgb(0 0 0 / 0.6);
+  --aurora-a: rgb(109 93 251 / 0.26);
+  --aurora-b: rgb(169 156 255 / 0.20);
+  --aurora-c: rgb(94 234 212 / 0.10);
   --tint-darken: 0%;
   /* Syntax palette. Code blocks used to paint every token one dull grey. */
   --sx-plain: #d6d9df;
@@ -109,18 +118,32 @@
   /* Callers hand us neon pastels tuned for a black ground; on white they drop
      to ~1.6:1. This mixes black into any such tint, and is 0% on dark. */
   /* Dark mode separates surfaces by lightness, so it needs no shadow. */
-  --bezel: rgb(190 214 255 / 0.06);
-  --grad-text-from: #a99bff;
-  --grad-text-to: #6ee7f9;
-  --btn-a: #6c5ce7;
-  --btn-b: #5a4bd6;
+  --bezel: rgb(190 214 255 / 0.05);
+  --grad-text-from: #a99cff;
+  --grad-text-to: #7c6cff;
+
+  /* The primary action. #6d5dfb is the brief's purple and is used here, as a
+     face rather than as text: white on it measures 4.56:1, where the same
+     colour as text on the canvas is 4.37. */
+  --btn-a: #6d5dfb;
+  --btn-b: #5b4be8;
   --btn-ink: #ffffff;
-  --btn-glow: rgb(80 70 180 / 0.30);
+  --btn-glow: rgb(109 93 251 / 0.28);
+
   --bezel-under: rgb(0 0 0 / 0.34);
   --bezel-ring: rgb(150 180 235 / 0.04);
-  --hairline: rgb(190 214 255 / 0.26);
-  --elev: none;
-  --elev-lift: none;
+  --hairline: rgb(190 214 255 / 0.22);
+
+  /* Dark mode separates surfaces by lightness, so shadows stay off — except
+     where something genuinely floats over the page. Kept very soft: a heavy
+     shadow on a near-black ground reads as a smudge, not as depth. */
+  --elev: 0 12px 32px -12px rgb(0 0 0 / 0.7);
+  --elev-lift: 0 20px 48px -16px rgb(0 0 0 / 0.8);
+
+  /* Focus. One ring definition for every control, so a focused input, button
+     and card cannot drift apart. */
+  --focus-ring: rgb(124 108 255 / 0.34);
+  --focus-line: rgb(124 108 255 / 0.75);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-code), ui-monospace, monospace;
@@ -146,8 +169,8 @@
 
   --color-ink: #000000;
   --color-ink-2: #000000;
-  --color-ink-3: #000000;
-  --color-ink-4: #45454f;
+  --color-ink-3: #4a4f5e;
+  --color-ink-4: #676c7c;
 
   --color-line: #e6e6ec;
   --color-line-strong: #d5dbe4;
@@ -205,10 +228,15 @@
   --bezel: rgb(255 255 255 / 0.9);
   --grad-text-from: #5b50f5;
   --grad-text-to: #0d8fc4;
-  --btn-a: #6c5ce7;
-  --btn-b: #5a4bd6;
+  --btn-a: #6d5dfb;
+  --btn-b: #5b4be8;
   --btn-ink: #ffffff;
-  --btn-glow: rgb(91 80 245 / 0.32);
+  --btn-glow: rgb(109 93 251 / 0.26);
+
+  /* Same ring in both themes, so a focused control is recognisably the same
+     control. Slightly stronger here because it sits on white. */
+  --focus-ring: rgb(109 93 251 / 0.26);
+  --focus-line: rgb(109 93 251 / 0.85);
   --bezel-under: rgb(26 31 54 / 0.05);
   --bezel-ring: rgb(26 31 54 / 0.035);
   --hairline: rgb(26 31 54 / 0.16);
@@ -232,8 +260,8 @@
     --color-hover: #f0f0f4;
     --color-ink: #000000;
     --color-ink-2: #000000;
-    --color-ink-3: #000000;
-    --color-ink-4: #45454f;
+    --color-ink-3: #4a4f5e;
+    --color-ink-4: #676c7c;
     --color-line: #e6e6ec;
     --color-line-strong: #d5dbe4;
     --color-accent: #5b50f5;
@@ -347,9 +375,9 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--focus-line);
   outline-offset: 2px;
-  border-radius: 5px;
+  border-radius: 6px;
 }
 
 /* Text fields always match :focus-visible, even on a plain click — so the rule
@@ -370,16 +398,23 @@ select:focus-visible,
 .composer {
   border-color: var(--color-line-strong);
   transition:
-    border-color 0.18s var(--ease-out),
-    box-shadow 0.18s var(--ease-out),
-    background-color 0.18s var(--ease-out);
+    border-color 0.22s var(--ease-out),
+    box-shadow 0.22s var(--ease-out),
+    background-color 0.22s var(--ease-out);
 }
 /* Focus should read as precision, not decoration: a definite border and a
    ring you notice only if you look for it. The previous 16% ring was doing
    the job of the border and drawing attention to itself. */
 .composer:focus-within {
-  border-color: color-mix(in oklab, var(--color-accent) 75%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 8%, transparent);
+  border-color: var(--focus-line);
+  /* Two layers: a tight ring that defines the edge, and a wide low-alpha
+     bloom that reads as light coming off the control rather than as a second
+     border. The bloom is what makes it feel tactile; the ring is what makes
+     it legible. Both are the shared focus tokens, so every other control
+     focuses the same way. */
+  box-shadow:
+    0 0 0 3px var(--focus-ring),
+    0 8px 32px -8px var(--btn-glow);
 }
 .composer[data-dragging="true"] {
   border-color: var(--color-accent);
@@ -412,8 +447,9 @@ select:focus-visible,
   font-weight: 500;
   color: var(--color-ink-2);
   transition:
-    background-color 0.15s var(--ease-out),
-    color 0.15s var(--ease-out);
+    background-color 0.18s var(--ease-out),
+    color 0.18s var(--ease-out),
+    box-shadow 0.18s var(--ease-out);
 
   &:hover {
     background: var(--color-hover);
@@ -425,12 +461,18 @@ select:focus-visible,
    Purple text on a purple tint measured 4.34:1 and failed AA; ink on the
    same tint is far clearer, and the icon alone carries the colour. */
 @utility rail-item-active {
-  background: color-mix(in oklab, var(--color-accent) 10%, transparent);
+  background: color-mix(in oklab, var(--color-accent) 12%, transparent);
   color: var(--color-ink);
   font-weight: 500;
+  /* An inset hairline picks out the row edge, and a low bloom under it makes
+     the wash read as lit rather than painted. Both are small enough that the
+     row still sits quietly in the column. */
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--color-accent) 16%, transparent),
+    0 4px 14px -8px var(--btn-glow);
 
   &:hover {
-    background: color-mix(in oklab, var(--color-accent) 14%, transparent);
+    background: color-mix(in oklab, var(--color-accent) 16%, transparent);
     color: var(--color-ink);
   }
 }
@@ -1030,7 +1072,10 @@ select:focus-visible,
     color-mix(in oklab, var(--color-accent) 26%, transparent),
     transparent 68%
   );
-  animation: nx-think 1.9s ease-in-out infinite;
+  /* Delayed so the sequence reads in order: the orbit is already turning
+     when the glow arrives, rather than both starting together and reading as
+     one flat pulse. */
+  animation: nx-think 1.9s ease-in-out 0.4s infinite;
   pointer-events: none;
 }
 
@@ -1059,14 +1104,6 @@ select:focus-visible,
   &:active {
     transform: translateY(0);
   }
-}
-
-/* The composer grows a soft ring as you focus it, rather than snapping. */
-.composer {
-  transition:
-    border-color 0.18s var(--ease-out),
-    box-shadow 0.22s var(--ease-out),
-    background-color 0.18s var(--ease-out);
 }
 
 /* Buttons that commit something get a press. */
@@ -1631,6 +1668,33 @@ a[role="button"]:active {
 }
 .nx-slide-up {
   animation: nx-slide-up 0.24s var(--ease-out);
+}
+
+/* ------------------------------------------------------------------
+   Phone
+   ------------------------------------------------------------------
+   The chrome on a phone is its own component tree; the inner pages are the
+   desktop ones. They already stack correctly — every multi-column grid here
+   starts at the sm breakpoint — but they still carry headings sized for a
+   1080px column, which on a 375px screen fills a third of the viewport before
+   any content appears.
+
+   Scoped to .nx-mobile so nothing here can reach the desktop UI. */
+.nx-mobile main h1 {
+  font-size: clamp(22px, 6.2vw, 26px);
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+}
+
+.nx-mobile main h2 {
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+/* Long single-line values — ids, emails, file names — are the usual cause of a
+   phone page scrolling sideways. */
+.nx-mobile main :where(p, li, td, dd) {
+  overflow-wrap: anywhere;
 }
 
 /* A bottom sheet arriving. Travels its own height rather than a fixed

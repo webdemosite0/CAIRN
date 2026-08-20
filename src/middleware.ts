@@ -43,6 +43,10 @@ function pinUi(req: NextRequest, res: NextResponse): NextResponse {
   const asked = req.nextUrl.searchParams.get("ui");
   if (asked === "mobile" || asked === "desktop") {
     res.cookies.set("nx_ui", asked, { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax" });
+  } else if (asked === "auto") {
+    // Without this the pin is a trap: ?ui=desktop on a phone lasts a month and
+    // there is no way back to letting the device decide.
+    res.cookies.delete("nx_ui");
   }
   return res;
 }

@@ -78,21 +78,31 @@ const GROUPS: { label: string; items: Item[] }[] = [
       { href: "/documents", label: "Documents", icon: TbFileText, motion: "lift" },
       { href: "/spreadsheets", label: "Spreadsheets", icon: TbTable, motion: "pop" },
       { href: "/slides", label: "Slides", icon: TbPresentation, motion: "grow" },
-      { href: "/design", label: "Design", icon: TbPalette, motion: "hue" },
     ],
   },
   {
-    label: "Automate",
+    label: "Explore",
     items: [
       { href: "/research", label: "Research", icon: TbSearch, motion: "scan" },
-      { href: "/workflows", label: "Workflows", icon: TbRefreshDot, motion: "spin", badge: "Soon" },
-      { href: "/reminders", label: "Reminders", icon: TbBell, motion: "ring" },
-      { href: "/integrations", label: "Integrations", icon: TbPlugConnected, motion: "open" },
     ],
   },
 ];
 
-const ALL = GROUPS.flatMap((g) => g.items);
+/**
+ * Reachable, but not part of the three groups above.
+ *
+ * The brief lists Workspace, Build and Explore only, which leaves four
+ * routes that exist and work with nothing linking to them. Deleting the link
+ * does not delete the page — it just makes it unreachable — so they sit here,
+ * under a divider, rather than being dropped.
+ */
+const EXTRA: Item[] = [
+  { href: "/design", label: "Design", icon: TbPalette, motion: "hue" },
+  { href: "/reminders", label: "Reminders", icon: TbBell, motion: "ring" },
+  { href: "/workflows", label: "Workflows", icon: TbRefreshDot, motion: "spin", badge: "Soon" },
+];
+
+const ALL = [...GROUPS.flatMap((g) => g.items), ...EXTRA];
 
 /** Reached rarely, so they get icons at the foot rather than nav rows. */
 const SECONDARY: { href: string; label: string; icon: IconType }[] = [
@@ -289,6 +299,15 @@ function RailBody({
             </div>
           </div>
         ))}
+
+        {/* Routes outside the three groups. Divided rather than labelled: a
+            fourth heading would imply they belong together, and they do not —
+            the only thing they share is not fitting the brief's nav. */}
+        <div className="mt-5 space-y-0.5 border-t border-line pt-3">
+          {EXTRA.map((it) => (
+            <NavRow key={it.href} item={it} pathname={pathname} onNavigate={onNavigate} />
+          ))}
+        </div>
       </nav>
 
       <div className="space-y-1 border-t border-line p-2.5">

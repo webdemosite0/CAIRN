@@ -41,6 +41,7 @@ export function isPhoneUserAgent(ua: string | null | undefined): boolean {
 /** True when this request should be served the mobile UI. */
 export async function isMobile(): Promise<boolean> {
   // An explicit pin wins, so the phone UI can be opened from a laptop.
+  // ?ui=auto clears it; see middleware.ts.
   const pinned = (await cookies()).get(UI_COOKIE)?.value;
   if (pinned === "mobile") return true;
   if (pinned === "desktop") return false;

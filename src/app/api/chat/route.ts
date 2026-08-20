@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { streamText, type Turn } from "@/lib/gemini";
 import { toParts, type Attachment } from "@/lib/attachments";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
-import { temperatureFor } from "@/lib/modes";
+import { hintFor, temperatureFor } from "@/lib/modes";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -55,7 +55,10 @@ export async function POST(req: NextRequest) {
       onUsage: (u) =>
         account && spend(account.userId, "chat", u.totalTokens),
       turns,
-      system: SYSTEM,
+      // The mode contributes an instruction as well as a temperature, so
+      // "Fast" and "Deep" are real differences in what is asked for rather
+      // than two labels on the same request.
+      system: [SYSTEM, hintFor(mode)].filter(Boolean).join("\n\n"),
       // The composer's mode, resolved to a real temperature. An unknown
       // value falls back to balanced rather than being trusted.
       temperature: temperatureFor(mode),
