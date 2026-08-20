@@ -1633,6 +1633,21 @@ a[role="button"]:active {
   animation: nx-slide-up 0.24s var(--ease-out);
 }
 
+/* A bottom sheet arriving. Travels its own height rather than a fixed
+   distance, so a tall sheet and a short one take the same time and neither
+   appears to start already halfway up. */
+@keyframes nx-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.nx-sheet-in {
+  animation: nx-sheet-in 0.26s var(--ease-out);
+}
+
 /* A hero element, drifting up as the page settles. */
 @keyframes nx-rise-big {
   from {
@@ -1682,6 +1697,7 @@ a[role="button"]:active {
   .nx-reveal,
   .nx-fade,
   .nx-slide-up,
+  .nx-sheet-in,
   .nx-rise-big,
   .nx-drift,
   .nx-stagger > * {

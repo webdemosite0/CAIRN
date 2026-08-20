@@ -29,18 +29,36 @@ function isPublic(pathname: string) {
   return PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
 }
 
+/**
+ * Pins the UI when ?ui=mobile or ?ui=desktop is on the URL.
+ *
+ * Only writes the cookie; lib/device.ts reads it. That keeps the decision in
+ * one place and means middleware does not have to rewrite request headers,
+ * which is the fiddly way to get a value from here into a server component.
+ *
+ * Exists so the phone UI can be opened from a laptop. Without a pin, the
+ * device is decided from the user agent.
+ */
+function pinUi(req: NextRequest, res: NextResponse): NextResponse {
+  const asked = req.nextUrl.searchParams.get("ui");
+  if (asked === "mobile" || asked === "desktop") {
+    res.cookies.set("nx_ui", asked, { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax" });
+  }
+  return res;
+}
+
 export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
   if (isPublic(pathname)) {
-    const res = NextResponse.next();
+    const res = pinUi(req, NextResponse.next());
     // Clear the old guest identity wherever one is still lying around, so it
     // stops being sent on every request for the next year.
     if (req.cookies.has("nx_guest")) res.cookies.delete("nx_guest");
     return res;
   }
 
-  if (req.cookies.has("nx_session")) return NextResponse.next();
+  if (req.cookies.has("nx_session")) return pinUi(req, NextResponse.next());
 
   // An API call gets a status it can act on; a page gets the sign-in screen.
   if (pathname.startsWith("/api/")) {
@@ -53,7 +71,7 @@ export function middleware(req: NextRequest) {
   // Come back to where they were headed once they are in.
   if (pathname !== "/") url.searchParams.set("next", pathname + search);
 
-  const res = NextResponse.redirect(url);
+  const res = pinUi(req, NextResponse.redirect(url));
   if (req.cookies.has("nx_guest")) res.cookies.delete("nx_guest");
   return res;
 }

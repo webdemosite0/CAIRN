@@ -85,6 +85,10 @@ export const viewport: Viewport = {
   colorScheme: "dark light",
   width: "device-width",
   initialScale: 1,
+  // The mobile UI paints its tab bar into the gesture area at the bottom of a
+  // phone, which only works if the page is allowed under the notch and home
+  // indicator. Without this, env(safe-area-inset-*) is always 0.
+  viewportFit: "cover",
 };
 
 /**

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import { Composer } from "@/components/chat/composer";
@@ -9,19 +9,10 @@ import { Greeting } from "@/components/chat/greeting";
 import { QuickActions } from "@/components/home/quick-actions";
 import { StarterCards } from "@/components/home/starter-cards";
 import { DEFAULT_MODE, type ModeId } from "@/lib/modes";
+import { useChatThread } from "@/lib/use-chat-thread";
 import { ContinuePanel, ActivityPanel } from "@/components/home/recent-panels";
 import { Aurora } from "@/components/shell/aurora";
-import type { Attachment } from "@/lib/attachments";
 import type { Recent } from "@/lib/recents";
-import { useRouter } from "next/navigation";
-import { useSaved } from "@/lib/use-saved";
-
-interface Turn {
-  id: number;
-  role: "user" | "model";
-  text: string;
-  files?: Attachment[];
-}
 
 export function HomeChat({
   restored = null,
@@ -35,83 +26,15 @@ export function HomeChat({
   /** Everything recent, across kinds, for the two panels below. */
   activity?: Recent[];
 }) {
-  const router = useRouter();
-  const { save, reset } = useSaved("chat", restored?.id ?? null);
-  const [turns, setTurns] = useState<Turn[]>(() =>
-    (restored?.messages ?? []).map((m, i) => ({ id: i, role: m.role, text: m.text })),
-  );
-  const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState("");
   const [mode, setMode] = useState<ModeId>(DEFAULT_MODE);
-  const [error, setError] = useState<string | null>(null);
-  const bottom = useRef<HTMLDivElement>(null);
-  const nextId = useRef(restored?.messages.length ?? 0);
 
-  useEffect(() => {
-    bottom.current?.scrollIntoView({ block: "end", behavior: "smooth" });
-  }, [turns]);
-
-  const run = useCallback(async (history: Turn[], files?: Attachment[]) => {
-    setBusy(true);
-    setError(null);
-    const replyId = nextId.current++;
-    setTurns((t) => [...t, { id: replyId, role: "model", text: "" }]);
-
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: history.map(({ role, text }) => ({ role, text })),
-          mode,
-          attachments: files?.map(({ name, mimeType, size, data, kind }) => ({
-            name, mimeType, size, data, kind,
-          })),
-        }),
-      });
-      if (!res.ok || !res.body) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error ?? `Request failed (${res.status}).`);
-      }
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        setTurns((t) =>
-          t.map((x) => (x.id === replyId ? { ...x, text: x.text + chunk } : x)),
-        );
-      }
-      // Read the finished thread out of state rather than closing over a
-      // stale copy — the reply text only exists after the stream drains.
-      setTurns((t) => {
-        void save(
-          t.map(({ role, text }) => ({ role, text })),
-          t[0]?.text,
-        );
-        return t;
-      });
-      router.refresh();
-    } catch (e) {
-      setTurns((t) => t.filter((x) => x.id !== replyId));
-      setError(e instanceof Error ? e.message : "Something went wrong.");
-    } finally {
-      setBusy(false);
-    }
-  }, [router, save, mode]);
-
-  const send = useCallback(
-    (text: string, files?: Attachment[]) => {
-      const history = [
-        ...turns,
-        { id: nextId.current++, role: "user" as const, text, files },
-      ];
-      setTurns(history);
-      void run(history, files);
-    },
-    [turns, run],
-  );
+  // Transcript, streaming and saving live in the hook, shared with the
+  // mobile chat screen. Only the layout below is desktop-specific.
+  const { turns, busy, error, send, retry, regenerate, clear, bottom } = useChatThread({
+    restored,
+    mode,
+  });
 
   /* ------------------- landing ------------------- */
 
@@ -171,7 +94,7 @@ export function HomeChat({
               <ActivityPanel items={activity} />
             </div>
 
-            {error ? <ErrorNote message={error} onRetry={() => run(turns)} /> : null}
+            {error ? <ErrorNote message={error} onRetry={retry} /> : null}
           </div>
         </div>
 
@@ -189,11 +112,7 @@ export function HomeChat({
             {turns[0]?.text.slice(0, 64)}
           </span>
           <button
-            onClick={() => {
-              setTurns([]);
-              setError(null);
-              reset();
-            }}
+            onClick={clear}
             className="shrink-0 rounded-[6px] px-2.5 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
           >
             New Chat
@@ -212,12 +131,12 @@ export function HomeChat({
               pending={busy && i === turns.length - 1 && t.role === "model"}
               onRegenerate={
                 !busy && i === turns.length - 1 && t.role === "model"
-                  ? () => run(turns.slice(0, -1))
+                  ? regenerate
                   : undefined
               }
             />
           ))}
-          {error ? <ErrorNote message={error} onRetry={() => run(turns)} /> : null}
+          {error ? <ErrorNote message={error} onRetry={retry} /> : null}
           <div ref={bottom} />
         </div>
       </div>

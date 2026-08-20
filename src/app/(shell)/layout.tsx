@@ -5,6 +5,8 @@ import { NavProvider } from "@/components/shell/nav-state";
 import { Backdrop } from "@/components/shell/backdrop";
 import { SetupNeeded } from "@/components/shell/setup-needed";
 import { ToastProvider } from "@/components/ui/toast";
+import { MobileShell } from "@/components/mobile/shell";
+import { isMobile } from "@/lib/device";
 import { redirect } from "next/navigation";
 import { currentUser, type User } from "@/lib/auth";
 import { myBalance } from "@/lib/credits";
@@ -83,6 +85,23 @@ export default async function ShellLayout({
   // cookie stops here.
   if (!user) redirect("/login");
   if (!user.emailVerified) redirect("/verify-email");
+
+  // Two separate UIs, not one that reflows. The phone gets its own chrome —
+  // tab bar, sheets, no rail — and never renders the desktop tree, so nothing
+  // here can regress the desktop layout.
+  if (await isMobile()) {
+    return (
+      <ToastProvider>
+        <Backdrop />
+        <MobileShell
+          user={{ name: user.name, email: user.email }}
+          balance={balance}
+        >
+          {children}
+        </MobileShell>
+      </ToastProvider>
+    );
+  }
 
   return (
     <NavProvider>
