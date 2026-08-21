@@ -3,6 +3,7 @@ import { streamText, type Turn } from "@/lib/ai";
 import { currentUser } from "@/lib/auth";
 import { one, str } from "@/lib/db";
 import { toParts, type Attachment } from "@/lib/attachments";
+import { OBEY_FORMAT, safeTimeZone, situation } from "@/lib/context";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 
 export const runtime = "nodejs";
@@ -16,11 +17,13 @@ export async function POST(req: NextRequest) {
   let agentId = "";
   let turns: Turn[] = [];
   let attachments: Attachment[] = [];
+  let timeZone = "UTC";
   try {
     const body = await req.json();
     agentId = String(body?.agentId ?? "");
     turns = Array.isArray(body?.messages) ? body.messages : [];
     attachments = Array.isArray(body?.attachments) ? body.attachments : [];
+    timeZone = safeTimeZone(body?.timeZone);
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -67,7 +70,11 @@ run and what you would need, rather than pretending you executed it.`
     : `You have no tool access. Do not claim to have run anything.`
 }
 
-Stay in role. Be concrete and brief. Never invent results you did not compute.`;
+Stay in role. Be concrete and brief. Never invent results you did not compute.
+
+${OBEY_FORMAT}
+
+${situation({ timeZone, canSearch: false })}`;
 
   // Checked before the call; the debit below uses what Google actually
   // reported, so a long answer costs more than a short one.

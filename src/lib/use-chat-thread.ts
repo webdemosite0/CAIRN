@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSaved } from "@/lib/use-saved";
 import type { Attachment } from "@/lib/attachments";
 import type { ModeId } from "@/lib/modes";
+import { localTimeZone } from "@/lib/context";
 
 export interface Turn {
   id: number;
@@ -12,6 +13,7 @@ export interface Turn {
   text: string;
   files?: Attachment[];
 }
+
 
 /**
  * A conversation: the transcript, the request, the stream, and the save.
@@ -63,6 +65,10 @@ export function useChatThread({
           body: JSON.stringify({
             messages: history.map(({ role, text }) => ({ role, text })),
             mode,
+            // The server runs in UTC wherever it is deployed, so without this
+            // "what is today's date" is answered for the datacentre rather
+            // than for the person asking.
+            timeZone: localTimeZone(),
             attachments: files?.map(({ name, mimeType, size, data, kind }) => ({
               name, mimeType, size, data, kind,
             })),

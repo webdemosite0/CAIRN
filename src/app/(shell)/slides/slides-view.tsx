@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { localTimeZone } from "@/lib/context";
 import {
   FiDownload,
   FiRotateCcw,
@@ -112,6 +113,7 @@ export function SlidesView({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          timeZone: localTimeZone(),
           tool: "slides",
           prompt: value,
           attachments: strip(attachments),

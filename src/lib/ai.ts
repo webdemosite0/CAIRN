@@ -49,11 +49,57 @@ interface Common {
   onUsage?: OnUsage;
 }
 
+function errText(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
 /** Worth moving on for: the provider is out, throttled, or refusing the key. */
 function shouldFallOver(message: string): boolean {
   return /429|quota|rate.?limit|exhaust|billing|insufficient|401|403|invalid.?api.?key|not available|404|503|overload/i.test(
     message,
   );
+}
+
+/**
+ * Whether an ungrounded retry is worth attempting.
+ *
+ * Google meters web-search grounding separately from the model itself, and far
+ * more tightly — on the free tier a plain request returns 200 while the same
+ * request carrying the search tool returns 429. Treating that as "Gemini is
+ * down" would take every chat with it, because the fallback providers have no
+ * search either: the whole product would stop over a tool it did not need for
+ * most questions.
+ *
+ * So when a grounded call is refused for quota reasons, the model is still
+ * there. Ask it again without the tool.
+ */
+function groundingMayBeTheProblem(message: string): boolean {
+  return /429|quota|rate.?limit|exhaust|billing|insufficient|403/i.test(message);
+}
+
+/**
+ * Remembers that grounding is currently refused, so the next request does not
+ * pay for the same discovery.
+ *
+ * Without this, a key whose search quota is exhausted makes every single
+ * message send a doomed request to Google, wait for the 429, and only then ask
+ * the real question — the failure is invisible but everyone waits twice.
+ *
+ * The window is short because the opposite mistake matters too: quota resets,
+ * and a long cooldown would keep search switched off for hours after it came
+ * back. Serverless instances are short-lived, so this is a per-instance hint
+ * rather than shared state — which is fine, since being wrong only costs the
+ * one wasted call it was already going to make.
+ */
+const GROUNDING_COOLDOWN_MS = 10 * 60_000;
+let groundingRefusedAt = 0;
+
+function groundingAvailable(): boolean {
+  return Date.now() - groundingRefusedAt > GROUNDING_COOLDOWN_MS;
+}
+
+function noteGroundingRefused() {
+  groundingRefusedAt = Date.now();
 }
 
 /**
@@ -86,16 +132,41 @@ export async function generateText(
     extraParts?: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }>;
     onAttempt?: OnAttempt;
     search?: boolean;
+    /** See streamText. The prompt to use if the search tool has to be dropped. */
+    systemWithoutSearch?: string;
     onSources?: OnSources;
   },
 ): Promise<string> {
   const temperature = opts.temperature ?? 0.7;
   const maxOutputTokens = opts.maxOutputTokens ?? 8192;
 
+  const grounded = { ...opts, search: Boolean(opts.search) && groundingAvailable() };
+  const ungrounded = {
+    ...opts,
+    search: false,
+    system: opts.systemWithoutSearch ?? opts.system,
+  };
+
+  let first: unknown;
   try {
-    return await geminiGenerate(opts);
+    return await geminiGenerate(grounded.search ? grounded : ungrounded);
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
+    first = e;
+  }
+
+  if (grounded.search && groundingMayBeTheProblem(errText(first))) {
+    noteGroundingRefused();
+    try {
+      console.warn("ai: grounding refused — retrying without web search");
+      return await geminiGenerate(ungrounded);
+    } catch (e2) {
+      first = e2;
+    }
+  }
+
+  {
+    const e = first;
+    const message = errText(e);
     const chain = compatProviders();
 
     // A failure that is not about availability — a malformed request, say —
@@ -111,7 +182,11 @@ export async function generateText(
         return await compatGenerate({
           provider,
           turns: opts.turns,
-          system: opts.system,
+          // No fallback provider has Gemini's search tool, so send the prompt
+          // written for that case — otherwise the model is told to look
+          // something up with a tool it does not have, and answers as though
+          // it did.
+          system: opts.search ? (opts.systemWithoutSearch ?? opts.system) : opts.system,
           temperature,
           maxOutputTokens,
           onUsage: opts.onUsage,
@@ -131,16 +206,54 @@ export async function streamText(
   opts: Common & {
     extraParts?: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }>;
     search?: boolean;
+    /**
+     * The prompt to use when the search tool is not in play — because Google
+     * refused it, or because a fallback provider is answering.
+     *
+     * Without this, a degraded request still carries "look it up with your
+     * search tool", and a model told it can search will happily produce an
+     * answer shaped like a researched one. The caveat has to change with the
+     * capability, so the two versions are written by the caller who knows what
+     * the prompt says.
+     */
+    systemWithoutSearch?: string;
     onSources?: OnSources;
   },
 ): Promise<ReadableStream<Uint8Array>> {
   const temperature = opts.temperature ?? 0.7;
   const maxOutputTokens = opts.maxOutputTokens ?? 4096;
 
+  // Skip a grounded attempt that recent evidence says will be refused.
+  const grounded = { ...opts, search: Boolean(opts.search) && groundingAvailable() };
+  const ungrounded = {
+    ...opts,
+    search: false,
+    system: opts.systemWithoutSearch ?? opts.system,
+  };
+
+  let first: unknown;
   try {
-    return await geminiStream(opts);
+    return await geminiStream(grounded.search ? grounded : ungrounded);
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
+    first = e;
+  }
+
+  // Grounding is metered separately and far more tightly than the model. If
+  // only the tool was refused, ask again without it before giving up on
+  // Gemini entirely — see groundingMayBeTheProblem.
+  if (grounded.search && groundingMayBeTheProblem(errText(first))) {
+    noteGroundingRefused();
+    try {
+      console.warn("ai: grounding refused — retrying without web search");
+      return await geminiStream(ungrounded);
+    } catch (e2) {
+      first = e2;
+    }
+  }
+
+  {
+    const e = first;
+    const message = errText(e);
     const chain = compatProviders();
     if (!chain.length || !shouldFallOver(message)) throw e;
 
@@ -152,7 +265,7 @@ export async function streamText(
         return await compatStream({
           provider,
           turns: opts.turns,
-          system: opts.system,
+          system: opts.search ? (opts.systemWithoutSearch ?? opts.system) : opts.system,
           temperature,
           maxOutputTokens,
           onUsage: opts.onUsage,

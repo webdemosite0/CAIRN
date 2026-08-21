@@ -1,6 +1,7 @@
 "use client";
 
 import { Ico } from "@/components/ui/ico";
+import { localTimeZone } from "@/lib/context";
 import { FailureNote } from "@/components/ui/failure-note";
 import { useRef, useState } from "react";
 import type { IconType } from "react-icons";
@@ -77,7 +78,12 @@ export function ToolPage({
       const res = await fetch("/api/tool", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tool, prompt: text, attachments: strip(attachments) }),
+        body: JSON.stringify({
+          tool,
+          prompt: text,
+          attachments: strip(attachments),
+          timeZone: localTimeZone(),
+        }),
       });
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => null);

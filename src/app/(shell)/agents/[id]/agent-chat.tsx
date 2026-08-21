@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { localTimeZone } from "@/lib/context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiPlus } from "react-icons/fi";
@@ -73,6 +74,7 @@ export function AgentChat({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            timeZone: localTimeZone(),
             agentId: agent.id,
             messages: history.map(({ role, text }) => ({ role, text })),
             attachments: strip(attachments),

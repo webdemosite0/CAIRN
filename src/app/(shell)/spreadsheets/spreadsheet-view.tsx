@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { localTimeZone } from "@/lib/context";
 import {
   FiDownload,
   FiRotateCcw,
@@ -144,6 +145,7 @@ export function SpreadsheetView({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          timeZone: localTimeZone(),
           tool: "sheets",
           prompt: text,
           attachments: strip(attachments),

@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { streamText, type Source } from "@/lib/ai";
 import { toParts, type Attachment } from "@/lib/attachments";
+import { OBEY_FORMAT, safeTimeZone, situation } from "@/lib/context";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
 
 export const runtime = "nodejs";
@@ -65,11 +66,13 @@ export async function POST(req: NextRequest) {
   let tool = "";
   let prompt = "";
   let attachments: Attachment[] = [];
+  let timeZone = "UTC";
   try {
     const body = await req.json();
     tool = String(body?.tool ?? "");
     prompt = String(body?.prompt ?? "").trim();
     attachments = Array.isArray(body?.attachments) ? body.attachments : [];
+    timeZone = safeTimeZone(body?.timeZone);
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -95,6 +98,9 @@ export async function POST(req: NextRequest) {
     throw e;
   }
 
+  const promptFor = (canSearch: boolean) =>
+    [system, OBEY_FORMAT, situation({ timeZone, canSearch })].join("\n\n");
+
   try {
     // Collected during the stream and appended after it. The client renders
     // markdown, so this needs no protocol of its own.
@@ -104,7 +110,10 @@ export async function POST(req: NextRequest) {
       onUsage: (u) =>
         account && spend(account.userId, tool, u.totalTokens),
       turns: [{ role: "user", text: prompt || "Work from the attached files." }],
-      system,
+      // Every tool gets the date and the format rule; only research gets a
+      // search tool, so the knowledge caveat is worded for what it can do.
+      system: promptFor(SEARCHES.has(tool)),
+      systemWithoutSearch: promptFor(false),
       temperature: 0.75,
       maxOutputTokens: 4096,
       extraParts: attachments.length ? toParts(attachments) : undefined,

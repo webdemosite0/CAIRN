@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { localTimeZone } from "@/lib/context";
 import {
   FiDownload,
   FiRotateCcw,
@@ -127,6 +128,7 @@ export function DocumentView({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          timeZone: localTimeZone(),
           tool: "docs",
           prompt: value,
           attachments: strip(attachments),
