@@ -181,6 +181,23 @@ PRAGMA journal_mode = WAL;
  */
 export const MIGRATIONS: string[] = [
   /* ---------------------------------------------------------------
+     Billing
+     ---------------------------------------------------------------
+     Stripe is the source of truth for whether someone is subscribed; these
+     columns are a local cache of what it last told us, so a page render does
+     not need a network call to Stripe to know which plan to show.
+
+     status is Stripe own subscription status verbatim (active, past_due,
+     canceled, ...) rather than a boolean, because "not active" and "about to
+     lapse" need different treatment and a boolean throws that away. */
+  `ALTER TABLE users ADD COLUMN stripe_customer_id TEXT NOT NULL DEFAULT ''`,
+  `ALTER TABLE users ADD COLUMN stripe_subscription_id TEXT NOT NULL DEFAULT ''`,
+  `ALTER TABLE users ADD COLUMN subscription_status TEXT NOT NULL DEFAULT ''`,
+  `ALTER TABLE users ADD COLUMN subscription_ends_at INTEGER`,
+  `CREATE INDEX IF NOT EXISTS users_by_stripe_customer ON users (stripe_customer_id)`,
+
+
+  /* ---------------------------------------------------------------
      Missions
      ---------------------------------------------------------------
      A mission is one piece of work given to Trove: a goal, the tasks it was

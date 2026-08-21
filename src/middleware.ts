@@ -22,6 +22,7 @@ const PUBLIC_PREFIXES = [
   "/verify-email", // opened from an email, in whatever browser
   "/api/auth/", // the sign-in and OAuth callback routes themselves
   "/api/health", // has to answer when the database is down
+  "/api/billing/webhook", // Stripe calls this server-to-server; it has no cookie
 ];
 
 function isPublic(pathname: string) {

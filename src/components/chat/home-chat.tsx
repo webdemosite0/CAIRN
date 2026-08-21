@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
+import { FailureNote } from "@/components/ui/failure-note";
 import { Composer } from "@/components/chat/composer";
 import { Message } from "@/components/chat/message";
 import { Greeting } from "@/components/chat/greeting";
@@ -149,6 +149,11 @@ export function HomeChat({
   );
 }
 
+/**
+ * Kept as a named export because several screens render it; the body now
+ * delegates to the shared component so every surface classifies a failure
+ * the same way instead of each one printing the raw message.
+ */
 export function ErrorNote({
   message,
   onRetry,
@@ -156,20 +161,5 @@ export function ErrorNote({
   message: string;
   onRetry?: () => void;
 }) {
-  return (
-    <div className="nx-in mt-5 flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
-      <FiAlertCircle size={15} className="mt-0.5 shrink-0 text-critical" />
-      <div className="min-w-0 flex-1">
-        <p className="text-[13.5px] leading-relaxed text-ink-2">{message}</p>
-        {onRetry ? (
-          <button
-            onClick={onRetry}
-            className="mt-1.5 inline-flex items-center gap-1.5 text-[12.5px] text-critical hover:underline"
-          >
-            <FiRefreshCw size={11} /> Try again
-          </button>
-        ) : null}
-      </div>
-    </div>
-  );
+  return <FailureNote error={message} onRetry={onRetry} className="mt-5" />;
 }

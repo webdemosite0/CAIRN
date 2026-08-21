@@ -1,10 +1,10 @@
 "use client";
 
 import { Ico } from "@/components/ui/ico";
+import { FailureNote } from "@/components/ui/failure-note";
 import { useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import {
-  FiAlertCircle,
   FiCopy,
   FiCheck,
   FiRotateCcw,
@@ -210,18 +210,7 @@ export function ToolPage({
       ) : null}
 
       {error ? (
-        <div className="mt-4 flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
-          <Ico icon={FiAlertCircle} motion="pop" size={15} className="mt-0.5 shrink-0 text-critical" />
-          <div>
-            <p className="text-[13.5px] text-ink-2">{error}</p>
-            <button
-              onClick={() => run(prompt)}
-              className="mt-1.5 text-[12.5px] text-critical hover:underline"
-            >
-              Try again
-            </button>
-          </div>
-        </div>
+        <FailureNote error={error} onRetry={() => run(prompt)} className="mt-4" />
       ) : null}
 
       <div ref={bottom} />

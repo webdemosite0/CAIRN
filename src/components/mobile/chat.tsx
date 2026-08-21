@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import {
   TbWorld,
   TbRobot,
@@ -20,7 +19,7 @@ import { Wordmark } from "@/components/brand/logo";
 import { DEFAULT_MODE, type ModeId } from "@/lib/modes";
 import { useChatThread } from "@/lib/use-chat-thread";
 import type { Recent } from "@/lib/recents";
-import { Ico } from "@/components/ui/ico";
+import { FailureNote } from "@/components/ui/failure-note";
 
 /**
  * Chat, for a phone.
@@ -182,19 +181,6 @@ export function MobileChat({
 }
 
 function Problem({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div className="nx-in mt-4 flex items-start gap-2.5 rounded-[14px] border border-critical/30 bg-critical/10 px-3.5 py-3">
-      <Ico icon={FiAlertCircle} motion="alert" size={15} className="mt-0.5 shrink-0 text-critical" />
-      <div className="min-w-0 flex-1">
-        <p className="text-[13.5px] leading-relaxed text-ink-2">{message}</p>
-        <button
-          type="button"
-          onClick={onRetry}
-          className="mt-1.5 inline-flex items-center gap-1.5 text-[12.5px] text-critical"
-        >
-          <Ico icon={FiRefreshCw} motion="spin" size={11} /> Try again
-        </button>
-      </div>
-    </div>
-  );
+  // compact: the phone layout has no room for the full card.
+  return <FailureNote error={message} onRetry={onRetry} className="mt-4" compact />;
 }
