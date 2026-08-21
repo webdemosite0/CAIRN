@@ -108,10 +108,12 @@ async function serper(query: string): Promise<SearchResult[]> {
     body: JSON.stringify({ q: query, num: MAX_RESULTS }),
   })) as {
     answerBox?: Record<string, unknown>;
+    knowledgeGraph?: Record<string, unknown>;
     organic?: Array<Record<string, unknown>>;
   };
 
   const out: SearchResult[] = [];
+
   // The answer box is usually the direct answer to exactly this kind of
   // question ("net worth", "who is the CEO of"), so it leads.
   const box = json.answerBox;
@@ -122,6 +124,39 @@ async function serper(query: string): Promise<SearchResult[]> {
       snippet: clean(box.answer ?? box.snippet),
     });
   }
+
+  /**
+   * The knowledge panel, where Google puts the attribute someone asked for.
+   *
+   * "Net worth", "Founded", "CEO" live in `attributes` as plain key/value
+   * pairs — for the questions this whole feature exists to answer, that panel
+   * is often more direct than any organic result.
+   *
+   * Read defensively: Serper's exact field names for this object are not
+   * pinned down in public documentation, so anything missing is skipped rather
+   * than assumed. A renamed field costs a little context; a wrong assumption
+   * would throw and lose the whole search.
+   */
+  const kg = json.knowledgeGraph;
+  if (kg) {
+    const attrs = kg.attributes;
+    const pairs =
+      attrs && typeof attrs === "object" && !Array.isArray(attrs)
+        ? Object.entries(attrs as Record<string, unknown>)
+            .filter(([, v]) => typeof v === "string" || typeof v === "number")
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(" · ")
+        : "";
+    const body = [clean(kg.description, 260), pairs].filter(Boolean).join(" — ");
+    if (body) {
+      out.push({
+        title: clean(kg.title ?? "Knowledge panel", 160),
+        url: String(kg.descriptionLink ?? kg.website ?? ""),
+        snippet: clean(body, 600),
+      });
+    }
+  }
+
   for (const r of json.organic ?? []) {
     out.push({
       title: clean(r.title, 160),
