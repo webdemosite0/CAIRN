@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FiAlertCircle, FiArrowLeft, FiPlus } from "react-icons/fi";
+import { FiArrowLeft, FiPlus } from "react-icons/fi";
 import { Bot } from "@/components/agents/bot";
 import { Message } from "@/components/chat/message";
 import { Composer } from "@/components/chat/composer";
 import { Ico } from "@/components/ui/ico";
+import { FailureNote } from "@/components/ui/failure-note";
 import { strip, type Attachment } from "@/lib/attachments";
 import { useSaved } from "@/lib/use-saved";
 import type { AgentRow } from "@/app/actions/agents";
@@ -52,11 +53,14 @@ export function AgentChat({
   }, [turns, busy]);
 
   const send = useCallback(
-    async (raw: string, attachments?: Attachment[]) => {
+    async (raw: string, attachments?: Attachment[], base?: Turn[]) => {
       const text = raw.trim() || (attachments?.length ? "See the attached files." : "");
       if (!text || busy) return;
 
-      const history = [...turns, { id: nextId.current++, role: "user" as const, text }];
+      // `base` lets a retry replay from before the failed question instead of
+      // from the current thread, which still contains it — appending to that
+      // would ask the same thing twice.
+      const history = [...(base ?? turns), { id: nextId.current++, role: "user" as const, text }];
       setTurns(history);
       setBusy(true);
       setError(null);
@@ -109,6 +113,26 @@ export function AgentChat({
     },
     [agent.id, agent.name, busy, router, save, turns],
   );
+
+  /**
+   * Runs the last question again after a failure.
+   *
+   * The failed reply was removed but the question was not, so the replay
+   * starts from the turn before it — otherwise the thread would show the same
+   * question twice, once for the attempt that failed and once for the retry.
+   */
+  const retry = useCallback(() => {
+    if (busy) return;
+    let i = -1;
+    for (let n = turns.length - 1; n >= 0; n--) {
+      if (turns[n].role === "user") {
+        i = n;
+        break;
+      }
+    }
+    if (i < 0) return;
+    void send(turns[i].text, undefined, turns.slice(0, i));
+  }, [busy, send, turns]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -175,12 +199,7 @@ export function AgentChat({
             ))
           )}
 
-          {error ? (
-            <div className="flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
-              <Ico icon={FiAlertCircle} motion="pop" size={15} className="mt-0.5 shrink-0 text-critical" />
-              <p className="text-[13.5px] text-ink-2">{error}</p>
-            </div>
-          ) : null}
+          {error ? <FailureNote error={error} onRetry={retry} /> : null}
 
           <div ref={bottom} />
         </div>

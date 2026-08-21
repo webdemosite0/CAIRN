@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import {
   FiDownload,
   FiRotateCcw,
-  FiAlertCircle,
   FiPlus,
   FiLoader,
   FiArrowUp,
@@ -17,6 +16,7 @@ import {
   parseMarkdownTable,
 } from "@/lib/export";
 import { Ico } from "@/components/ui/ico";
+import { FailureNote } from "@/components/ui/failure-note";
 import { Composer } from "@/components/chat/composer";
 import { strip, type Attachment } from "@/lib/attachments";
 import { Recents } from "@/components/ui/recents";
@@ -353,18 +353,7 @@ export function SpreadsheetView({
       ) : null}
 
       {error ? (
-        <div className="mx-5 mt-4 flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
-          <Ico icon={FiAlertCircle} motion="pop" size={15} className="mt-0.5 shrink-0 text-critical" />
-          <div>
-            <p className="text-[13.5px] text-ink-2">{error}</p>
-            <button
-              onClick={() => run(prompt)}
-              className="mt-1.5 text-[12.5px] text-critical hover:underline"
-            >
-              Try again
-            </button>
-          </div>
-        </div>
+        <FailureNote error={error} onRetry={() => run(prompt)} className="mx-5 mt-4" />
       ) : null}
 
       {rows.length > 0 ? (

@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FiDownload,
   FiRotateCcw,
-  FiAlertCircle,
   FiChevronLeft,
   FiChevronRight,
   FiPlay,
@@ -15,6 +14,7 @@ import { Bot } from "@/components/agents/bot";
 import { Composer } from "@/components/chat/composer";
 import { Recents } from "@/components/ui/recents";
 import { Ico } from "@/components/ui/ico";
+import { FailureNote } from "@/components/ui/failure-note";
 import { SlideCanvas } from "@/components/slides/slide-canvas";
 import { strip, type Attachment } from "@/lib/attachments";
 import { parseDeck, deckFilename } from "@/lib/slides";
@@ -358,18 +358,7 @@ export function SlidesView({
         ) : null}
 
         {error ? (
-          <div className="mt-4 flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
-            <Ico icon={FiAlertCircle} motion="pop" size={15} className="mt-0.5 shrink-0 text-critical" />
-            <div>
-              <p className="text-[13.5px] text-ink-2">{error}</p>
-              <button
-                onClick={() => run(prompt)}
-                className="mt-1.5 text-[12.5px] text-critical hover:underline"
-              >
-                Try again
-              </button>
-            </div>
-          </div>
+          <FailureNote error={error} onRetry={() => run(prompt)} className="mt-4" />
         ) : null}
       </div>
     </div>

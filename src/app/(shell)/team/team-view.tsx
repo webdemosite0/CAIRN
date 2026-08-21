@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { FiCheck, FiAlertCircle } from "react-icons/fi";
+import { FailureNote } from "@/components/ui/failure-note";
+import { FiCheck } from "react-icons/fi";
 import { Composer } from "@/components/chat/composer";
 import { Recents } from "@/components/ui/recents";
 import type { Recent } from "@/lib/recents";
@@ -191,18 +192,7 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
       </div>
 
       {error ? (
-        <div className="mb-6 flex items-start gap-2 rounded-[8px] border border-critical/30 bg-critical/10 px-4 py-3">
-          <FiAlertCircle size={15} className="mt-0.5 shrink-0 text-critical" />
-          <div>
-            <p className="text-[13.5px] text-ink-2">{error}</p>
-            <button
-              onClick={() => run(task)}
-              className="mt-1.5 text-[12.5px] text-critical hover:underline"
-            >
-              Run again
-            </button>
-          </div>
-        </div>
+        <FailureNote error={error} onRetry={() => run(task)} className="mb-6" />
       ) : null}
 
       {/* output */}

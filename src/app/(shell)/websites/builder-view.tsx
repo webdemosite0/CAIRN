@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FailureNote } from "@/components/ui/failure-note";
 import {
   FiDownload,
   FiExternalLink,
@@ -8,7 +9,6 @@ import {
   FiSmartphone,
   FiTablet,
   FiRefreshCw,
-  FiAlertCircle,
   FiCheck,
   FiCopy,
   FiRotateCcw,
@@ -575,10 +575,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
         </div>
 
         {error ? (
-          <div className="mt-6 flex items-start gap-2.5 rounded-[10px] border border-critical/30 bg-critical/10 px-4 py-3">
-            <Ico icon={FiAlertCircle} motion="pop" size={15} className="mt-0.5 shrink-0 text-critical" />
-            <p className="text-[13.5px] text-ink-2">{error}</p>
-          </div>
+          <FailureNote error={error} className="mt-6" />
         ) : null}
       </div>
     );
@@ -870,10 +867,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
             <ActivityBox tasks={tasks} running={phase === "building"} />
 
             {error ? (
-              <div className="nx-in flex items-start gap-2.5 rounded-[8px] border border-critical/30 bg-critical/10 px-3 py-2.5">
-                <FiAlertCircle size={14} className="mt-0.5 shrink-0 text-critical" />
-                <p className="text-[13px] text-ink-2">{error}</p>
-              </div>
+              <FailureNote error={error} compact />
             ) : null}
 
             <div ref={feedEnd} />
