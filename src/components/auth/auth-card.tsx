@@ -6,6 +6,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FiAlertCircle, FiCheck, FiLoader } from "react-icons/fi";
 import { logIn, signUp, type AuthState } from "@/app/actions/auth";
 import { TroveOrb } from "@/components/brand/orb";
+import { Ico } from "@/components/ui/ico";
 
 const field =
   "h-12 w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent sm:text-[14.5px]";
@@ -59,7 +60,7 @@ export function AuthCard({
 
       {justVerified ? (
         <div className="mb-5 flex items-start gap-2 rounded-[8px] border border-positive/30 bg-positive/10 px-3 py-2.5">
-          <FiCheck size={14} className="mt-0.5 shrink-0 text-positive" />
+          <Ico icon={FiCheck} motion="check" size={14} className="mt-0.5 shrink-0 text-positive" />
           <p className="text-[13px] text-ink-2">
             Email confirmed. Sign in to get started.
           </p>
@@ -129,7 +130,7 @@ export function AuthCard({
 
         {error ? (
           <div className="flex items-start gap-2 rounded-[8px] border border-critical/30 bg-critical/10 px-3 py-2.5">
-            <FiAlertCircle size={14} className="mt-0.5 shrink-0 text-critical" />
+            <Ico icon={FiAlertCircle} motion="alert" size={14} className="mt-0.5 shrink-0 text-critical" />
             <p className="text-[13px] text-critical">{error}</p>
           </div>
         ) : null}
@@ -139,7 +140,7 @@ export function AuthCard({
           disabled={pending}
           className="flex h-12 w-full items-center justify-center gap-2 rounded-[8px] btn-grad text-[15px] font-semibold transition-colors disabled:opacity-60"
         >
-          {pending ? <FiLoader size={16} className="animate-spin" /> : null}
+          {pending ? <Ico icon={FiLoader} motion="spin" size={16} className="animate-spin" /> : null}
           {isLogin ? "Log In" : "Sign Up"}
         </button>
       </form>

@@ -154,7 +154,7 @@ export function Composer({
                 />
               ) : (
                 <span className="grid h-8 w-8 place-items-center rounded-[5px] bg-sunk text-ink-3">
-                  {a.kind === "text" ? <FiFileText size={14} /> : <FiFile size={14} />}
+                  {a.kind === "text" ? <Ico icon={FiFileText} motion="lift" size={14} /> : <Ico icon={FiFile} motion="lift" size={14} />}
                 </span>
               )}
               <span className="min-w-0">
@@ -170,7 +170,7 @@ export function Composer({
                 aria-label={`Remove ${a.name}`}
                 className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
               >
-                <FiX size={12} />
+                <Ico icon={FiX} motion="close" size={12} />
               </button>
             </div>
           ))}
@@ -179,7 +179,7 @@ export function Composer({
 
       {error || voice.error ? (
         <p className="flex items-center gap-1.5 px-4 pt-3 text-[12.5px] text-critical">
-          <FiAlertCircle size={12} /> {error ?? voice.error}
+          <Ico icon={FiAlertCircle} motion="alert" size={12} /> {error ?? voice.error}
         </p>
       ) : null}
 

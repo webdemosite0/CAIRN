@@ -1,4 +1,5 @@
 import { FiDatabase, FiExternalLink } from "react-icons/fi";
+import { Ico } from "@/components/ui/ico";
 
 /**
  * Shown instead of a blank 500 when the database cannot be reached, and
@@ -32,7 +33,7 @@ export function SetupNeeded({
   return (
     <div className="mx-auto flex min-h-screen max-w-[620px] flex-col justify-center px-5 py-16">
       <span className="grid h-14 w-14 place-items-center rounded-[12px] bg-caution/15 text-caution">
-        <FiDatabase size={26} />
+        <Ico icon={FiDatabase} motion="stack" size={26} />
       </span>
 
       <h1 className="mt-6 text-[26px] font-semibold tracking-tight text-ink">
@@ -85,7 +86,7 @@ export function SetupNeeded({
           href="/api/health"
           className="inline-flex items-center gap-1 text-accent hover:underline"
         >
-          Check /api/health <FiExternalLink size={11} />
+          Check /api/health <Ico icon={FiExternalLink} motion="launch" size={11} />
         </a>
       </p>
     </div>

@@ -6,20 +6,38 @@ import { cn } from "@/lib/utils";
  * variety — a bell rings, a globe spins, a table pops into its grid.
  */
 export type Motion =
+  // movement
   | "spin"
   | "ring"
   | "tilt"
   | "lift"
-  | "type"
-  | "scan"
+  | "grow"
   | "pop"
   | "hue"
-  | "open"
-  | "launch"
-  | "nudge"
   | "shake"
+  // direction — where the thing goes
+  | "nudge"
+  | "back"
+  | "down"
+  | "send"
+  | "exit"
+  | "launch"
+  | "panel"
+  // action — what the thing does
+  | "open"
+  | "close"
+  | "copy"
+  | "lock"
   | "check"
-  | "grow";
+  | "menu"
+  | "fit"
+  | "type"
+  | "scan"
+  | "tick"
+  | "stack"
+  | "mail"
+  | "alert"
+  | "sparkle";
 
 /**
  * Wraps a react-icon so it animates.

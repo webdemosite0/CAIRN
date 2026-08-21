@@ -5,6 +5,7 @@ import { TbSearch, TbBell, TbHelpCircle } from "react-icons/tb";
 import { FiMenu } from "react-icons/fi";
 import { useNav } from "@/components/shell/nav-state";
 import { cn } from "@/lib/utils";
+import { Ico } from "@/components/ui/ico";
 
 /**
  * The bar above every page: search, and the two things that are always
@@ -30,7 +31,7 @@ export function TopBar({ initial }: { initial?: string }) {
         aria-label="Open menu"
         className="grid h-11 w-11 shrink-0 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9 lg:hidden"
       >
-        <FiMenu size={18} />
+        <Ico icon={FiMenu} motion="menu" size={18} />
       </button>
 
       <button
@@ -41,7 +42,7 @@ export function TopBar({ initial }: { initial?: string }) {
           "hover:border-line-strong hover:bg-hover",
         )}
       >
-        <TbSearch size={16} className="shrink-0 text-ink-4" />
+        <Ico icon={TbSearch} motion="scan" size={16} className="shrink-0 text-ink-4" />
         <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink-4">
           Search anything…
         </span>
@@ -58,7 +59,7 @@ export function TopBar({ initial }: { initial?: string }) {
         title="Reminders"
         className="grid h-11 w-11 shrink-0 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9"
       >
-        <TbBell size={18} />
+        <Ico icon={TbBell} motion="ring" size={18} />
       </Link>
       <Link
         href="/plans"
@@ -66,7 +67,7 @@ export function TopBar({ initial }: { initial?: string }) {
         title="Plan and usage"
         className="grid h-11 w-11 shrink-0 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9"
       >
-        <TbHelpCircle size={18} />
+        <Ico icon={TbHelpCircle} motion="pop" size={18} />
       </Link>
       <Link
         href="/settings"

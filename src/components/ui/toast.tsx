@@ -4,6 +4,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { FiAlertTriangle, FiCheck, FiInfo, FiX } from "react-icons/fi";
 import { useMounted } from "@/lib/use-mounted";
+import { Ico } from "@/components/ui/ico";
 
 type Tone = "info" | "success" | "error";
 
@@ -72,9 +73,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const api = React.useMemo(() => ({ show }), [show]);
 
   const icons: Record<Tone, React.ReactNode> = {
-    info: <FiInfo size={15} className="text-accent" />,
-    success: <FiCheck size={15} className="text-positive" />,
-    error: <FiAlertTriangle size={15} className="text-critical" />,
+    info: <Ico icon={FiInfo} motion="alert" size={15} className="text-accent" />,
+    success: <Ico icon={FiCheck} motion="check" size={15} className="text-positive" />,
+    error: <Ico icon={FiAlertTriangle} motion="alert" size={15} className="text-critical" />,
   };
 
   return (
@@ -116,7 +117,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                     aria-label="Dismiss"
                     className="-mr-1 -mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
                   >
-                    <FiX size={13} />
+                    <Ico icon={FiX} motion="close" size={13} />
                   </button>
                 </div>
               ))}

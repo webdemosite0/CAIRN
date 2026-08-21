@@ -13,6 +13,7 @@ import {
 import { ModePicker } from "@/components/chat/mode-picker";
 import type { ModeId } from "@/lib/modes";
 import { cn } from "@/lib/utils";
+import { Ico } from "@/components/ui/ico";
 
 /**
  * The phone composer.
@@ -131,7 +132,7 @@ export function MobileComposer({
                 onClick={() => setFiles((list) => list.filter((_, n) => n !== i))}
                 className="grid h-5 w-5 place-items-center rounded-full text-ink-4 active:bg-hover"
               >
-                <FiX size={12} />
+                <Ico icon={FiX} motion="close" size={12} />
               </button>
             </li>
           ))}
@@ -165,7 +166,7 @@ export function MobileComposer({
             disabled && "pointer-events-none opacity-40",
           )}
         >
-          <FiPlus size={20} />
+          <Ico icon={FiPlus} motion="grow" size={20} />
           <span className="sr-only">Attach files</span>
           <input
             type="file"
@@ -196,7 +197,7 @@ export function MobileComposer({
               : "bg-sunk text-ink-4",
           )}
         >
-          <FiArrowUp size={20} />
+          <Ico icon={FiArrowUp} motion="send" size={20} />
         </button>
       </div>
     </div>

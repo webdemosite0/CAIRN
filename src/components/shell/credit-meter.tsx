@@ -7,6 +7,7 @@ import { FiArrowRight, FiLoader } from "react-icons/fi";
 import type { Balance, UsageRow } from "@/lib/credits";
 import { kindLabel } from "@/lib/kind-label";
 import { cn } from "@/lib/utils";
+import { Ico } from "@/components/ui/ico";
 
 /**
  * The credit indicator in the rail.
@@ -132,7 +133,7 @@ export function CreditMeter({
       <div className="mt-3 border-t border-line pt-3">
         {state === "loading" ? (
           <p className="flex items-center gap-2 text-[13px] text-ink-4">
-            <FiLoader size={13} className="animate-spin" />
+            <Ico icon={FiLoader} motion="spin" size={13} className="animate-spin" />
             Loading breakdown…
           </p>
         ) : state === "error" ? (
@@ -164,7 +165,7 @@ export function CreditMeter({
         className="mt-3 flex items-center justify-between gap-2 rounded-[6px] px-2 py-1.5 text-[13px] font-medium text-accent transition-colors hover:bg-hover"
       >
         Credits and plans
-        <FiArrowRight size={13} />
+        <Ico icon={FiArrowRight} motion="nudge" size={13} />
       </Link>
     </div>
   );

@@ -775,6 +775,124 @@ select:focus-visible,
 }
 
 /* bell — rings */
+/* ------------------------------------------------------------------
+   Icon motion, second set
+   ------------------------------------------------------------------
+   Each of these is derived from what the icon does, not chosen for
+   variety. The test applied to every one: if you swapped it onto a
+   different icon, would it look wrong? If not, the motion is decoration and
+   does not belong here. A bell rings, a lock shuts, an arrow leaves.
+
+   Kept small and fast — 0.4-0.9s, a few degrees or a few pixels. These play
+   on hover across a whole interface, and anything larger reads as the UI
+   being unstable rather than responsive. */
+
+/* Attention, once. A single sharp beat rather than a wobble: the point is
+   to be noticed, and a repeated shake reads as broken. */
+@keyframes ico-alert {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.18); }
+  55% { transform: scale(0.96); }
+}
+
+/* A close control. Turns the last few degrees into its X, so the gesture is
+   the icon completing itself. */
+@keyframes ico-close {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(90deg); }
+}
+
+/* Duplication. The glyph offsets and returns, as though a copy peeled off
+   and settled back onto the original. */
+@keyframes ico-copy {
+  0%, 100% { transform: translate(0, 0); }
+  45% { transform: translate(2px, -2px); }
+}
+
+/* A panel sliding out of the edge it is docked to. */
+@keyframes ico-panel {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-2.5px); }
+}
+
+/* Menu lines separating, the way the list they open does. */
+@keyframes ico-menu {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.25); }
+}
+
+/* Leaving. Travels out and does not come back the way it went — it fades at
+   the far edge, because a sign-out that springs back reads as a cancel. */
+@keyframes ico-exit {
+  0% { transform: translateX(0); opacity: 1; }
+  60% { transform: translateX(4px); opacity: 0.35; }
+  61% { transform: translateX(-3px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* A shackle closing: down, then a small settle as it seats. */
+@keyframes ico-lock {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-2px); }
+  70% { transform: translateY(0.5px); }
+}
+
+/* Send. Leaves upward and is replaced, rather than returning — the message
+   is gone. */
+@keyframes ico-send {
+  0% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-7px); opacity: 0; }
+  51% { transform: translateY(6px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* An envelope flap lifting. */
+@keyframes ico-mail {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-2px) rotate(-4deg); }
+}
+
+/* A clock hand sweeping one full turn, in steps rather than smoothly —
+   clocks tick. */
+@keyframes ico-tick {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* A stack compressing under its own weight and recovering. */
+@keyframes ico-stack {
+  0%, 100% { transform: scaleY(1); }
+  45% { transform: scaleY(0.86); }
+}
+
+/* Download. Arrives from above and lands. */
+@keyframes ico-down {
+  0% { transform: translateY(0); }
+  45% { transform: translateY(3px); }
+  70% { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+
+/* A sparkle catching light: brightens and turns slightly, no travel. */
+@keyframes ico-sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.16) rotate(18deg); opacity: 0.85; }
+}
+
+/* Going back — the mirror of nudge, so a pair of navigation controls reads
+   as one mechanism. */
+@keyframes ico-back {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-3px); }
+}
+
+/* A piece seating into place. */
+@keyframes ico-fit {
+  0% { transform: rotate(0deg) scale(1); }
+  40% { transform: rotate(-8deg) scale(1.06); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
 @keyframes ico-ring {
   0%,
   60%,
@@ -946,6 +1064,7 @@ select:focus-visible,
 
 /* Layer promotion only while something is actually animating. */
 .group:hover .ico,
+:where(a, button, label, summary, [role="button"]):hover .ico,
 .ico-live,
 .ico-active {
   will-change: transform;
@@ -953,57 +1072,148 @@ select:focus-visible,
 
 /* run once on hover of the nearest .group, and loop while active */
 .group:hover .ico-spin,
+:where(a, button, label, summary, [role="button"]):hover .ico-spin,
 .ico-live.ico-spin {
   animation: ico-spin 1.6s linear infinite;
 }
 .group:hover .ico-ring,
+:where(a, button, label, summary, [role="button"]):hover .ico-ring,
 .ico-live.ico-ring {
   animation: ico-ring 1s ease-in-out;
 }
+.group:hover .ico-alert,
+:where(a, button, label, summary, [role="button"]):hover .ico-alert,
+.ico-live.ico-alert {
+  animation: ico-alert 0.55s var(--ease-out);
+}
+.group:hover .ico-close,
+:where(a, button, label, summary, [role="button"]):hover .ico-close,
+.ico-live.ico-close {
+  animation: ico-close 0.35s var(--ease-out) forwards;
+}
+.group:hover .ico-copy,
+:where(a, button, label, summary, [role="button"]):hover .ico-copy,
+.ico-live.ico-copy {
+  animation: ico-copy 0.5s var(--ease-out);
+}
+.group:hover .ico-panel,
+:where(a, button, label, summary, [role="button"]):hover .ico-panel,
+.ico-live.ico-panel {
+  animation: ico-panel 0.5s var(--ease-out);
+}
+.group:hover .ico-menu,
+:where(a, button, label, summary, [role="button"]):hover .ico-menu,
+.ico-live.ico-menu {
+  animation: ico-menu 0.45s var(--ease-out);
+}
+.group:hover .ico-exit,
+:where(a, button, label, summary, [role="button"]):hover .ico-exit,
+.ico-live.ico-exit {
+  animation: ico-exit 0.6s var(--ease-out);
+}
+.group:hover .ico-lock,
+:where(a, button, label, summary, [role="button"]):hover .ico-lock,
+.ico-live.ico-lock {
+  animation: ico-lock 0.5s var(--ease-out);
+}
+.group:hover .ico-send,
+:where(a, button, label, summary, [role="button"]):hover .ico-send,
+.ico-live.ico-send {
+  animation: ico-send 0.55s var(--ease-out);
+}
+.group:hover .ico-mail,
+:where(a, button, label, summary, [role="button"]):hover .ico-mail,
+.ico-live.ico-mail {
+  animation: ico-mail 0.6s ease-in-out;
+}
+.group:hover .ico-tick,
+:where(a, button, label, summary, [role="button"]):hover .ico-tick,
+.ico-live.ico-tick {
+  animation: ico-tick 2s steps(12, end);
+}
+.group:hover .ico-stack,
+:where(a, button, label, summary, [role="button"]):hover .ico-stack,
+.ico-live.ico-stack {
+  animation: ico-stack 0.5s var(--ease-out);
+}
+.group:hover .ico-down,
+:where(a, button, label, summary, [role="button"]):hover .ico-down,
+.ico-live.ico-down {
+  animation: ico-down 0.55s var(--ease-out);
+}
+.group:hover .ico-sparkle,
+:where(a, button, label, summary, [role="button"]):hover .ico-sparkle,
+.ico-live.ico-sparkle {
+  animation: ico-sparkle 0.7s ease-in-out;
+}
+.group:hover .ico-back,
+:where(a, button, label, summary, [role="button"]):hover .ico-back,
+.ico-live.ico-back {
+  animation: ico-back 0.5s var(--ease-out);
+}
+.group:hover .ico-fit,
+:where(a, button, label, summary, [role="button"]):hover .ico-fit,
+.ico-live.ico-fit {
+  animation: ico-fit 0.5s var(--ease-out);
+}
 .group:hover .ico-tilt,
+:where(a, button, label, summary, [role="button"]):hover .ico-tilt,
 .ico-live.ico-tilt {
   animation: ico-tilt 0.9s ease-in-out;
 }
 .group:hover .ico-lift,
+:where(a, button, label, summary, [role="button"]):hover .ico-lift,
 .ico-live.ico-lift {
   animation: ico-lift 0.7s ease-in-out;
 }
 .group:hover .ico-type,
+:where(a, button, label, summary, [role="button"]):hover .ico-type,
 .ico-live.ico-type {
   animation: ico-type 0.5s ease-in-out 2;
 }
 .group:hover .ico-scan,
+:where(a, button, label, summary, [role="button"]):hover .ico-scan,
 .ico-live.ico-scan {
   animation: ico-scan 1.1s ease-in-out;
 }
 .group:hover .ico-pop,
+:where(a, button, label, summary, [role="button"]):hover .ico-pop,
 .ico-live.ico-pop {
   animation: ico-pop 0.6s var(--ease-out);
 }
 .group:hover .ico-hue,
+:where(a, button, label, summary, [role="button"]):hover .ico-hue,
 .ico-live.ico-hue {
   animation: ico-hue 2.4s ease-in-out infinite;
 }
 .group:hover .ico-open,
+:where(a, button, label, summary, [role="button"]):hover .ico-open,
 .ico-live.ico-open {
   animation: ico-open 0.35s var(--ease-out) forwards;
 }
 .group:hover .ico-launch,
+:where(a, button, label, summary, [role="button"]):hover .ico-launch,
 .ico-live.ico-launch {
   animation: ico-launch 0.6s var(--ease-out);
 }
 .group:hover .ico-nudge,
+:where(a, button, label, summary, [role="button"]):hover .ico-nudge,
 .ico-live.ico-nudge {
   animation: ico-nudge 0.5s ease-in-out;
 }
 .group:hover .ico-shake,
+:where(a, button, label, summary, [role="button"]):hover .ico-shake,
 .ico-live.ico-shake {
   animation: ico-shake 0.5s ease-in-out;
 }
+/* The one motion with no hover trigger, deliberately. A tick means something
+   just succeeded, so it plays when it mounts — waiting for a hover would mean
+   the confirmation never animates for anyone who does not point at it. */
 .ico-check {
   animation: ico-check 0.4s var(--ease-out);
 }
 .group:hover .ico-grow,
+:where(a, button, label, summary, [role="button"]):hover .ico-grow,
 .ico-live.ico-grow {
   animation: ico-grow 0.7s ease-in-out;
 }

@@ -6,6 +6,7 @@ import type { IconType } from "react-icons";
 import { TbBolt, TbScale, TbTelescope, TbSparkles } from "react-icons/tb";
 import { MODE_LIST, MODES, type ModeId } from "@/lib/modes";
 import { cn } from "@/lib/utils";
+import { Ico } from "@/components/ui/ico";
 
 /** One icon per mode. Tabler, matching the navigation, so the set stays one
   * family rather than a fifth library imported for four glyphs. */
@@ -141,7 +142,7 @@ export function ModePicker({
                 </span>
               </span>
               {m.id === value ? (
-                <FiCheck size={14} className="mt-1 shrink-0 text-accent" />
+                <Ico icon={FiCheck} motion="check" size={14} className="mt-1 shrink-0 text-accent" />
               ) : null}
             </button>
           ))}

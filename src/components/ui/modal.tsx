@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { FiX } from "react-icons/fi";
 import { useMounted } from "@/lib/use-mounted";
 import { cn } from "@/lib/utils";
+import { Ico } from "@/components/ui/ico";
 
 /**
  * A centred dialog.
@@ -140,7 +141,7 @@ export function Modal({
             aria-label="Close"
             className="-mr-1 -mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-[6px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
           >
-            <FiX size={16} />
+            <Ico icon={FiX} motion="close" size={16} />
           </button>
         </div>
 

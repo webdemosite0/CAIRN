@@ -31,6 +31,7 @@ import { ThemeToggle } from "@/components/shell/theme";
 import { Drawer } from "@/components/mobile/drawer";
 import type { Balance } from "@/lib/credits";
 import { cn } from "@/lib/utils";
+import { Ico } from "@/components/ui/ico";
 
 /**
  * The mobile chrome: a thin top bar and a navigation drawer.
@@ -123,7 +124,7 @@ export function MobileShell({
             aria-haspopup="dialog"
             className="press grid h-10 w-10 shrink-0 place-items-center rounded-[10px] text-ink-3 transition-colors active:bg-hover"
           >
-            <TbLayoutSidebar size={21} />
+            <Ico icon={TbLayoutSidebar} motion="panel" size={21} />
           </button>
 
           {/* Redundant on the home screen, where the wordmark below is already
@@ -165,7 +166,7 @@ export function MobileShell({
             aria-label="Close navigation"
             className="press grid h-9 w-9 place-items-center rounded-[9px] text-ink-3 transition-colors active:bg-hover"
           >
-            <TbLayoutSidebar size={19} />
+            <Ico icon={TbLayoutSidebar} motion="panel" size={19} />
           </button>
         </div>
 
@@ -174,7 +175,7 @@ export function MobileShell({
             href="/chat"
             className="press flex h-12 items-center gap-2.5 rounded-[12px] border border-line bg-raised px-3.5 text-[15px] font-medium text-ink transition-colors active:bg-hover"
           >
-            <FiPlus size={18} className="text-accent" />
+            <Ico icon={FiPlus} motion="grow" size={18} className="text-accent" />
             New chat
           </Link>
         </div>
@@ -226,7 +227,7 @@ export function MobileShell({
                   aria-label="Sign out"
                   className="press grid h-9 w-9 place-items-center rounded-[9px] text-ink-4 transition-colors active:bg-hover"
                 >
-                  <TbLogout size={17} />
+                  <Ico icon={TbLogout} motion="exit" size={17} />
                 </button>
               </form>
             </div>
@@ -239,7 +240,7 @@ export function MobileShell({
               aria-label="Settings"
               className="press grid h-9 w-9 place-items-center rounded-[9px] text-ink-3 transition-colors active:bg-hover"
             >
-              <TbSettings size={19} />
+              <Ico icon={TbSettings} motion="spin" size={19} />
             </Link>
           </div>
         </div>

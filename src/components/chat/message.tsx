@@ -245,7 +245,7 @@ export function Message({
                   />
                 ) : (
                   <span className="grid h-8 w-8 place-items-center rounded-[5px] bg-sunk text-ink-3">
-                    <FiFile size={14} />
+                    <Ico icon={FiFile} motion="lift" size={14} />
                   </span>
                 )}
                 <span className="min-w-0">
