@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { FailureNote } from "@/components/ui/failure-note";
 import {
+  FiArrowLeft,
   FiDownload,
   FiExternalLink,
   FiMonitor,
@@ -19,7 +21,6 @@ import {
 import { TbWorld, TbPuzzle, TbTerminal2, TbCode, TbFiles } from "react-icons/tb";
 import { Composer } from "@/components/chat/composer";
 import { MobileComposer } from "@/components/mobile/composer";
-import { useNav } from "@/components/shell/nav-state";
 import { TroveOrb } from "@/components/brand/orb";
 import { Ico, type Motion } from "@/components/ui/ico";
 import { ActivityBox } from "@/components/builder/task-feed";
@@ -132,8 +133,6 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
   const [copied, setCopied] = useState(false);
   const [skillsOpen, setSkillsOpen] = useState(false);
   const [questionsOpen, setQuestionsOpen] = useState(false);
-
-  const { setCollapsed } = useNav();
 
   const nextLog = useRef(0);
   const feedEnd = useRef<HTMLDivElement>(null);
@@ -350,8 +349,6 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
     setError(null);
     setPane("console");
     setHalf("build");
-    // The preview is what matters from here; the nav is not.
-    setCollapsed(true);
     log(`building ${plan.title} — ${plan.steps.length} steps`);
 
     let current = files;
@@ -394,7 +391,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
         : `build complete — ${target.commands[0]} to run it`,
       "ok",
     );
-  }, [plan, busy, files, runStep, styleBrief, log, target, setCollapsed]);
+  }, [plan, busy, files, runStep, styleBrief, log, target]);
 
   /* ---------------- 4. edits ---------------- */
 
@@ -457,7 +454,6 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
 
   function reset() {
     abort.current?.abort();
-    setCollapsed(false);
     setPhase("idle");
     setPlan(null);
     setFiles([]);
@@ -475,7 +471,22 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
 
   if (phase === "idle") {
     return (
-      <div className="nx-in mx-auto flex min-h-screen max-w-[720px] flex-col justify-center px-5 py-16">
+      <div className="relative flex min-h-screen flex-col">
+        {/* The only way out.
+
+            The studio has no rail and no tab bar by design, so without this the
+            idle screen is a dead end — on a phone especially, where there is no
+            sidebar to fall back on. The workspace header carries the same link
+            once a project exists. */}
+        <Link
+          href="/chat"
+          className="group absolute left-3 top-3 z-10 flex items-center gap-2 rounded-[9px] px-2 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+        >
+          <Ico icon={FiArrowLeft} motion="back" size={15} />
+          Trove
+        </Link>
+
+        <div className="nx-in mx-auto flex w-full max-w-[720px] flex-1 flex-col justify-center px-5 py-16">
         <div className="mb-7 text-center">
           <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[12px] bg-accent/15 text-accent">
             <Ico icon={TbWorld} motion="spin" size={26} />
@@ -577,6 +588,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
         {error ? (
           <FailureNote error={error} className="mt-6" />
         ) : null}
+        </div>
       </div>
     );
   }
@@ -585,29 +597,107 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
 
   return (
     <div className="flex h-screen flex-col">
-      <header className="flex shrink-0 items-center gap-3 border-b border-line px-4 py-2.5">
-        <button onClick={reset} className="chip group !px-2.5 !py-1.5 !text-[12.5px]">
-          <Ico icon={FiRotateCcw} motion="spin" size={13} /> New
-        </button>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[14px] font-medium text-ink">
+      {/* The studio's own chrome. There is no app rail behind this screen, so
+          this bar carries everything: identity on the left, what you are
+          looking at in the middle, what you can do with it on the right.
+
+          Every control here is wired to something. A row of plausible icons
+          that do nothing is the fastest way to make a tool feel fake. */}
+      <header className="flex shrink-0 items-center gap-2 border-b border-line px-3 py-2">
+        <Link
+          href="/chat"
+          aria-label="Back to Trove"
+          className="group grid size-8 shrink-0 place-items-center rounded-[8px] transition-colors hover:bg-hover"
+        >
+          <TroveOrb size={22} state="idle" />
+        </Link>
+
+        <div className="flex min-w-0 items-baseline gap-2">
+          <p className="truncate text-[14px] font-semibold text-ink">
             {plan?.title ?? "New project"}
           </p>
-          <p className="truncate text-[11.5px] text-ink-4">{idea}</p>
+          {idea ? (
+            <p className="hidden min-w-0 truncate text-[12px] text-ink-4 xl:block">{idea}</p>
+          ) : null}
         </div>
+
+        <span className="flex-1" />
+
+        {/* What the right pane is showing. The segmented control is the
+            "Preview" pill from the reference, with the panes that exist. */}
+        <div className="flex items-center gap-0.5 rounded-[9px] border border-line bg-rail p-0.5">
+          {PANES.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setPane(p.id)}
+              aria-pressed={pane === p.id}
+              className={cn(
+                "group flex items-center gap-1.5 rounded-[7px] px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
+                pane === p.id ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
+              )}
+            >
+              <Ico icon={p.icon} motion={p.motion} size={14} active={pane === p.id} />
+              <span className="hidden sm:inline">{p.label}</span>
+              {p.id === "files" && files.length ? (
+                <span className="rounded-[4px] bg-sunk px-1 text-[10px] tabular-nums text-ink-4">
+                  {files.length}
+                </span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+
+        {pane === "preview" ? (
+          <div className="flex items-center gap-0.5 rounded-[9px] border border-line bg-rail p-0.5">
+            {(Object.keys(DEVICE) as (keyof typeof DEVICE)[]).map((d) => {
+              const D = DEVICE[d];
+              return (
+                <button
+                  key={d}
+                  onClick={() => setDevice(d)}
+                  aria-label={D.label}
+                  aria-pressed={device === d}
+                  className={cn(
+                    "grid size-7 place-items-center rounded-[7px] transition-colors",
+                    device === d ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
+                  )}
+                >
+                  <D.icon size={14} />
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setFiles((f) => [...f])}
+              aria-label="Reload preview"
+              className="grid size-7 place-items-center rounded-[7px] text-ink-4 transition-colors hover:text-ink-2"
+            >
+              <FiRefreshCw size={13} />
+            </button>
+          </div>
+        ) : null}
+
+        <button
+          onClick={reset}
+          className="chip group shrink-0 !px-2.5 !py-1.5 !text-[12.5px]"
+        >
+          <Ico icon={FiRotateCcw} motion="spin" size={13} />
+          <span className="hidden lg:inline">New</span>
+        </button>
         <button
           onClick={openTab}
           disabled={!preview}
-          className="chip group !px-3 !py-1.5 !text-[12.5px] disabled:opacity-40"
+          aria-label="Open in a new tab"
+          className="chip group shrink-0 !px-2.5 !py-1.5 !text-[12.5px] disabled:opacity-40"
         >
-          <Ico icon={FiExternalLink} motion="lift" size={13} /> Open
+          <Ico icon={FiExternalLink} motion="launch" size={13} />
         </button>
         <button
           onClick={download}
           disabled={!files.length}
-          className="chip group !px-3 !py-1.5 !text-[12.5px] disabled:opacity-40"
+          aria-label="Download the project"
+          className="chip group shrink-0 !px-2.5 !py-1.5 !text-[12.5px] disabled:opacity-40"
         >
-          <Ico icon={FiDownload} motion="lift" size={13} /> Download
+          <Ico icon={FiDownload} motion="down" size={13} />
         </button>
       </header>
 
@@ -635,193 +725,11 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
         </div>
       ) : null}
 
-      <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_400px]">
-        {/* ---------- left ---------- */}
+      <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(360px,440px)_minmax(0,1fr)]">
+        {/* ---------- conversation ---------- */}
         <section
           className={cn(
             "flex min-h-0 flex-col border-r border-line",
-            mobile && half !== "build" && "hidden",
-          )}
-        >
-          <div className="flex shrink-0 items-center gap-1 border-b border-line px-2 py-1.5">
-            {PANES.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setPane(p.id)}
-                className={cn(
-                  "group flex items-center gap-1.5 rounded-[6px] px-2.5 py-1.5 text-[12.5px] transition-colors",
-                  pane === p.id ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
-                )}
-              >
-                <Ico icon={p.icon} motion={p.motion} size={14} active={pane === p.id} />
-                {p.label}
-                {p.id === "files" && files.length ? (
-                  <span className="rounded-[4px] bg-sunk px-1 text-[10px] tabular-nums text-ink-4">
-                    {files.length}
-                  </span>
-                ) : null}
-              </button>
-            ))}
-
-            <span className="flex-1" />
-
-            {pane === "preview" ? (
-              <>
-                {(Object.keys(DEVICE) as (keyof typeof DEVICE)[]).map((d) => {
-                  const D = DEVICE[d];
-                  return (
-                    <button
-                      key={d}
-                      onClick={() => setDevice(d)}
-                      aria-label={D.label}
-                      className={cn(
-                        "grid h-7 w-7 place-items-center rounded-[6px] transition-colors",
-                        device === d ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
-                      )}
-                    >
-                      <D.icon size={14} />
-                    </button>
-                  );
-                })}
-                <button
-                  onClick={() => setFiles((f) => [...f])}
-                  aria-label="Reload preview"
-                  className="grid h-7 w-7 place-items-center rounded-[6px] text-ink-4 transition-colors hover:text-ink-2"
-                >
-                  <FiRefreshCw size={13} />
-                </button>
-              </>
-            ) : null}
-          </div>
-
-          <div className="min-h-0 flex-1 overflow-hidden bg-sunk">
-            {pane === "preview" && !target.previewable ? (
-              files.length ? (
-                <RunPanel target={target} fileCount={files.length} onDownload={download} />
-              ) : (
-                <div className="grid h-full place-items-center">
-                  <div className="text-center">
-                    <span className={cn(busy && "nx-thinking", "inline-grid place-items-center")}>
-                      <TroveOrb size={40} state={busy ? "working" : "idle"} />
-                    </span>
-                    <p className="mt-3 text-[13.5px] text-ink-3">
-                      {busy ? (
-                        <span className="nx-dots">Writing your {target.label}</span>
-                      ) : (
-                        "Nothing built yet."
-                      )}
-                    </p>
-                  </div>
-                </div>
-              )
-            ) : null}
-
-            {pane === "preview" && target.previewable ? (
-              preview ? (
-                <div className="h-full overflow-auto p-4">
-                  <iframe
-                    key={preview.length}
-                    title="Preview"
-                    srcDoc={preview}
-                    sandbox="allow-scripts allow-forms allow-modals allow-popups"
-                    className="nx-preview-in mx-auto h-full min-h-[560px] rounded-[8px] border border-line bg-white shadow-[var(--elev-lift)] transition-[width] duration-300 ease-out"
-                    style={{ width: DEVICE[device].w, maxWidth: "100%" }}
-                  />
-                </div>
-              ) : (
-                <div className="grid h-full place-items-center">
-                  <div className="text-center">
-                    <span className={cn(busy && "nx-thinking", "inline-grid place-items-center")}>
-                      <TroveOrb size={40} state={busy ? "working" : "idle"} />
-                    </span>
-                    <p className="mt-3 text-[13.5px] text-ink-3">
-                      {busy ? (
-                        <span className="nx-dots">Building your site</span>
-                      ) : (
-                        "Nothing built yet."
-                      )}
-                    </p>
-                  </div>
-                </div>
-              )
-            ) : null}
-
-            {pane === "files" ? (
-              <ul className="h-full overflow-auto p-3">
-                {files.length === 0 ? (
-                  <li className="text-[13px] text-ink-4">No files yet.</li>
-                ) : (
-                  files.map((f, i) => (
-                    <li
-                      key={f.path}
-                      className="nx-in"
-                      style={{ animationDelay: `${i * 40}ms`, animationFillMode: "backwards" }}
-                    >
-                      <button
-                        onClick={() => {
-                          setOpenFile(f.path);
-                          setPane("code");
-                        }}
-                        className="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[13px] text-ink-2 transition-colors hover:bg-hover"
-                      >
-                        <FiFile size={13} className="shrink-0 text-ink-4" />
-                        <span className="flex-1 truncate">{f.path}</span>
-                        <span className="shrink-0 text-[11px] tabular-nums text-ink-4">
-                          {(f.content.length / 1024).toFixed(1)} KB
-                        </span>
-                      </button>
-                    </li>
-                  ))
-                )}
-              </ul>
-            ) : null}
-
-            {pane === "code" ? (
-              <div className="flex h-full min-h-0 flex-col">
-                <div className="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-line px-2 py-1.5">
-                  {files.map((f) => (
-                    <button
-                      key={f.path}
-                      onClick={() => setOpenFile(f.path)}
-                      className={cn(
-                        "shrink-0 rounded-[5px] px-2 py-1 font-mono text-[11.5px] transition-colors",
-                        openFile === f.path ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
-                      )}
-                    >
-                      {f.path}
-                    </button>
-                  ))}
-                  <span className="flex-1" />
-                  <button
-                    onClick={() => {
-                      const f = files.find((x) => x.path === openFile);
-                      if (!f) return;
-                      navigator.clipboard?.writeText(f.content);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 1500);
-                    }}
-                    className="shrink-0 rounded-[5px] px-2 py-1 text-ink-4 hover:text-ink-2"
-                    aria-label="Copy file"
-                  >
-                    {copied ? <FiCheck size={13} className="text-positive" /> : <FiCopy size={13} />}
-                  </button>
-                </div>
-                <pre className="min-h-0 flex-1 overflow-auto p-3 font-mono text-[11.5px] leading-relaxed text-ink-2">
-                  {files.find((f) => f.path === openFile)?.content ?? "Select a file."}
-                </pre>
-              </div>
-            ) : null}
-
-            {pane === "console" ? (
-              <BuildConsole lines={logs} onClear={() => setLogs([])} className="h-full" />
-            ) : null}
-          </div>
-        </section>
-
-        {/* ---------- right ---------- */}
-        <section
-          className={cn(
-            "flex min-h-0 flex-col",
             mobile && half !== "chat" && "hidden",
           )}
         >
@@ -919,6 +827,143 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
               <TbPuzzle size={13} />
               {SKILL_LIST.length} skills available
             </button>
+          </div>
+        </section>
+
+        {/* ---------- preview, files, code, console ---------- */}
+        <section
+          className={cn(
+            "flex min-h-0 flex-col",
+            mobile && half !== "build" && "hidden",
+          )}
+        >
+
+          <div className="min-h-0 flex-1 overflow-hidden bg-sunk">
+            {pane === "preview" && !target.previewable ? (
+              files.length ? (
+                <RunPanel target={target} fileCount={files.length} onDownload={download} />
+              ) : (
+                <div className="grid h-full place-items-center">
+                  <div className="text-center">
+                    <span className={cn(busy && "nx-thinking", "inline-grid place-items-center")}>
+                      <TroveOrb size={40} state={busy ? "working" : "idle"} />
+                    </span>
+                    <p className="mt-3 text-[13.5px] text-ink-3">
+                      {busy ? (
+                        <span className="nx-dots">Writing your {target.label}</span>
+                      ) : (
+                        "Nothing built yet."
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )
+            ) : null}
+
+            {pane === "preview" && target.previewable ? (
+              preview ? (
+                // Inset, rounded and lifted off the ground: the page being
+                // built reads as an object on a surface rather than as part of
+                // the tool's own chrome. It matters here because the preview is
+                // white and the studio is dark — without the gap they meet at a
+                // hard edge and the site looks like a panel of the app.
+                <div className="h-full overflow-auto p-3">
+                  <iframe
+                    key={preview.length}
+                    title="Preview"
+                    srcDoc={preview}
+                    sandbox="allow-scripts allow-forms allow-modals allow-popups"
+                    className="nx-preview-in mx-auto h-full min-h-[560px] rounded-[12px] border border-line bg-white shadow-[0_20px_60px_-24px_rgba(0,0,0,0.7)] transition-[width] duration-300 ease-out"
+                    style={{ width: DEVICE[device].w, maxWidth: "100%" }}
+                  />
+                </div>
+              ) : (
+                <div className="grid h-full place-items-center">
+                  <div className="text-center">
+                    <span className={cn(busy && "nx-thinking", "inline-grid place-items-center")}>
+                      <TroveOrb size={40} state={busy ? "working" : "idle"} />
+                    </span>
+                    <p className="mt-3 text-[13.5px] text-ink-3">
+                      {busy ? (
+                        <span className="nx-dots">Building your site</span>
+                      ) : (
+                        "Nothing built yet."
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )
+            ) : null}
+
+            {pane === "files" ? (
+              <ul className="h-full overflow-auto p-3">
+                {files.length === 0 ? (
+                  <li className="text-[13px] text-ink-4">No files yet.</li>
+                ) : (
+                  files.map((f, i) => (
+                    <li
+                      key={f.path}
+                      className="nx-in"
+                      style={{ animationDelay: `${i * 40}ms`, animationFillMode: "backwards" }}
+                    >
+                      <button
+                        onClick={() => {
+                          setOpenFile(f.path);
+                          setPane("code");
+                        }}
+                        className="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[13px] text-ink-2 transition-colors hover:bg-hover"
+                      >
+                        <FiFile size={13} className="shrink-0 text-ink-4" />
+                        <span className="flex-1 truncate">{f.path}</span>
+                        <span className="shrink-0 text-[11px] tabular-nums text-ink-4">
+                          {(f.content.length / 1024).toFixed(1)} KB
+                        </span>
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>
+            ) : null}
+
+            {pane === "code" ? (
+              <div className="flex h-full min-h-0 flex-col">
+                <div className="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-line px-2 py-1.5">
+                  {files.map((f) => (
+                    <button
+                      key={f.path}
+                      onClick={() => setOpenFile(f.path)}
+                      className={cn(
+                        "shrink-0 rounded-[5px] px-2 py-1 font-mono text-[11.5px] transition-colors",
+                        openFile === f.path ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
+                      )}
+                    >
+                      {f.path}
+                    </button>
+                  ))}
+                  <span className="flex-1" />
+                  <button
+                    onClick={() => {
+                      const f = files.find((x) => x.path === openFile);
+                      if (!f) return;
+                      navigator.clipboard?.writeText(f.content);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 1500);
+                    }}
+                    className="shrink-0 rounded-[5px] px-2 py-1 text-ink-4 hover:text-ink-2"
+                    aria-label="Copy file"
+                  >
+                    {copied ? <FiCheck size={13} className="text-positive" /> : <FiCopy size={13} />}
+                  </button>
+                </div>
+                <pre className="min-h-0 flex-1 overflow-auto p-3 font-mono text-[11.5px] leading-relaxed text-ink-2">
+                  {files.find((f) => f.path === openFile)?.content ?? "Select a file."}
+                </pre>
+              </div>
+            ) : null}
+
+            {pane === "console" ? (
+              <BuildConsole lines={logs} onClear={() => setLogs([])} className="h-full" />
+            ) : null}
           </div>
         </section>
       </div>
