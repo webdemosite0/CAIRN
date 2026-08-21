@@ -1,5 +1,6 @@
 import { one, isRemote, ephemeral } from "@/lib/db";
 import { providerChain } from "@/lib/ai";
+import { searchProvider } from "@/lib/search";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,6 +23,10 @@ export async function GET() {
     // reporting: a deployment running entirely on a fallback still looks
     // healthy from the outside, and the bill arrives from somewhere else.
     aiProviders: providerChain(),
+    // Which index answers a "what is happening now" question. Wikipedia is
+    // the keyless floor, so this reporting "Wikipedia" means no real web
+    // search is configured — not that search is broken.
+    searchProvider: searchProvider(),
     tursoUrl: Boolean(process.env.TURSO_DATABASE_URL?.trim()),
     tursoToken: Boolean(process.env.TURSO_AUTH_TOKEN?.trim()),
     siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL?.trim()),

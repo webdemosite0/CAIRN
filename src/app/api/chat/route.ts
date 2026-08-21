@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
     // Collected during the stream and appended after it, the same way the
     // tool route does it — the client renders markdown, so no extra protocol.
     let sources: Source[] = [];
+    const searches: { query: string; provider: string; count: number }[] = [];
 
     const stream = await streamText({
       onUsage: (u) =>
@@ -97,16 +98,33 @@ export async function POST(req: NextRequest) {
       onSources: (s) => {
         sources = s;
       },
+      // Fires when Trove ran the search itself (function calling) rather than
+      // Google running it inside the call. Recorded so the answer can still
+      // say where it looked, which is the whole point of searching.
+      onSearch: (query, provider, count) => {
+        searches.push({ query, provider, count });
+      },
     });
 
     const withSources = stream.pipeThrough(
       new TransformStream<Uint8Array, Uint8Array>({
         flush(controller) {
-          if (!sources.length) return;
-          const lines = sources.map((s) => `- [${s.title}](${s.url})`).join("\n");
-          controller.enqueue(
-            new TextEncoder().encode(`\n\n---\n**Sources**\n${lines}\n`),
-          );
+          // Google's own grounding reports the pages it used; a search Trove
+          // ran reports the query. Either way the reader gets to see that the
+          // answer came from a lookup rather than from memory.
+          if (sources.length) {
+            const lines = sources.map((s) => `- [${s.title}](${s.url})`).join("\n");
+            controller.enqueue(
+              new TextEncoder().encode(`\n\n---\n**Sources**\n${lines}\n`),
+            );
+            return;
+          }
+          if (searches.length) {
+            const lines = searches
+              .map((s) => `- Searched ${s.provider} for "${s.query}" — ${s.count} results`)
+              .join("\n");
+            controller.enqueue(new TextEncoder().encode(`\n\n---\n${lines}\n`));
+          }
         },
       }),
     );

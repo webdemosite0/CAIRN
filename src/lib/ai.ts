@@ -2,6 +2,7 @@ import "server-only";
 import {
   streamText as geminiStream,
   generateText as geminiGenerate,
+  streamWithSearch as geminiSearchStream,
   type Turn,
   type Usage,
   type OnUsage,
@@ -218,36 +219,84 @@ export async function streamText(
      */
     systemWithoutSearch?: string;
     onSources?: OnSources;
+    /** Fires for each search Trove runs itself, for logging and citations. */
+    onSearch?: (query: string, provider: string, count: number) => void;
   },
 ): Promise<ReadableStream<Uint8Array>> {
   const temperature = opts.temperature ?? 0.7;
   const maxOutputTokens = opts.maxOutputTokens ?? 4096;
 
-  // Skip a grounded attempt that recent evidence says will be refused.
-  const grounded = { ...opts, search: Boolean(opts.search) && groundingAvailable() };
+  /**
+   * Three ways to answer a question that needs current information, in
+   * descending order of quality, and the rules for moving between them.
+   *
+   *   1. Gemini grounding — Google runs the search inside the call, against
+   *      its own index. Best answers, and Trove touches no network itself.
+   *      Metered separately from the model and refused on a free key.
+   *   2. Function calling — the model asks, Trove runs the search through
+   *      lib/search.ts, the model answers from the results. Not metered like
+   *      grounding, so this works where (1) does not; the index is whatever
+   *      provider is configured.
+   *   3. No web access — say the information may be stale and date it.
+   *
+   * The important part is that (2) sits between them. Going straight from a
+   * refused grounding to (3) is what produced "my information may be out of
+   * date" for a question the web could have answered outright.
+   */
+  const wantSearch = Boolean(opts.search);
+  const tryGrounding = wantSearch && groundingAvailable();
+
   const ungrounded = {
     ...opts,
     search: false,
     system: opts.systemWithoutSearch ?? opts.system,
   };
 
+  const toolSearch = () =>
+    geminiSearchStream({
+      turns: opts.turns,
+      system: opts.system,
+      temperature,
+      maxOutputTokens,
+      extraParts: opts.extraParts,
+      onUsage: opts.onUsage,
+      onSearch: opts.onSearch,
+    });
+
+  // Grounding was refused recently, so do not spend a round trip rediscovering
+  // that. Straight to (2) — which still has web access, unlike (3).
+  if (wantSearch && !tryGrounding) {
+    try {
+      return await toolSearch();
+    } catch (e) {
+      console.warn("ai: tool search failed —", errText(e).slice(0, 200));
+    }
+  }
+
   let first: unknown;
   try {
-    return await geminiStream(grounded.search ? grounded : ungrounded);
+    return await geminiStream(tryGrounding ? { ...opts, search: true } : ungrounded);
   } catch (e) {
     first = e;
   }
 
-  // Grounding is metered separately and far more tightly than the model. If
-  // only the tool was refused, ask again without it before giving up on
-  // Gemini entirely — see groundingMayBeTheProblem.
-  if (grounded.search && groundingMayBeTheProblem(errText(first))) {
-    noteGroundingRefused();
+  if (wantSearch && groundingMayBeTheProblem(errText(first))) {
+    if (tryGrounding) noteGroundingRefused();
+    if (tryGrounding) {
+      try {
+        console.warn("ai: grounding refused — searching via function calling instead");
+        return await toolSearch();
+      } catch (e2) {
+        console.warn("ai: tool search failed —", errText(e2).slice(0, 200));
+        first = e2;
+      }
+    }
+
     try {
-      console.warn("ai: grounding refused — retrying without web search");
+      console.warn("ai: answering without web access");
       return await geminiStream(ungrounded);
-    } catch (e2) {
-      first = e2;
+    } catch (e3) {
+      first = e3;
     }
   }
 
