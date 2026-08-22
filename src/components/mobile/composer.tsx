@@ -44,6 +44,7 @@ export function MobileComposer({
   mode,
   onModeChange,
   autoFocus = false,
+  initialValue = "",
 }: {
   onSend: (text: string, files?: Attachment[]) => void;
   disabled?: boolean;
@@ -51,8 +52,10 @@ export function MobileComposer({
   mode?: ModeId;
   onModeChange?: (id: ModeId) => void;
   autoFocus?: boolean;
+  /** Prefills the box — an idea typed before signing in, for instance. */
+  initialValue?: string;
 }) {
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState(initialValue);
   const [files, setFiles] = React.useState<Attachment[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const box = React.useRef<HTMLTextAreaElement>(null);

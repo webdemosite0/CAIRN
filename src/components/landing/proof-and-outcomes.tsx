@@ -119,7 +119,14 @@ function Plate({ kind }: { kind: string }) {
     );
   }
   return (
-    <span className={`${base} font-mono text-[7px] leading-[1.7] text-white/55`}>
+    // A picture of code, not code. At 7px and 55% alpha it is texture — it
+    // measures 1.04 against its backdrop and no one is meant to read it. Hidden
+    // from assistive tech because it was otherwise announced, inside a link, as
+    // four lines of meaningless source.
+    <span
+      aria-hidden
+      className={`${base} font-mono text-[7px] leading-[1.7] text-white/55`}
+    >
       <span className="block text-white/80">export function build() {"{"}</span>
       <span className="block pl-2">const files = plan()</span>
       <span className="block pl-2">return write(files)</span>

@@ -8,9 +8,9 @@ import { isMobile } from "@/lib/device";
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ c?: string }>;
+  searchParams: Promise<{ c?: string; q?: string }>;
 }) {
-  const { c } = await searchParams;
+  const { c, q } = await searchParams;
   const [saved, user, activity, mobile] = await Promise.all([
     c ? loadConversation(c) : Promise.resolve(null),
     currentUser(),
@@ -24,6 +24,14 @@ export default async function HomePage({
     restored: saved
       ? { id: saved.id, title: saved.title, messages: saved.messages }
       : null,
+    /**
+     * An idea typed on the landing page, carried through sign-in.
+     *
+     * Middleware puts the whole path and query into ?next=, and the auth form
+     * posts it back, so someone who typed a prompt before having an account
+     * finds it waiting in the composer rather than having to remember it.
+     */
+    draft: typeof q === "string" ? q.slice(0, 2000) : "",
   };
 
   /**

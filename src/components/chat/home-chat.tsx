@@ -17,6 +17,7 @@ export function HomeChat({
   restored = null,
   name = "there",
   activity = [],
+  draft: initialDraft = "",
 }: {
   /** A saved thread, when the URL carries ?c=<id>. */
   restored?: { id: string; title: string; messages: { role: "user" | "model"; text: string }[] } | null;
@@ -24,8 +25,10 @@ export function HomeChat({
   name?: string;
   /** Everything recent, across kinds, for the two panels below. */
   activity?: Recent[];
+  /** Prefills the composer, e.g. an idea typed before signing in. */
+  draft?: string;
 }) {
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState(initialDraft);
   const [mode, setMode] = useState<ModeId>(DEFAULT_MODE);
 
   // Transcript, streaming and saving live in the hook, shared with the

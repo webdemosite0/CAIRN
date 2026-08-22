@@ -54,6 +54,7 @@ export function MobileChat({
   restored = null,
   name = "there",
   activity = [],
+  draft: initialDraft = "",
 }: {
   restored?: {
     id: string;
@@ -62,6 +63,8 @@ export function MobileChat({
   } | null;
   name?: string;
   activity?: Recent[];
+  /** Prefills the composer, e.g. an idea typed before signing in. */
+  draft?: string;
 }) {
   const [mode, setMode] = React.useState<ModeId>(DEFAULT_MODE);
   const { turns, busy, error, send, retry, clear, bottom } = useChatThread({
@@ -89,6 +92,7 @@ export function MobileChat({
             disabled={busy}
             mode={mode}
             onModeChange={setMode}
+            initialValue={initialDraft}
           />
         </div>
 
