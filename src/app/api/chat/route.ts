@@ -18,7 +18,30 @@ user asks for depth. Use fenced code blocks for code.
 When a file is attached, work from its actual contents. If a file could not be
 read, say so plainly rather than guessing what it contained.`;
 
+/**
+ * Nothing here may return a bare 500.
+ *
+ * A 500 carries no body, so the failure card can only say "Request failed
+ * (500)" — which is indistinguishable from every other 500 and sends whoever
+ * is debugging it to the host's log, if they have one. The handler below
+ * returns a described error for everything it anticipates; this wrapper covers
+ * what it does not, so an unexpected exception still arrives as a sentence
+ * instead of a status code.
+ */
 export async function POST(req: NextRequest) {
+  try {
+    return await handle(req);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("chat route: unhandled —", message, e);
+    return Response.json(
+      { error: `The server failed to handle that: ${message}` },
+      { status: 500 },
+    );
+  }
+}
+
+async function handle(req: NextRequest) {
   let turns: Turn[];
   let attachments: Attachment[] = [];
   let mode: unknown;
@@ -52,7 +75,15 @@ export async function POST(req: NextRequest) {
         { status: 402 },
       );
     }
-    throw e;
+    // Anything else here is the database, not the model — the balance lookup
+    // is the first query a chat makes. Rethrowing turned that into a blank
+    // 500, which reads as "the AI is broken" when the AI was never reached.
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("chat route: could not read the credit balance —", message);
+    return Response.json(
+      { error: `Could not reach the database to check your credits: ${message}` },
+      { status: 503 },
+    );
   }
 
   const promptFor = (canSearch: boolean) =>

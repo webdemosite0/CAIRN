@@ -1,4 +1,5 @@
 import "server-only";
+import { webSearch, formatResults } from "@/lib/search";
 
 const API = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -609,7 +610,6 @@ async function runSearchRounds({
   onSearch?: (query: string, provider: string, count: number) => void;
   onUsage?: OnUsage;
 }): Promise<{ contents: Content[]; searched: boolean }> {
-  const { webSearch, formatResults } = await import("@/lib/search");
   let searched = false;
 
   for (let round = 0; round < MAX_SEARCH_ROUNDS; round++) {

@@ -120,7 +120,15 @@ export async function POST(req: NextRequest) {
         { status: 402 },
       );
     }
-    throw e;
+    // Not a credit problem, so it is the database — the balance lookup is
+    // the first query these routes make. Rethrowing made an outage
+    // indistinguishable from a model failure, as a blank 500.
+    const why = e instanceof Error ? e.message : String(e);
+    console.error("missions/plan: credit check failed —", why);
+    return Response.json(
+      { error: `Could not reach the database to check your credits: ${why}` },
+      { status: 503 },
+    );
   }
 
   let reply: string;
