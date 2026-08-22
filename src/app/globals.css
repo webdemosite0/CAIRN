@@ -162,25 +162,25 @@
    only reversing the ramp keeps that true.
    ============================================================ */
 :root[data-theme="light"] {
-  --color-canvas: #ffffff;
-  --color-rail: #f7f7f9;
-  --color-sunk: #f4f4f7;
+  --color-canvas: #f7f6f3;
+  --color-rail: #fbfaf8;
+  --color-sunk: #f1efea;
   --color-raised: #ffffff;
-  --color-hover: #f0f0f4;
+  --color-hover: #edebe5;
 
-  --color-ink: #000000;
-  --color-ink-2: #000000;
-  --color-ink-3: #0a0c10;
-  --color-ink-4: #2b2f38;
+  --color-ink: #101014;
+  --color-ink-2: #101014;
+  --color-ink-3: #3f3f4a;
+  --color-ink-4: #63636f;
 
-  --color-line: #e6e6ec;
-  --color-line-strong: #d5dbe4;
+  --color-line: #e6e3dc;
+  --color-line-strong: #d6d2c8;
 
   /* Darker, saturated variants — the dark-mode hues are pastels tuned to glow
      on black and go muddy on white. */
-  --color-accent: #1d4ed8;
-  --color-accent-soft: #eaf2ff;
-  --color-violet: #2563eb;
+  --color-accent: #4f46e5;
+  --color-accent-soft: #eeecfd;
+  --color-violet: #6366f1;
   --color-positive: #0b6553;
   --color-positive-soft: #e8f7f3;
   --color-caution: #9a6700;
@@ -192,10 +192,10 @@
   --ground: #ffffff;
   --scrollbar: #cdd4e0;
   --scrollbar-hover: #b4bdcd;
-  --selection: #d6e6ff;
+  --selection: #e0ddfb;
   --selection-ink: #1a1f36;
-  --wordmark-from: #1a1f36;
-  --wordmark-to: #1d4ed8;
+  --wordmark-from: #101014;
+  --wordmark-to: #4f46e5;
   --chip-hover-line: #c3cad6;
   --shimmer: rgb(26 31 54 / 0.05);
   --grid-line: rgb(26 31 54 / 0.04);
@@ -207,9 +207,9 @@
   --sweep-hi: #2563eb;
   --grad-sky: rgb(226 235 255 / 0.35);
   --floor: rgb(26 31 54 / 0.04);
-  --aurora-a: rgb(37 99 235 / 0.13);
-  --aurora-b: rgb(96 165 250 / 0.11);
-  --aurora-c: rgb(0 191 191 / 0.08);
+  --aurora-a: rgb(79 70 229 / 0.10);
+  --aurora-b: rgb(99 102 241 / 0.09);
+  --aurora-c: rgb(129 140 248 / 0.07);
   --tint-darken: 50%;
   /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
   --sx-plain: #1f2430;
@@ -227,17 +227,17 @@
   --tag-e: #875616;
   --tag-f: #ad2b48;
   --bezel: rgb(255 255 255 / 0.9);
-  --grad-text-from: #1d4ed8;
-  --grad-text-to: #0d8fc4;
-  --btn-a: #2563eb;
-  --btn-b: #1d4ed8;
+  --grad-text-from: #4f46e5;
+  --grad-text-to: #6366f1;
+  --btn-a: #4f46e5;
+  --btn-b: #4338ca;
   --btn-ink: #ffffff;
-  --btn-glow: rgb(37 99 235 / 0.24);
+  --btn-glow: rgb(79 70 229 / 0.26);
 
   /* Same ring in both themes, so a focused control is recognisably the same
      control. Slightly stronger here because it sits on white. */
-  --focus-ring: rgb(37 99 235 / 0.24);
-  --focus-line: rgb(37 99 235 / 0.85);
+  --focus-ring: rgb(79 70 229 / 0.24);
+  --focus-line: rgb(79 70 229 / 0.85);
   --bezel-under: rgb(26 31 54 / 0.05);
   --bezel-ring: rgb(26 31 54 / 0.035);
   --hairline: rgb(26 31 54 / 0.16);
@@ -254,20 +254,20 @@
    palette — which is dark — applies again. */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --color-canvas: #ffffff;
-    --color-rail: #f7f7f9;
-    --color-sunk: #f4f4f7;
+    --color-canvas: #f7f6f3;
+    --color-rail: #fbfaf8;
+    --color-sunk: #f1efea;
     --color-raised: #ffffff;
-    --color-hover: #f0f0f4;
-    --color-ink: #000000;
-    --color-ink-2: #000000;
-    --color-ink-3: #0a0c10;
-    --color-ink-4: #2b2f38;
-    --color-line: #e6e6ec;
-    --color-line-strong: #d5dbe4;
-    --color-accent: #1d4ed8;
-    --color-accent-soft: #eaf2ff;
-    --color-violet: #2563eb;
+    --color-hover: #edebe5;
+    --color-ink: #101014;
+    --color-ink-2: #101014;
+    --color-ink-3: #3f3f4a;
+    --color-ink-4: #63636f;
+    --color-line: #e6e3dc;
+    --color-line-strong: #d6d2c8;
+    --color-accent: #4f46e5;
+    --color-accent-soft: #eeecfd;
+    --color-violet: #6366f1;
     --color-positive: #0b6553;
     --color-positive-soft: #e8f7f3;
     --color-caution: #9a6700;
@@ -277,10 +277,10 @@
     --ground: #ffffff;
     --scrollbar: #cdd4e0;
     --scrollbar-hover: #b4bdcd;
-    --selection: #d6e6ff;
+    --selection: #e0ddfb;
     --selection-ink: #1a1f36;
-    --wordmark-from: #1a1f36;
-    --wordmark-to: #1d4ed8;
+    --wordmark-from: #101014;
+    --wordmark-to: #4f46e5;
     --chip-hover-line: #c3cad6;
     --shimmer: rgb(26 31 54 / 0.05);
     --grid-line: rgb(26 31 54 / 0.04);
@@ -292,9 +292,9 @@
     --sweep-hi: #2563eb;
     --grad-sky: rgb(226 235 255 / 0.35);
     --floor: rgb(26 31 54 / 0.04);
-    --aurora-a: rgb(37 99 235 / 0.13);
-    --aurora-b: rgb(96 165 250 / 0.11);
-    --aurora-c: rgb(0 191 191 / 0.08);
+    --aurora-a: rgb(79 70 229 / 0.10);
+    --aurora-b: rgb(99 102 241 / 0.09);
+    --aurora-c: rgb(129 140 248 / 0.07);
     --tint-darken: 50%;
     /* Darker, saturated tokens — the dark palette goes pastel-on-white. */
     --sx-plain: #1f2430;
@@ -312,12 +312,17 @@
     --tag-e: #875616;
     --tag-f: #ad2b48;
     --bezel: rgb(255 255 255 / 0.9);
-    --grad-text-from: #1d4ed8;
-    --grad-text-to: #0d8fc4;
-    --btn-a: #2563eb;
-    --btn-b: #1d4ed8;
+    --grad-text-from: #4f46e5;
+    --grad-text-to: #6366f1;
+    --btn-a: #4f46e5;
+    --btn-b: #4338ca;
     --btn-ink: #ffffff;
-    --btn-glow: rgb(37 99 235 / 0.24);
+    --btn-glow: rgb(79 70 229 / 0.26);
+    /* These were absent here while present in [data-theme="light"], so a
+       reader on OS-light who never touched the toggle got the dark focus ring
+       on a light page. The blocks are meant to be identical. */
+    --focus-ring: rgb(79 70 229 / 0.24);
+    --focus-line: rgb(79 70 229 / 0.85);
     --bezel-under: rgb(26 31 54 / 0.05);
     --bezel-ring: rgb(26 31 54 / 0.035);
     --hairline: rgb(26 31 54 / 0.16);
