@@ -12,6 +12,7 @@ import {
   FiTablet,
   FiRefreshCw,
   FiCheck,
+  FiChevronDown,
   FiCopy,
   FiRotateCcw,
   FiFile,
@@ -130,6 +131,8 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
   const [half, setHalf] = useState<"build" | "chat">("chat");
   const [device, setDevice] = useState<keyof typeof DEVICE>("desktop");
   const [openFile, setOpenFile] = useState("index.html");
+  // Which page the preview renders. See `pages` below.
+  const [page, setPage] = useState("index.html");
   const [copied, setCopied] = useState(false);
   const [skillsOpen, setSkillsOpen] = useState(false);
   const [questionsOpen, setQuestionsOpen] = useState(false);
@@ -152,9 +155,27 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
   }, []);
 
   const target = useMemo(() => targetFor(targetId), [targetId]);
+  /**
+   * Every page the project actually has.
+   *
+   * `bundle` already took an entry file and nothing ever passed one, so the
+   * preview was permanently stuck on index.html even when the model had
+   * written four pages. This is the page switcher the reference shows — the
+   * difference being that these entries are the real files, so the list is
+   * empty on a one-page site rather than showing a control with one option.
+   */
+  const pages = useMemo(
+    () => files.filter((f) => f.path.endsWith(".html")).map((f) => f.path),
+    [files],
+  );
+
+  // Falls back to index.html whenever the chosen page is not among them —
+  // a rebuild can replace the file set entirely.
+  const entry = pages.includes(page) ? page : (pages[0] ?? "index.html");
+
   const preview = useMemo(
-    () => (target.previewable ? bundle(files) : ""),
-    [files, target.previewable],
+    () => (target.previewable ? bundle(files, entry) : ""),
+    [files, target.previewable, entry],
   );
 
   /** The task currently running, shown inside the active step. */
@@ -674,6 +695,34 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
               <FiRefreshCw size={13} />
             </button>
           </div>
+        ) : null}
+
+        {/* Which page is on screen.
+
+            Only rendered once the project actually has more than one HTML
+            file. A dropdown with a single entry is furniture — it looks like a
+            capability and does nothing, which is exactly the impression a tool
+            cannot afford to give. */}
+        {pane === "preview" && pages.length > 1 ? (
+          <label className="relative flex shrink-0 items-center">
+            <span className="sr-only">Page to preview</span>
+            <select
+              value={entry}
+              onChange={(e) => setPage(e.target.value)}
+              className="h-8 cursor-pointer appearance-none rounded-[9px] border border-line bg-rail pl-2.5 pr-7 text-[12.5px] font-medium text-ink outline-none transition-colors hover:bg-hover focus:border-accent"
+            >
+              {pages.map((p) => (
+                <option key={p} value={p}>
+                  {p.replace(/\.html$/, "").replace(/^index$/, "Home")}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown
+              size={13}
+              aria-hidden
+              className="pointer-events-none absolute right-2 text-ink-4"
+            />
+          </label>
         ) : null}
 
         <button
