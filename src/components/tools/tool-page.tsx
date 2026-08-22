@@ -1,6 +1,7 @@
 "use client";
 
 import { Ico } from "@/components/ui/ico";
+import { StudioBack } from "@/components/shell/studio-back";
 import { localTimeZone } from "@/lib/context";
 import { FailureNote } from "@/components/ui/failure-note";
 import { useRef, useState } from "react";
@@ -122,7 +123,9 @@ export function ToolPage({
 
   if (!prompt) {
     return (
-      <div className="nx-in mx-auto flex min-h-screen max-w-[780px] flex-col justify-center px-5 py-16">
+      <div className="relative flex min-h-screen flex-col">
+        <StudioBack className="absolute left-3 top-3 z-10" />
+        <div className="nx-in mx-auto flex w-full max-w-[780px] flex-1 flex-col justify-center px-5 py-16">
         <div className="mb-7 flex flex-col items-center text-center">
           <span
             className="mb-4 grid h-14 w-14 place-items-center rounded-[12px]"
@@ -159,6 +162,7 @@ export function ToolPage({
           items={recents}
           onPick={run}
         />
+        </div>
       </div>
     );
   }
@@ -167,6 +171,7 @@ export function ToolPage({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-[820px] flex-col px-5 py-8 lg:px-8">
+      <StudioBack className="-ml-2 mb-3 self-start" />
       <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="mb-1 flex items-center gap-2 text-[12px] uppercase tracking-[0.08em] text-ink-4">

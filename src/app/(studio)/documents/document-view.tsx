@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { StudioBack } from "@/components/shell/studio-back";
 import { localTimeZone } from "@/lib/context";
 import {
   FiDownload,
@@ -174,7 +175,8 @@ export function DocumentView({
 
   if (!prompt) {
     return (
-      <div className="nx-in mx-auto flex min-h-screen max-w-[760px] flex-col justify-center px-5 py-16">
+      <div className="nx-in relative mx-auto flex min-h-screen max-w-[760px] flex-col justify-center px-5 py-16">
+        <StudioBack className="absolute left-0 top-6" />
         <div className="mb-7 text-center">
           <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[12px] bg-accent/15 text-accent">
             <Ico icon={FiFileText} motion="lift" size={26} />
@@ -210,6 +212,7 @@ export function DocumentView({
   return (
     <div className="min-h-screen">
       <header className="nx-no-print sticky top-0 z-20 flex flex-wrap items-center gap-3 border-b border-line bg-canvas/90 px-5 py-3 backdrop-blur-md lg:px-6">
+        <StudioBack className="-ml-2" label="" />
         <div className="min-w-0 flex-1">
           <p className="text-[11.5px] uppercase tracking-[0.08em] text-ink-4">Documents</p>
           <h1 className="truncate text-[15px] font-medium text-ink">{prompt}</h1>

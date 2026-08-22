@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import {
-  FiPaperclip,
   FiArrowUp,
   FiLoader,
   FiX,
@@ -14,6 +13,7 @@ import {
 import { Ico } from "@/components/ui/ico";
 import { useVoice } from "@/components/chat/use-voice";
 import { ModePicker } from "@/components/chat/mode-picker";
+import { AttachMenu } from "@/components/chat/attach-menu";
 import type { ModeId } from "@/lib/modes";
 import {
   MAX_FILES,
@@ -234,6 +234,12 @@ export function Composer({
           compact ? "gap-1.5 px-2 pb-2" : "gap-2 border-t border-line/70 px-3.5 py-3",
         )}
       >
+        {/* Controls are icons, not words.
+
+            "Attach" and "Voice" spelled out took most of the row and said
+            nothing a paperclip and a microphone do not. The mode picker keeps
+            its label on purpose — it is the one control whose current *value*
+            matters before you click it, and an icon cannot say "Balanced". */}
         {allowAttachments ? (
           <>
             <input
@@ -246,42 +252,21 @@ export function Composer({
                 e.target.value = "";
               }}
             />
-            <button
-              onClick={() => picker.current?.click()}
+            <AttachMenu
               disabled={disabled}
-              aria-label="Attach files"
-              title="Attach images, PDFs, text or code"
-              className={cn(
-                "group flex shrink-0 items-center gap-1.5 rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40",
-                compact ? "h-7 w-7 justify-center" : "h-9 px-2.5",
-              )}
-            >
-              <Ico icon={FiPaperclip} motion="nudge" size={compact ? 15 : 16} />
-              {!compact ? <span className="text-[13px]">Attach</span> : null}
-            </button>
+              compact={compact}
+              onPick={(accept) => {
+                // Set on the shared input rather than rendering four of them,
+                // so the picker opens filtered to what was chosen.
+                if (picker.current) {
+                  if (accept) picker.current.accept = accept;
+                  else picker.current.removeAttribute("accept");
+                  picker.current.click();
+                }
+              }}
+            />
           </>
         ) : null}
-
-        <button
-            onClick={voice.toggle}
-            disabled={disabled}
-            aria-label={voice.listening ? "Stop dictating" : "Dictate a message"}
-            aria-pressed={voice.listening}
-            title={voice.listening ? "Listening — click to stop" : "Speak your message"}
-            className={cn(
-              "group relative flex shrink-0 items-center gap-1.5 rounded-[8px] transition-colors disabled:opacity-40",
-              compact ? "h-7 w-7 justify-center" : "h-9 px-2.5",
-              voice.listening
-                ? "bg-critical/15 text-critical"
-                : "text-ink-3 hover:bg-hover hover:text-ink",
-            )}
-          >
-            {voice.listening ? (
-              <span className="nx-pulse absolute inset-0 rounded-full bg-critical/20" />
-            ) : null}
-          <Ico icon={FiMic} motion="pop" size={compact ? 14 : 16} live={voice.listening} />
-          {!compact ? <span className="text-[13px]">Voice</span> : null}
-        </button>
 
         {mode && onModeChange ? (
           <ModePicker
@@ -294,12 +279,34 @@ export function Composer({
 
         {leading}
 
+        <span className="flex-1" />
+
+        <button
+          onClick={voice.toggle}
+          disabled={disabled}
+          aria-label={voice.listening ? "Stop dictating" : "Dictate a message"}
+          aria-pressed={voice.listening}
+          title={voice.listening ? "Listening — click to stop" : "Speak your message"}
+          className={cn(
+            "group relative grid shrink-0 place-items-center rounded-full transition-colors disabled:opacity-40",
+            compact ? "size-7" : "size-9",
+            voice.listening
+              ? "bg-critical/15 text-critical"
+              : "text-ink-3 hover:bg-hover hover:text-ink",
+          )}
+        >
+          {voice.listening ? (
+            <span className="nx-pulse absolute inset-0 rounded-full bg-critical/20" />
+          ) : null}
+          <Ico icon={FiMic} motion="pop" size={compact ? 14 : 17} live={voice.listening} />
+        </button>
+
         <button
           onClick={send}
           disabled={!ready}
           aria-label="Send message"
           className={cn(
-            "group ml-auto grid shrink-0 place-items-center rounded-full transition-all duration-200",
+            "group grid shrink-0 place-items-center rounded-full transition-all duration-200",
             compact ? "h-8 w-8" : "h-12 w-12",
             ready ? "btn-grad hover:scale-105" : "bg-raised text-ink-4",
           )}

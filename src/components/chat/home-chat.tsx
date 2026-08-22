@@ -45,27 +45,27 @@ export function HomeChat({
         {/* No upsell banner here: /plans has no payment processor wired up, so
             "Unlock unlimited builds" would promise something it cannot do. */}
 
-        <div className="relative flex flex-1 flex-col items-center px-5 pb-16 pt-10 lg:pt-14">
-          <div className="w-full max-w-[1140px]">
-            {/* The wordmark used to sit here at 58px. The reader is already
-                inside Trove, so a logo the size of a headline was telling them
-                where they are instead of what to do next. */}
-            <div className="nx-rise mb-2">
+        {/* Centred, and vertically weighted around the composer.
+
+            Left-aligned, the hero read as the top of a document with a form
+            under it — the eye started at the corner and had to find the box.
+            Centring puts the one thing worth doing at the optical middle of an
+            empty screen, which is what every tool of this kind does and why
+            they all feel like they are waiting for you. */}
+        <div className="relative flex flex-1 flex-col items-center px-5 pb-14 pt-[8vh] lg:pt-[11vh]">
+          <div className="w-full max-w-[820px] text-center">
+            <div className="nx-rise">
               <Greeting name={name} />
-              <h1 className="mt-2 text-[clamp(2.125rem,1.4rem+1.9vw,3rem)] font-semibold leading-[1.05] tracking-tight text-ink">
+              <h1 className="mt-2.5 text-[clamp(2.25rem,1.3rem+2.6vw,3.5rem)] font-semibold leading-[1.03] tracking-[-0.02em] text-ink">
                 What will you build today?
               </h1>
-              <p className="mt-3 max-w-[52ch] text-[16.5px] leading-relaxed text-ink-3">
+              <p className="mx-auto mt-3.5 max-w-[46ch] text-[16.5px] leading-relaxed text-ink-3">
                 Describe an idea, automate a task, or create something new.
               </p>
             </div>
 
-            {/* 36px, so the composer reads as the continuation of the hero
-                rather than a separate block below it. Capped at 1000px: the
-                column is wider than that on a large screen, and a composer
-                spanning the full width stops reading as one object. */}
             <div
-              className="nx-rise mt-9 max-w-[1000px]"
+              className="nx-rise mt-8 text-left"
               style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
             >
               {/* Keyed by the draft so a starter card refills an existing
@@ -81,20 +81,24 @@ export function HomeChat({
               />
             </div>
 
-            {/* One row of starters, not two. QuickActions and StarterCards
-                were both "ways to begin something" stacked on top of each
-                other, which made the page long without making it more
-                useful. These fill the composer, so the next thing you do is
-                still typing rather than navigating away. */}
-            <StarterCards className="mt-8" onPick={setDraft} />
-
-            {/* One list of recent work, not two panels of it. */}
-            <div className="mt-10">
-              <ContinuePanel items={activity} />
-            </div>
+            {/* Starters fill the composer rather than navigating away, so the
+                next thing you do is still typing. */}
+            <StarterCards className="mt-7" onPick={setDraft} />
 
             {error ? <ErrorNote message={error} onRetry={retry} /> : null}
           </div>
+
+          {/* Recent work sits below the fold-ish and wider than the hero: it is
+              for the second visit onward, and should not compete with the
+              composer on the first. */}
+          {activity.length ? (
+            <div
+              className="nx-rise mt-16 w-full max-w-[1140px] text-left"
+              style={{ animationDelay: "220ms", animationFillMode: "backwards" }}
+            >
+              <ContinuePanel items={activity} />
+            </div>
+          ) : null}
         </div>
 
       </div>
