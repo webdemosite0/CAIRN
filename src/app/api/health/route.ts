@@ -1,7 +1,7 @@
 import { one, isRemote, ephemeral } from "@/lib/db";
 import { providerChain } from "@/lib/ai";
 import { searchProvider } from "@/lib/search";
-import { mailTransport } from "@/lib/mail";
+import { mailTransport, mailFallback } from "@/lib/mail";
 import { site } from "@/lib/site";
 
 export const runtime = "nodejs";
@@ -36,6 +36,7 @@ export async function GET() {
     // The name of a transport is not a secret; the credentials are, and none
     // of them are here.
     mail: mailTransport(),
+    mailFallback: mailFallback(),
     tursoUrl: Boolean(process.env.TURSO_DATABASE_URL?.trim()),
     tursoToken: Boolean(process.env.TURSO_AUTH_TOKEN?.trim()),
     // Both names, because the variable was renamed and the old one is still

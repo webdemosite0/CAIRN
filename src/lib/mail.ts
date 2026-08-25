@@ -36,18 +36,20 @@ import { site } from "@/lib/site";
 
 type Transport = "resend" | "smtp" | "none";
 
+function smtpConfigured(): boolean {
+  return Boolean(
+    process.env.SMTP_HOST?.trim() &&
+      process.env.SMTP_USER?.trim() &&
+      process.env.SMTP_PASSWORD?.trim(),
+  );
+}
+
 function transport(): Transport {
   const from = process.env.MAIL_FROM?.trim();
   // MAIL_FROM is required either way: a message with no From is not a message.
   if (!from) return "none";
   if (process.env.RESEND_API_KEY?.trim()) return "resend";
-  if (
-    process.env.SMTP_HOST?.trim() &&
-    process.env.SMTP_USER?.trim() &&
-    process.env.SMTP_PASSWORD?.trim()
-  ) {
-    return "smtp";
-  }
+  if (smtpConfigured()) return "smtp";
   return "none";
 }
 
@@ -58,6 +60,16 @@ export function mailerConfigured(): boolean {
 /** Which one is live, for the setup screen and /api/health. */
 export function mailTransport(): Transport {
   return transport();
+}
+
+/**
+ * Whether a second transport is standing by if the first one fails.
+ *
+ * Surfaced so "resend" in the health output can be read correctly: with a
+ * backup present a stale key costs a retry, without one it costs the signup.
+ */
+export function mailFallback(): Transport | null {
+  return transport() === "resend" && smtpConfigured() ? "smtp" : null;
 }
 
 export interface MailResult {
@@ -87,7 +99,29 @@ export async function sendMail(opts: MailOptions): Promise<MailResult> {
     return { sent: false, reason: "not-configured" };
   }
 
-  return via === "resend" ? sendViaResend(opts) : sendViaSmtp(opts);
+  if (via === "smtp") return sendViaSmtp(opts);
+
+  const first = await sendViaResend(opts);
+  if (first.sent) return first;
+
+  /**
+   * Resend was chosen, Resend failed, and SMTP is also configured — so send it
+   * the other way rather than dropping the message.
+   *
+   * This is not theoretical. Setting up a mailbox while an older RESEND_API_KEY
+   * is still in the environment gives you a deployment that reports "resend",
+   * uses a key that may be stale or for an unverified domain, and silently
+   * fails to deliver the one email that lets people finish signing up. The
+   * working transport is sitting right there.
+   */
+  if (smtpConfigured()) {
+    console.warn("mail: resend failed, falling back to SMTP");
+    const second = await sendViaSmtp(opts);
+    if (second.sent) return second;
+    return { sent: false, reason: `resend-${first.reason};smtp-${second.reason}` };
+  }
+
+  return first;
 }
 
 async function sendViaResend(opts: MailOptions): Promise<MailResult> {
