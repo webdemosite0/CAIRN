@@ -790,9 +790,7 @@ select:focus-visible,
 
 /* globe, loader, refresh — rotation */
 @keyframes ico-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 /* bell — rings */
@@ -811,271 +809,228 @@ select:focus-visible,
 /* Attention, once. A single sharp beat rather than a wobble: the point is
    to be noticed, and a repeated shake reads as broken. */
 @keyframes ico-alert {
-  0%, 100% { transform: scale(1); }
-  30% { transform: scale(1.18); }
-  55% { transform: scale(0.96); }
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  15% { transform: scale(0.92) rotate(-3deg); }
+  40% { transform: scale(1.2) rotate(2deg); }
+  65% { transform: scale(0.97) rotate(-1deg); }
 }
 
 /* A close control. Turns the last few degrees into its X, so the gesture is
    the icon completing itself. */
 @keyframes ico-close {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(90deg); }
+  0% { transform: rotate(0deg) scale(1); }
+  60% { transform: rotate(78deg) scale(0.88); }
+  100% { transform: rotate(90deg) scale(1); }
 }
 
 /* Duplication. The glyph offsets and returns, as though a copy peeled off
    and settled back onto the original. */
 @keyframes ico-copy {
-  0%, 100% { transform: translate(0, 0); }
-  45% { transform: translate(2px, -2px); }
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  20% { transform: translate(-0.5px, 0.5px) scale(0.97); }
+  55% { transform: translate(2.5px, -2.5px) scale(1.05); }
 }
 
 /* A panel sliding out of the edge it is docked to. */
 @keyframes ico-panel {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(-2.5px); }
+  0%, 100% { transform: translateX(0) scaleX(1); }
+  20% { transform: translateX(1px) scaleX(0.97); }
+  60% { transform: translateX(-3px) scaleX(1.04); }
 }
 
 /* Menu lines separating, the way the list they open does. */
 @keyframes ico-menu {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.25); }
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  45% { transform: scaleY(1.3) scaleX(0.93); }
+  75% { transform: scaleY(0.96) scaleX(1.02); }
 }
 
 /* Leaving. Travels out and does not come back the way it went — it fades at
    the far edge, because a sign-out that springs back reads as a cancel. */
 @keyframes ico-exit {
-  0% { transform: translateX(0); opacity: 1; }
-  60% { transform: translateX(4px); opacity: 0.35; }
-  61% { transform: translateX(-3px); opacity: 0; }
-  100% { transform: translateX(0); opacity: 1; }
+  0% { transform: translateX(0) scale(1); opacity: 1; }
+  18% { transform: translateX(-2px) scale(0.96); opacity: 1; }
+  60% { transform: translateX(6px) scale(1.04); opacity: 0; }
+  61% { transform: translateX(-5px) scale(0.96); opacity: 0; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
 }
 
 /* A shackle closing: down, then a small settle as it seats. */
 @keyframes ico-lock {
-  0%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-2px); }
-  70% { transform: translateY(0.5px); }
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  35% { transform: translateY(-3px) scaleY(1.06); }
+  62% { transform: translateY(1px) scaleY(0.9); }
+  82% { transform: translateY(0) scaleY(1.03); }
 }
 
 /* Send. Leaves upward and is replaced, rather than returning — the message
    is gone. */
 @keyframes ico-send {
-  0% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(-7px); opacity: 0; }
-  51% { transform: translateY(6px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% { transform: translateY(0) scaleY(1) rotate(0deg); opacity: 1; }
+  15% { transform: translateY(2px) scaleY(0.9) rotate(-2deg); opacity: 1; }
+  50% { transform: translateY(-9px) scaleY(1.15) rotate(4deg); opacity: 0; }
+  51% { transform: translateY(7px) scaleY(1.1) rotate(0deg); opacity: 0; }
+  100% { transform: translateY(0) scaleY(1) rotate(0deg); opacity: 1; }
 }
 
 /* An envelope flap lifting. */
 @keyframes ico-mail {
   0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-2px) rotate(-4deg); }
+  30% { transform: translateY(-3px) rotate(-7deg); }
+  65% { transform: translateY(0.5px) rotate(3deg); }
 }
 
 /* A clock hand sweeping one full turn, in steps rather than smoothly —
    clocks tick. */
 @keyframes ico-tick {
   0% { transform: rotate(0deg); }
+  55% { transform: rotate(140deg); }
   100% { transform: rotate(360deg); }
 }
 
 /* A stack compressing under its own weight and recovering. */
 @keyframes ico-stack {
-  0%, 100% { transform: scaleY(1); }
-  45% { transform: scaleY(0.86); }
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  40% { transform: scaleY(0.8) scaleX(1.09); }
+  72% { transform: scaleY(1.05) scaleX(0.98); }
 }
 
 /* Download. Arrives from above and lands. */
 @keyframes ico-down {
-  0% { transform: translateY(0); }
-  45% { transform: translateY(3px); }
-  70% { transform: translateY(-1px); }
-  100% { transform: translateY(0); }
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  18% { transform: translateY(-2px) scaleY(1.05); }
+  55% { transform: translateY(4px) scaleY(0.92); }
+  78% { transform: translateY(-1px) scaleY(1.02); }
 }
 
 /* A sparkle catching light: brightens and turns slightly, no travel. */
 @keyframes ico-sparkle {
   0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
-  50% { transform: scale(1.16) rotate(18deg); opacity: 0.85; }
+  30% { transform: scale(1.22) rotate(20deg); opacity: 0.9; }
+  55% { transform: scale(0.95) rotate(6deg); opacity: 1; }
+  78% { transform: scale(1.08) rotate(-4deg); opacity: 0.96; }
 }
 
 /* Going back — the mirror of nudge, so a pair of navigation controls reads
    as one mechanism. */
 @keyframes ico-back {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(-3px); }
+  0%, 100% { transform: translateX(0) scaleX(1); }
+  20% { transform: translateX(1.5px) scaleX(0.96); }
+  60% { transform: translateX(-4px) scaleX(1.05); }
 }
 
 /* A piece seating into place. */
 @keyframes ico-fit {
-  0% { transform: rotate(0deg) scale(1); }
-  40% { transform: rotate(-8deg) scale(1.06); }
-  100% { transform: rotate(0deg) scale(1); }
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  35% { transform: rotate(-10deg) scale(1.08); }
+  70% { transform: rotate(4deg) scale(0.98); }
 }
 
 @keyframes ico-ring {
-  0%,
-  60%,
-  100% {
-    transform: rotate(0deg);
-  }
-  10%,
-  30%,
-  50% {
-    transform: rotate(11deg);
-  }
-  20%,
-  40% {
-    transform: rotate(-11deg);
-  }
+  0%, 100% { transform: rotate(0deg); }
+  8% { transform: rotate(14deg); }
+  24% { transform: rotate(-11deg); }
+  40% { transform: rotate(7deg); }
+  56% { transform: rotate(-4deg); }
+  72% { transform: rotate(2deg); }
+  86% { transform: rotate(-1deg); }
 }
 
 /* robot, users — a curious tilt */
 @keyframes ico-tilt {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  30% {
-    transform: rotate(-9deg);
-  }
-  65% {
-    transform: rotate(7deg);
-  }
+  0%, 100% { transform: rotate(0deg); }
+  22% { transform: rotate(-11deg); }
+  48% { transform: rotate(7deg); }
+  72% { transform: rotate(-3deg); }
+  88% { transform: rotate(1deg); }
 }
 
 /* files, documents — lifts like a turning page */
 @keyframes ico-lift {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  45% {
-    transform: translateY(-3px);
-  }
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(1px) scale(1.04, 0.94); }
+  55% { transform: translateY(-4px) scale(0.97, 1.06); }
+  80% { transform: translateY(0.5px) scale(1.02, 0.98); }
 }
 
 /* code, terminal — types */
 @keyframes ico-type {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-1.5px);
-  }
-  75% {
-    transform: translateX(1.5px);
-  }
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-1.8px); }
+  45% { transform: translateX(1.4px); }
+  70% { transform: translateX(-0.8px); }
+  88% { transform: translateX(0.4px); }
 }
 
 /* search, research — scans */
 @keyframes ico-scan {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  30% {
-    transform: translate(2px, -2px);
-  }
-  70% {
-    transform: translate(-2px, 1px);
-  }
+  0%, 100% { transform: translateX(0) scaleX(1); opacity: 1; }
+  25% { transform: translateX(-3px) scaleX(1.08); opacity: 0.75; }
+  50% { transform: translateX(0) scaleX(1); opacity: 1; }
+  75% { transform: translateX(3px) scaleX(1.08); opacity: 0.75; }
 }
 
 /* grids, tables, dashboards — settles into place */
 @keyframes ico-pop {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  45% {
-    transform: scale(1.16);
-  }
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(0.88); }
+  50% { transform: scale(1.24); }
+  74% { transform: scale(0.97); }
 }
 
 /* palette, design — a slow hue drift */
 @keyframes ico-hue {
-  0%,
-  100% {
-    filter: hue-rotate(0deg);
-  }
-  50% {
-    filter: hue-rotate(38deg);
-  }
+  0%, 100% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(22deg); }
 }
 
 /* plus — opens */
 @keyframes ico-open {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(90deg);
-  }
+  0% { transform: rotate(0deg) scale(1); }
+  60% { transform: rotate(52deg) scale(1.1); }
+  100% { transform: rotate(45deg) scale(1); }
 }
 
 /* send, arrows — launches */
 @keyframes ico-launch {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-3px);
-  }
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  18% { transform: translate(-1px, 1px) scale(0.94); opacity: 1; }
+  60% { transform: translate(6px, -6px) scale(1.06); opacity: 0; }
+  61% { transform: translate(-5px, 5px) scale(0.96); opacity: 0; }
+  100% { transform: translate(0, 0) scale(1); opacity: 1; }
 }
 
 /* copy, share — nudges */
 @keyframes ico-nudge {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(2px, -2px);
-  }
+  0%, 100% { transform: translate(0, 0); }
+  22% { transform: translate(-1px, 1px); }
+  62% { transform: translate(3px, -3px); }
 }
 
 /* trash — shakes its lid */
 @keyframes ico-shake {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-12deg);
-  }
-  75% {
-    transform: rotate(12deg);
-  }
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  12% { transform: translateX(-3px) rotate(-3deg); }
+  30% { transform: translateX(2.5px) rotate(2.5deg); }
+  50% { transform: translateX(-1.8px) rotate(-1.6deg); }
+  70% { transform: translateX(1px) rotate(0.8deg); }
+  86% { transform: translateX(-0.4px) rotate(0deg); }
 }
 
 /* checks, success — settles in */
 @keyframes ico-check {
-  0% {
-    transform: scale(0.6);
-    opacity: 0.4;
-  }
-  60% {
-    transform: scale(1.18);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(0.4) rotate(-12deg); opacity: 0; }
+  45% { transform: scale(1.18) rotate(4deg); opacity: 1; }
+  72% { transform: scale(0.96) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
 /* presentation, slides — grows */
 @keyframes ico-grow {
-  0%,
-  100% {
-    transform: scaleY(1);
-  }
-  50% {
-    transform: scaleY(1.14);
-  }
+  0%, 100% { transform: scale(1); }
+  22% { transform: scale(0.93); }
+  58% { transform: scale(1.16); }
+  80% { transform: scale(0.985); }
 }
 
 .ico {
