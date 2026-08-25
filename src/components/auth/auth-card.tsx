@@ -7,6 +7,7 @@ import { FiAlertCircle, FiCheck, FiLoader } from "react-icons/fi";
 import { logIn, signUp, type AuthState } from "@/app/actions/auth";
 import { TroveOrb } from "@/components/brand/orb";
 import { Ico } from "@/components/ui/ico";
+import { PasswordField } from "@/components/auth/password-field";
 
 const field =
   "h-12 w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent sm:text-[14.5px]";
@@ -118,14 +119,11 @@ export function AuthCard({
           required
         />
 
-        <input
+        <PasswordField
           className={field}
-          name="password"
-          type="password"
           placeholder={isLogin ? "Password" : "Password (8+ characters)"}
           autoComplete={isLogin ? "current-password" : "new-password"}
-          minLength={8}
-          required
+          showStrength={!isLogin}
         />
 
         {error ? (

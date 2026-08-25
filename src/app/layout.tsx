@@ -165,11 +165,27 @@ function StructuredData() {
   );
 }
 
+/**
+ * data-theme is rendered on the server, not only set by the script.
+ *
+ * Light became the default, so the script was stamping data-theme="light"
+ * onto an element the server had rendered without it — a hydration
+ * mismatch on every page, reported by React and unfixable by it ("this
+ * won't be patched up").
+ *
+ * Rendering the default here makes the markup agree. The script still
+ * overrides it: to "dark" for that preference, and removing it entirely
+ * for "system", both of which happen before the first paint.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${display.variable} ${mono.variable}`}>
+    <html
+      lang="en"
+      data-theme="light"
+      className={`${inter.variable} ${display.variable} ${mono.variable}`}
+    >
       <head>
         {/* Must run before the first paint — see THEME_SCRIPT. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
