@@ -2,6 +2,7 @@
 
 import { Ico } from "@/components/ui/ico";
 import { StudioBack } from "@/components/shell/studio-back";
+import { SystemEditor } from "@/components/design/system-editor";
 import { localTimeZone } from "@/lib/context";
 import { FailureNote } from "@/components/ui/failure-note";
 import { useRef, useState } from "react";
@@ -211,6 +212,18 @@ export function ToolPage({
         <div className="flex items-center gap-3.5 rounded-[10px] border border-line bg-rail px-5 py-4">
           <Bot size={38} accent={accent} state="working" />
           <span className="nx-dots text-[14px] text-ink-2">Working</span>
+        </div>
+      ) : null}
+
+      {/* The design spec becomes editable tokens; every other tool's output
+          is prose, which is the right shape for a document or a piece of
+          research. Decided from `tool` rather than passed in as a render
+          prop — the page is a server component, and a function cannot cross
+          that boundary. The written version stays below either way: the
+          extraction is a convenience, and a spec holds more than colours. */}
+      {tool === "design" && output && !busy ? (
+        <div className="mb-4 rounded-[10px] border border-line bg-rail p-5">
+          <SystemEditor markdown={output} />
         </div>
       ) : null}
 
