@@ -30,10 +30,10 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — ${site.shortDescription}`,
+    default: `${site.name} — ${site.searchTitle}`,
     template: `%s · ${site.name}`,
   },
-  description: site.description,
+  description: site.metaDescription,
   keywords: [...site.keywords],
   applicationName: site.name,
   category: "technology",
@@ -57,12 +57,12 @@ export const metadata: Metadata = {
     siteName: site.name,
     locale: site.locale,
     url: site.url,
-    title: `${site.name} — ${site.shortDescription}`,
+    title: `${site.name} — ${site.searchTitle}`,
     description: site.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} — ${site.shortDescription}`,
+    title: `${site.name} — ${site.searchTitle}`,
     description: site.shortDescription,
     creator: site.twitter,
   },
@@ -105,6 +105,10 @@ function StructuredData() {
         "@id": `${site.url}/#organization`,
         name: site.name,
         url: site.url,
+        // Google needs somewhere to find the mark before it can show one beside
+        // the result. Points at the icon route the app already renders, so it
+        // cannot drift from the favicon.
+        logo: `${site.url}/icon`,
         description: site.shortDescription,
       },
       {
@@ -112,6 +116,9 @@ function StructuredData() {
         "@id": `${site.url}/#website`,
         url: site.url,
         name: site.name,
+        // What Google reads to decide whether the result says "Trove" or
+        // "troveai.site". A hint, not an instruction, and it needs a recrawl.
+        alternateName: "Trove AI",
         description: site.description,
         publisher: { "@id": `${site.url}/#organization` },
         inLanguage: "en",

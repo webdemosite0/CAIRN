@@ -62,6 +62,25 @@ export const site = {
   tagline: "Describe what you want. Trove builds it.",
   description:
     "Trove is an AI workspace that builds real things and keeps them. Generate a complete website from a sentence and keep editing it in chat, create your own AI agents, put a team of four on one task, and export documents to Word and spreadsheets to Excel. Every conversation is saved, so reopening it shows the same answer you left.",
+  /**
+   * The <title> on the home page, and the tail of every other title.
+   *
+   * Under 60 characters because Google truncates around there — the old one
+   * was 110 and the result read "…generates websites, agents ...", cut off
+   * mid-list. A title that ends in an ellipsis wastes the most valuable line
+   * on the page.
+   */
+  searchTitle: "AI workspace that builds websites, docs and agents",
+  /**
+   * The <meta name="description">.
+   *
+   * Separate from `description` because that one is 329 characters — written
+   * for schema.org and llms.txt, where length is free. Google renders about
+   * 155, so the long version arrives cut off mid-clause and the sentence that
+   * would have persuaded anyone never appears.
+   */
+  metaDescription:
+    "An AI workspace that turns a sentence into finished work: websites, documents, spreadsheets, code and AI agents you can download and keep.",
   shortDescription:
     "An AI workspace that generates websites, agents, documents and spreadsheets you can actually download.",
   keywords: [
