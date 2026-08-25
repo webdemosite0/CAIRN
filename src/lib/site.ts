@@ -12,7 +12,20 @@ const FALLBACK_URL = "http://localhost:3100";
  * completely normal thing to have on a host dashboard, so treat it as absent.
  */
 function resolveSiteUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  /**
+   * SITE_URL first, NEXT_PUBLIC_SITE_URL second.
+   *
+   * Nothing that reads `site.url` is a client component — it is metadata,
+   * sitemap, robots, OG image, OAuth redirect and Stripe return URLs, all of
+   * which run on the server. So the NEXT_PUBLIC_ prefix bought nothing and
+   * cost a warning: Vercel flags public-prefixed variables because the prefix
+   * inlines the value into the browser bundle.
+   *
+   * The old name is still read so deployments that already set it keep
+   * working; there is nothing secret about a site's own address either way.
+   */
+  const raw =
+    process.env.SITE_URL?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
   if (raw) {
     // People type "trove.app" as often as "https://trove.app".
@@ -42,8 +55,10 @@ function resolveSiteUrl(): string {
 
 export const site = {
   name: "Trove",
-  /** Set NEXT_PUBLIC_SITE_URL in production — canonical URLs depend on it. */
+  /** Set SITE_URL in production — canonical URLs depend on it. */
   url: resolveSiteUrl(),
+  /** Where a person can actually reach a human. */
+  email: "official@troveai.site",
   tagline: "Describe what you want. Trove builds it.",
   description:
     "Trove is an AI workspace that builds real things and keeps them. Generate a complete website from a sentence and keep editing it in chat, create your own AI agents, put a team of four on one task, and export documents to Word and spreadsheets to Excel. Every conversation is saved, so reopening it shows the same answer you left.",
