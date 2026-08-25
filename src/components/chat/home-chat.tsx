@@ -89,19 +89,19 @@ export function HomeChat({
             <StarterCards className="mt-7" onPick={setDraft} />
 
             {error ? <ErrorNote message={error} onRetry={retry} /> : null}
-          </div>
 
-          {/* Recent work sits below the fold-ish and wider than the hero: it is
-              for the second visit onward, and should not compete with the
-              composer on the first. */}
-          {activity.length ? (
-            <div
-              className="nx-rise mt-16 w-full max-w-[1140px] text-left"
-              style={{ animationDelay: "220ms", animationFillMode: "backwards" }}
-            >
-              <ContinuePanel items={activity} />
-            </div>
-          ) : null}
+            {/* Recent work sits directly under the composer and shares its
+                column width, so the page reads as one centred stack rather
+                than a hero with a separate wide section bolted beneath it. */}
+            {activity.length ? (
+              <div
+                className="nx-rise mt-11 text-left"
+                style={{ animationDelay: "220ms", animationFillMode: "backwards" }}
+              >
+                <ContinuePanel items={activity} />
+              </div>
+            ) : null}
+          </div>
         </div>
 
       </div>

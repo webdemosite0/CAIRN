@@ -42,69 +42,70 @@ const metaFor = (k: RecentKind) => META[k] ?? META.chat;
  * would look like work you had done and lost.
  */
 export function ContinuePanel({ items }: { items: Recent[] }) {
-  const shown = items.slice(0, 3);
+  // Five across on a wide screen, matching the strip in the design. More than
+  // that and each thumbnail is too small to tell the projects apart.
+  const shown = items.slice(0, 5);
+
+  if (shown.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-10 text-center">
+        <TroveOrb size={30} state="idle" />
+        <p className="text-[13.5px] text-ink-3">Nothing here yet</p>
+        <p className="max-w-[34ch] text-[12.5px] text-ink-4">
+          Describe something above and it will show up here so you can pick it
+          back up.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <section className="min-w-0 rounded-[12px] border border-line bg-canvas p-4 shadow-[var(--sh-1)]">
-      <header className="mb-3 flex items-center justify-between">
-        <h2 className="text-[14px] font-medium text-ink">Continue where you left off</h2>
-        {items.length > 3 ? (
+    <section className="min-w-0">
+      <header className="mb-3 flex items-baseline justify-between">
+        <h2 className="text-[14px] font-medium text-ink">Recent creations</h2>
+        {items.length > shown.length ? (
           <Link href="/dashboard" className="text-[12.5px] text-accent hover:underline">
             View all
           </Link>
         ) : null}
       </header>
 
-      {shown.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-8 text-center">
-          <TroveOrb size={30} state="idle" />
-          <p className="text-[13.5px] text-ink-3">Nothing here yet</p>
-          <p className="max-w-[34ch] text-[12.5px] text-ink-4">
-            Describe something above and it will show up here so you can pick it
-            back up.
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {shown.map((r, i) => {
-            const m = metaFor(r.kind);
-            return (
-              <Link
-                key={r.id}
-                href={r.href || "/chat"}
-                className={cn(
-                  "nx-in group flex flex-col overflow-hidden rounded-[10px] border border-line bg-canvas",
-                  "transition-[transform,border-color,box-shadow] duration-200",
-                  "hover:-translate-y-[2px] hover:border-line-strong hover:shadow-[var(--sh-2)]",
-                )}
-                style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {shown.map((r, i) => {
+          const m = metaFor(r.kind);
+          return (
+            <Link
+              key={r.id}
+              href={r.href || "/chat"}
+              title={`${r.title || "Untitled"} — edited ${relativeTime(r.createdAt)}`}
+              className={cn(
+                "nx-in group min-w-0",
+                "transition-transform duration-200 hover:-translate-y-[2px]",
+              )}
+              style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
+            >
+              {/* A tinted field, not a screenshot. There is no render of this
+                  artefact, and a fake preview image would be a picture of work
+                  that was never done. The tint is the kind's own colour, so the
+                  row is still scannable by type. */}
+              <span
+                aria-hidden
+                className="mb-2 grid h-[86px] place-items-center rounded-[10px] border border-line transition-colors group-hover:border-line-strong"
+                style={{
+                  background: `linear-gradient(150deg, color-mix(in oklab, ${m.tone} 70%, #0b0b12) 0%, #0b0b12 90%)`,
+                }}
               >
-                {/* A tinted field standing in for a thumbnail. Honest: there is
-                    no screenshot of this artefact, so it does not pretend. */}
-                <span
-                  aria-hidden
-                  className="grid h-[92px] place-items-center border-b border-line"
-                  style={{
-                    background: `linear-gradient(135deg, color-mix(in oklab, ${m.tone} 16%, transparent), transparent 70%), var(--color-sunk)`,
-                  }}
-                >
-                  <m.icon size={22} style={{ color: m.tone }} />
-                </span>
+                <m.icon size={20} className="text-white/85" />
+              </span>
 
-                <span className="flex flex-col gap-0.5 p-3">
-                  <span className="truncate text-[13px] font-medium text-ink">
-                    {r.title || "Untitled"}
-                  </span>
-                  <span className="text-[11.5px] text-ink-4">{m.label}</span>
-                  <span className="mt-1 text-[11px] text-ink-4">
-                    Edited {relativeTime(r.createdAt)}
-                  </span>
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+              <span className="block truncate text-[13px] font-medium text-ink">
+                {r.title || "Untitled"}
+              </span>
+              <span className="block text-[11.5px] text-ink-4">{m.label}</span>
+            </Link>
+          );
+        })}
+      </div>
     </section>
   );
 }

@@ -67,14 +67,14 @@ export const metadata: Metadata = {
     creator: site.twitter,
   },
   formatDetection: { telephone: false, address: false, email: false },
-  // Google Search Console ownership. Emitted as
-  // <meta name="google-site-verification"> in <head> on every page.
-  // Hardcoded on purpose: it is a public token by design, and putting it in
-  // an env var only creates another variable that can go missing on deploy
-  // and silently un-verify the domain.
-  verification: {
-    google: "ToesbbZChUTU1HoKJbTHMKNjXwHACXL2d3Kb-GtuN7c",
-  },
+  // No `verification` block here on purpose.
+  //
+  // Ownership of troveai.site is proved by public/google117c584ed0903345.html
+  // instead. A meta tag carrying a *different* property's token was left over
+  // from a previous domain: Search Console reads it, matches it against no
+  // property this site owns, and it does nothing but sit in the <head> of
+  // every page. One verification method, and one that corresponds to the
+  // domain actually being verified.
 };
 
 export const viewport: Viewport = {

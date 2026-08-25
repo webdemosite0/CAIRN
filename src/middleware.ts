@@ -82,7 +82,19 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
+  /**
+   * `google...html` is the Search Console ownership file in public/.
+   *
+   * Without it here the auth gate answered Google's fetch with a 307 to
+   * /login, so the file was never read and the domain could not be verified —
+   * a failure that looks like Google's problem and is entirely ours. Any
+   * verification file dropped into public/ later is covered by the same
+   * pattern.
+   *
+   * It is safe to expose: the token is public by design and proves ownership
+   * only to whoever already controls the Search Console property.
+   */
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon|opengraph-image|robots.txt|sitemap.xml|manifest.webmanifest|llms.txt).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon|opengraph-image|robots.txt|sitemap.xml|manifest.webmanifest|llms.txt|google[0-9a-z]+\\.html).*)",
   ],
 };
