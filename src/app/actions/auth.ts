@@ -48,7 +48,9 @@ async function sendVerification(user: { id: string; email: string; name: string 
   const token = await issueToken(user.id, "verify-email");
   const link = `${site.url}/verify-email/confirm?token=${token}`;
   const mail = verificationEmail(user.name, link);
-  await sendMail({ to: user.email, ...mail });
+  // Returned, not swallowed. The caller decides what to tell the person; what
+  // it must not do is report success for a message that was never sent.
+  return sendMail({ to: user.email, ...mail });
 }
 
 export async function signUp(_prev: AuthState, form: FormData): Promise<AuthState> {
@@ -138,6 +140,28 @@ export async function resendVerification(): Promise<AuthState> {
     return { error: `Just sent one. Try again in ${wait}s.` };
   }
 
-  await sendVerification(user);
+  const result = await sendVerification(user);
+
+  /**
+   * Say what happened, including when nothing did.
+   *
+   * This used to return "Sent again to …" unconditionally, discarding the
+   * result — so a deployment whose mail credentials were wrong reported
+   * success on every attempt, and the only way to learn otherwise was to read
+   * the host's function logs. That is precisely the situation where nobody
+   * thinks to look at logs, because the screen says it worked.
+   *
+   * The reason code is short and non-sensitive (`http-401`, `smtp`,
+   * `not-configured`) — enough to act on, and it names no credential.
+   */
+  if (!result.sent) {
+    return {
+      error:
+        result.reason === "not-configured"
+          ? "No mail provider is configured on this deployment, so nothing was sent."
+          : `The mail provider rejected that (${result.reason}). Nothing was sent.`,
+    };
+  }
+
   return { notice: `Sent again to ${user.email}.` };
 }
