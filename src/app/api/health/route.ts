@@ -1,6 +1,7 @@
 import { one, isRemote, ephemeral } from "@/lib/db";
 import { providerChain } from "@/lib/ai";
 import { searchProvider } from "@/lib/search";
+import { mailTransport } from "@/lib/mail";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,6 +28,13 @@ export async function GET() {
     // the keyless floor, so this reporting "Wikipedia" means no real web
     // search is configured — not that search is broken.
     searchProvider: searchProvider(),
+    // Which transport will send the confirmation email, or "none".
+    // Reported because verification enforces itself off when nothing can
+    // deliver — so "none" here means anyone can sign up with an address they
+    // do not own, and that is worth being able to check without guessing.
+    // The name of a transport is not a secret; the credentials are, and none
+    // of them are here.
+    mail: mailTransport(),
     tursoUrl: Boolean(process.env.TURSO_DATABASE_URL?.trim()),
     tursoToken: Boolean(process.env.TURSO_AUTH_TOKEN?.trim()),
     siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL?.trim()),
