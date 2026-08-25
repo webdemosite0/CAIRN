@@ -2,6 +2,7 @@ import { one, isRemote, ephemeral } from "@/lib/db";
 import { providerChain } from "@/lib/ai";
 import { searchProvider } from "@/lib/search";
 import { mailTransport } from "@/lib/mail";
+import { site } from "@/lib/site";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -37,7 +38,17 @@ export async function GET() {
     mail: mailTransport(),
     tursoUrl: Boolean(process.env.TURSO_DATABASE_URL?.trim()),
     tursoToken: Boolean(process.env.TURSO_AUTH_TOKEN?.trim()),
-    siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL?.trim()),
+    // Both names, because the variable was renamed and the old one is still
+    // honoured. Checking only NEXT_PUBLIC_SITE_URL would report "not set" to
+    // someone who had just set SITE_URL correctly — a false alarm pointing at
+    // the one thing that was already right.
+    siteUrl: Boolean(
+      process.env.SITE_URL?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim(),
+    ),
+    // What canonical URLs, the sitemap, OAuth redirects and Stripe returns
+    // will actually use. Reported because "set" is not the same as "correct":
+    // an unset variable silently resolves to Vercel's own domain.
+    resolvedSiteUrl: site.url,
   };
 
   // "ephemeral" is the important one to surface: the app works, but every
