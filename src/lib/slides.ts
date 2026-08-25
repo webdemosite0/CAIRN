@@ -113,3 +113,39 @@ export function deckFilename(slides: Slide[], fallback: string): string {
       .toLowerCase() || "deck"
   );
 }
+
+/**
+ * Slides back to the markdown they were parsed from.
+ *
+ * The inverse of parseDeck, and it exists because the Markdown export was
+ * writing out the model's original answer while the PowerPoint export wrote
+ * the edited deck. Editing a deck and downloading the .md silently produced
+ * the version before the edits — the worst kind of bug, because the file looks
+ * complete.
+ *
+ * The format matches what the prompt asks the model for, so a deck can be
+ * exported, re-imported and parsed back to the same slides.
+ */
+export function serialiseDeck(slides: Slide[]): string {
+  if (!slides.length) return "";
+
+  const [first, ...rest] = slides;
+  const out: string[] = [];
+
+  // The first slide is the title slide: "# Title", no bullets. That is the
+  // shape parseDeck expects, and round-tripping depends on it.
+  out.push(`# ${first.title}`.trim());
+  if (first.bullets.length) {
+    out.push("");
+    for (const b of first.bullets) out.push(`- ${b}`);
+  }
+  if (first.note) out.push("", `Note: ${first.note}`);
+
+  rest.forEach((s, i) => {
+    out.push("", `## Slide ${i + 2} — ${s.title}`.trim(), "");
+    for (const b of s.bullets) out.push(`- ${b}`);
+    if (s.note) out.push("", `Note: ${s.note}`);
+  });
+
+  return out.join("\n") + "\n";
+}

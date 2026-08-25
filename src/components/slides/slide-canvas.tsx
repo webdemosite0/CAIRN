@@ -2,6 +2,7 @@
 
 import type { Slide } from "@/lib/slides";
 import { cn } from "@/lib/utils";
+import { Editable } from "@/components/slides/editable";
 
 /**
  * One slide, drawn at a fixed 16:9 ratio.
@@ -17,6 +18,7 @@ export function SlideCanvas({
   total,
   className,
   thumb = false,
+  edit,
 }: {
   slide: Slide;
   index: number;
@@ -24,6 +26,17 @@ export function SlideCanvas({
   className?: string;
   /** Thumbnails skip the slide number and clamp the bullet list. */
   thumb?: boolean;
+  /**
+   * Supplied only by the editor. Absent everywhere else — the thumbnail rail
+   * and the presenter view render exactly the same component read-only, so a
+   * deck cannot look different from the thing being edited.
+   */
+  edit?: {
+    onTitle: (v: string) => void;
+    onBullet: (i: number, v: string) => void;
+    onAddBullet: (after: number) => void;
+    onRemoveBullet: (i: number) => void;
+  };
 }) {
   const titleOnly = !slide.bullets.length;
 
@@ -57,7 +70,17 @@ export function SlideCanvas({
             titleOnly ? "text-[6.4cqw] leading-[1.12]" : "text-[4.6cqw] leading-[1.16]",
           )}
         >
-          {slide.title || `Slide ${index + 1}`}
+          {edit ? (
+            <Editable
+              ariaLabel={`Title of slide ${index + 1}`}
+              value={slide.title}
+              placeholder={`Slide ${index + 1}`}
+              onChange={edit.onTitle}
+              onEnter={() => edit.onAddBullet(-1)}
+            />
+          ) : (
+            slide.title || `Slide ${index + 1}`
+          )}
         </h2>
 
         {slide.bullets.length ? (
@@ -68,7 +91,19 @@ export function SlideCanvas({
                   aria-hidden
                   className="mt-[0.85cqw] h-[0.85cqw] w-[0.85cqw] shrink-0 rounded-full bg-accent"
                 />
-                <span className="min-w-0">{b}</span>
+                {edit ? (
+                  <Editable
+                    className="min-w-0 flex-1"
+                    ariaLabel={`Bullet ${i + 1} on slide ${index + 1}`}
+                    value={b}
+                    placeholder="Empty point"
+                    onChange={(v) => edit.onBullet(i, v)}
+                    onEnter={() => edit.onAddBullet(i)}
+                    onEmptyBackspace={() => edit.onRemoveBullet(i)}
+                  />
+                ) : (
+                  <span className="min-w-0">{b}</span>
+                )}
               </li>
             ))}
           </ul>

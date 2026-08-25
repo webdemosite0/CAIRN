@@ -1,9 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { StudioBack } from "@/components/shell/studio-back";
 import { localTimeZone } from "@/lib/context";
 import {
+  FiChevronDown,
+  FiChevronUp,
+  FiCopy,
+  FiPlus,
+  FiTrash2,
+  FiCornerUpLeft,
+  FiCornerUpRight,
   FiDownload,
   FiRotateCcw,
   FiChevronLeft,
@@ -19,7 +26,8 @@ import { Ico } from "@/components/ui/ico";
 import { FailureNote } from "@/components/ui/failure-note";
 import { SlideCanvas } from "@/components/slides/slide-canvas";
 import { strip, type Attachment } from "@/lib/attachments";
-import { parseDeck, deckFilename } from "@/lib/slides";
+import { parseDeck, deckFilename, serialiseDeck } from "@/lib/slides";
+import { useDeck } from "@/lib/use-deck";
 import { downloadPptx } from "@/lib/pptx";
 import { downloadMarkdown } from "@/lib/export";
 import type { Recent } from "@/lib/recents";
@@ -53,7 +61,25 @@ export function SlidesView({
   const stageRef = useRef<HTMLDivElement>(null);
 
   // Parsed on every chunk so slides appear as the model writes them.
-  const slides = useMemo(() => parseDeck(text), [text]);
+  /**
+   * The deck is state, not a view of the markdown.
+   *
+   * It was `useMemo(() => parseDeck(text))`, which recomputed from the
+   * model output on every render — so any edit was overwritten by the next
+   * one. parseDeck now runs once, when a generation finishes, and everything
+   * after that is the person editing.
+   */
+  const deck = useDeck([]);
+  const slides = deck.slides;
+
+  // Import when the model finishes writing, not while it streams: parsing a
+  // half-written outline produces slides that appear and vanish.
+  const importedFrom = useRef<string | null>(null);
+  useEffect(() => {
+    if (busy || !text.trim() || importedFrom.current === text) return;
+    importedFrom.current = text;
+    deck.load(parseDeck(text));
+  }, [busy, text, deck]);
   const total = slides.length;
   const safeIndex = Math.min(current, Math.max(0, total - 1));
   const slide = slides[safeIndex];
@@ -201,6 +227,30 @@ export function SlidesView({
         </div>
 
         <div className="flex items-center gap-1.5">
+          {/* Undo and redo sit before the export actions: they are what you
+              reach for while editing, and the exports are what you reach for
+              once. */}
+          <div className="mr-1 flex items-center gap-0.5 rounded-[9px] border border-line bg-rail p-0.5">
+            <button
+              onClick={deck.undo}
+              disabled={!deck.canUndo}
+              aria-label="Undo"
+              title="Undo"
+              className="group grid size-7 place-items-center rounded-[7px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-30"
+            >
+              <Ico icon={FiCornerUpLeft} motion="back" size={14} />
+            </button>
+            <button
+              onClick={deck.redo}
+              disabled={!deck.canRedo}
+              aria-label="Redo"
+              title="Redo"
+              className="group grid size-7 place-items-center rounded-[7px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-30"
+            >
+              <Ico icon={FiCornerUpRight} motion="nudge" size={14} />
+            </button>
+          </div>
+
           <button
             onClick={present}
             disabled={!total}
@@ -216,8 +266,11 @@ export function SlidesView({
             <Ico icon={FiDownload} motion="lift" size={13} /> PowerPoint
           </button>
           <button
-            onClick={() => downloadMarkdown(text, `${filename}.md`)}
-            disabled={!text || busy}
+            // serialiseDeck(slides), not the raw model output: `text` is what
+            // the model wrote, so exporting it discarded every edit while the
+            // PowerPoint beside it exported them.
+            onClick={() => downloadMarkdown(serialiseDeck(slides), `${filename}.md`)}
+            disabled={!total || busy}
             className="chip group !px-3 !py-1.5 !text-[12.5px] disabled:opacity-40"
           >
             <Ico icon={FiDownload} motion="lift" size={13} /> Markdown
@@ -250,7 +303,7 @@ export function SlidesView({
             {/* thumbnail rail */}
             <ol className="order-2 flex gap-3 overflow-x-auto pb-2 lg:order-1 lg:max-h-[70vh] lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0 lg:pr-1">
               {slides.map((s, i) => (
-                <li key={i} className="w-[164px] shrink-0 lg:w-full">
+                <li key={i} className="group/slide w-[164px] shrink-0 lg:w-full">
                   <button
                     onClick={() => setCurrent(i)}
                     aria-current={i === safeIndex}
@@ -275,8 +328,56 @@ export function SlidesView({
                       )}
                     />
                   </button>
+
+                  {/* Slide actions. Hidden until the thumbnail is hovered or
+                      something inside it has focus — five buttons per slide
+                      visible at all times would bury the deck itself. */}
+                  <div className="mt-1 flex items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover/slide:opacity-100 lg:opacity-0">
+                    <button
+                      onClick={() => deck.moveSlide(i, i - 1)}
+                      disabled={i === 0}
+                      aria-label={`Move slide ${i + 1} earlier`}
+                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink disabled:opacity-25"
+                    >
+                      <Ico icon={FiChevronUp} motion="lift" size={13} />
+                    </button>
+                    <button
+                      onClick={() => deck.moveSlide(i, i + 1)}
+                      disabled={i >= total - 1}
+                      aria-label={`Move slide ${i + 1} later`}
+                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink disabled:opacity-25"
+                    >
+                      <Ico icon={FiChevronDown} motion="down" size={13} />
+                    </button>
+                    <span className="flex-1" />
+                    <button
+                      onClick={() => deck.duplicateSlide(i)}
+                      aria-label={`Duplicate slide ${i + 1}`}
+                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+                    >
+                      <Ico icon={FiCopy} motion="copy" size={12} />
+                    </button>
+                    <button
+                      onClick={() => deck.removeSlide(i)}
+                      disabled={total <= 1}
+                      aria-label={`Delete slide ${i + 1}`}
+                      title={total <= 1 ? "A deck needs at least one slide" : undefined}
+                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-critical/10 hover:text-critical disabled:opacity-25"
+                    >
+                      <Ico icon={FiTrash2} motion="shake" size={12} />
+                    </button>
+                  </div>
                 </li>
               ))}
+
+              <li className="w-[164px] shrink-0 lg:w-full">
+                <button
+                  onClick={() => deck.addSlide(total - 1)}
+                  className="group flex aspect-video w-full items-center justify-center gap-1.5 rounded-[10px] border border-dashed border-line-strong text-[12.5px] text-ink-4 transition-colors hover:border-accent hover:bg-accent/5 hover:text-ink"
+                >
+                  <Ico icon={FiPlus} motion="open" size={14} /> Add slide
+                </button>
+              </li>
             </ol>
 
             {/* stage */}
@@ -292,11 +393,25 @@ export function SlidesView({
                 <div className={cn(presenting && "w-full max-w-[min(96vw,170vh)]")}>
                   {slide ? (
                     <SlideCanvas
-                      key={safeIndex}
+                      // NOT keyed by index. Remounting on every keystroke
+                      // would destroy the element the caret lives in.
                       slide={slide}
                       index={safeIndex}
                       total={total}
-                      className="nx-settle shadow-[0_18px_48px_-24px_rgb(0_0_0/0.5)]"
+                      className="shadow-[0_18px_48px_-24px_rgb(0_0_0/0.5)]"
+                      // Read-only while presenting — a projector is not a
+                      // place to discover you have edited a slide.
+                      edit={
+                        presenting
+                          ? undefined
+                          : {
+                              onTitle: (v) => deck.setTitle(safeIndex, v),
+                              onBullet: (i, v) => deck.setBullet(safeIndex, i, v),
+                              onAddBullet: (after) =>
+                                deck.addBullet(safeIndex, after + 1),
+                              onRemoveBullet: (i) => deck.removeBullet(safeIndex, i),
+                            }
+                      }
                     />
                   ) : null}
                 </div>
@@ -328,7 +443,7 @@ export function SlidesView({
 
                     <span className="text-[12.5px] tabular-nums text-ink-4">
                       Slide {safeIndex + 1} of {total}
-                      {busy ? " · writing…" : ""}
+                      {busy ? " · writing…" : deck.edited ? " · edited" : ""}
                     </span>
 
                     <button
