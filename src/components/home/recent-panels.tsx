@@ -90,7 +90,7 @@ export function ContinuePanel({ items }: { items: Recent[] }) {
                   row is still scannable by type. */}
               <span
                 aria-hidden
-                className="mb-2 grid h-[86px] place-items-center rounded-[10px] border border-line transition-colors group-hover:border-line-strong"
+                className="mb-2 grid h-[86px] place-items-center rounded-[var(--r-panel)] border border-line transition-colors group-hover:border-line-strong"
                 style={{
                   background: `linear-gradient(150deg, color-mix(in oklab, ${m.tone} 70%, #0b0b12) 0%, #0b0b12 90%)`,
                 }}
@@ -121,7 +121,7 @@ export function ActivityPanel({ items }: { items: Recent[] }) {
   const shown = items.slice(0, 6);
 
   return (
-    <section className="min-w-0 rounded-[12px] border border-line bg-canvas p-4 shadow-[var(--sh-1)]">
+    <section className="min-w-0 rounded-[var(--r-panel)] border border-line bg-canvas p-4 shadow-[var(--sh-1)]">
       <header className="mb-3 flex items-center justify-between">
         <h2 className="text-[14px] font-medium text-ink">Recent activity</h2>
         {items.length > 6 ? (
@@ -142,7 +142,7 @@ export function ActivityPanel({ items }: { items: Recent[] }) {
             return (
               <li
                 key={r.id}
-                className="nx-in flex items-center gap-2.5 rounded-[6px] px-1 py-1.5"
+                className="nx-in flex items-center gap-2.5 rounded-[var(--r-chip)] px-1 py-1.5"
                 style={{ animationDelay: `${i * 40}ms`, animationFillMode: "backwards" }}
               >
                 <span

@@ -123,7 +123,7 @@ export function Hero({ freeCredits }: { freeCredits: number }) {
                 aria-selected={on}
                 onClick={() => setLane(l)}
                 className={cn(
-                  "group flex h-10 items-center gap-2 rounded-[10px] border px-3.5 text-[13.5px] font-medium transition-colors",
+                  "group flex h-10 items-center gap-2 rounded-[var(--r-panel)] border px-3.5 text-[13.5px] font-medium transition-colors",
                   on
                     ? "border-line-strong bg-raised text-ink shadow-[var(--elev)]"
                     : "border-transparent text-ink-3 hover:bg-hover hover:text-ink",
@@ -145,7 +145,7 @@ export function Hero({ freeCredits }: { freeCredits: number }) {
               e.preventDefault();
               go(value);
             }}
-            className="composer rounded-[18px] border bg-raised shadow-[var(--sh-2)]"
+            className="composer rounded-[var(--r-hero)] border bg-raised shadow-[var(--sh-2)]"
           >
             <label className="sr-only" htmlFor="hero-idea">
               Describe what to build
@@ -170,7 +170,7 @@ export function Hero({ freeCredits }: { freeCredits: number }) {
                 type="submit"
                 disabled={!value.trim()}
                 className={cn(
-                  "group flex h-11 items-center gap-2 rounded-[10px] px-5 text-[14.5px] font-semibold transition-all duration-200",
+                  "group flex h-11 items-center gap-2 rounded-[var(--r-panel)] px-5 text-[14.5px] font-semibold transition-all duration-200",
                   value.trim() ? "btn-grad hover:scale-[1.02]" : "bg-sunk text-ink-4",
                 )}
               >

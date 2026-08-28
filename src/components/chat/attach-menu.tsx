@@ -94,7 +94,7 @@ export function AttachMenu({
       {open ? (
         <div
           role="menu"
-          className="nx-in absolute bottom-[calc(100%+8px)] left-0 z-50 w-[228px] overflow-hidden rounded-[12px] border border-line bg-raised p-1 shadow-[var(--sh-2)]"
+          className="nx-in absolute bottom-[calc(100%+8px)] left-0 z-50 w-[228px] overflow-hidden rounded-[var(--r-panel)] border border-line bg-raised p-1 shadow-[var(--sh-2)]"
         >
           {OPTIONS.map((o) => (
             <button
@@ -105,9 +105,9 @@ export function AttachMenu({
                 setOpen(false);
                 onPick(o.accept);
               }}
-              className="group flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-left transition-colors hover:bg-hover"
+              className="group flex w-full items-center gap-2.5 rounded-[var(--r-control)] px-2.5 py-2 text-left transition-colors hover:bg-hover"
             >
-              <span className="grid size-8 shrink-0 place-items-center rounded-[7px] bg-sunk text-ink-2">
+              <span className="grid size-8 shrink-0 place-items-center rounded-[var(--r-chip)] bg-sunk text-ink-2">
                 <Ico icon={o.icon} motion={o.motion} size={15} />
               </span>
               <span className="min-w-0">

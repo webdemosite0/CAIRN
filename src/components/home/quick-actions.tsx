@@ -83,7 +83,7 @@ export function QuickActions({ className }: { className?: string }) {
                 href={a.href}
                 className={cn(
                   // A fixed height, so every action lines up whatever the label.
-                  "group flex h-[50px] items-center gap-2 rounded-[10px] border border-line bg-canvas",
+                  "group flex h-[50px] items-center gap-2 rounded-[var(--r-panel)] border border-line bg-canvas",
                   "px-3.5 text-[13.5px] text-ink-2",
                   "transition-[transform,border-color,background-color] duration-150",
                   "hover:-translate-y-[1px] hover:border-accent/40 hover:bg-accent/[0.04] hover:text-ink",
@@ -91,7 +91,7 @@ export function QuickActions({ className }: { className?: string }) {
               >
                 <a.icon size={17} className="shrink-0 text-ink-4 transition-colors group-hover:text-accent" />
                 {a.label}
-                <kbd className="ml-1 rounded-[5px] border border-line bg-sunk px-1.5 py-0.5 font-sans text-[10.5px] tabular-nums text-ink-4">
+                <kbd className="ml-1 rounded-[var(--r-chip)] border border-line bg-sunk px-1.5 py-0.5 font-sans text-[10.5px] tabular-nums text-ink-4">
                   ⌘{a.key}
                 </kbd>
               </Link>

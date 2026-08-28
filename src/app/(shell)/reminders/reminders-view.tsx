@@ -173,7 +173,7 @@ export function RemindersView({
         </p>
         <Link
           href="/login"
-          className="mt-7 rounded-[8px] btn-grad px-5 py-2.5 text-[14px] font-medium transition-transform hover:scale-105"
+          className="mt-7 rounded-[var(--r-control)] btn-grad px-5 py-2.5 text-[14px] font-medium transition-transform hover:scale-105"
         >
           Log in
         </Link>
@@ -192,7 +192,7 @@ export function RemindersView({
       {permission !== "granted" ? (
         <div
           className={cn(
-            "mt-5 flex flex-wrap items-center gap-3 rounded-[10px] border px-4 py-3",
+            "mt-5 flex flex-wrap items-center gap-3 rounded-[var(--r-panel)] border px-4 py-3",
             permission === "denied" || permission === "unsupported"
               ? "border-critical/25 bg-critical/8"
               : "border-caution/25 bg-caution/8",
@@ -213,7 +213,7 @@ export function RemindersView({
           {permission === "default" ? (
             <button
               onClick={ask}
-              className="shrink-0 rounded-[8px] btn-grad px-3.5 py-2 text-[13px] font-medium transition-transform hover:scale-[1.03]"
+              className="shrink-0 rounded-[var(--r-control)] btn-grad px-3.5 py-2 text-[13px] font-medium transition-transform hover:scale-[1.03]"
             >
               Enable
             </button>
@@ -226,7 +226,7 @@ export function RemindersView({
       )}
 
       {/* composer */}
-      <div className="mt-6 rounded-[10px] border border-line bg-rail p-4">
+      <div className="mt-6 rounded-[var(--r-panel)] border border-line bg-rail p-4">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -235,7 +235,7 @@ export function RemindersView({
           }}
           placeholder="Remind me to…"
           aria-label="Reminder title"
-          className="h-11 w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 text-[14px] text-ink outline-none placeholder:text-ink-4 focus:border-accent"
+          className="h-11 w-full rounded-[var(--r-control)] border border-line-strong bg-sunk px-3.5 text-[14px] text-ink outline-none placeholder:text-ink-4 focus:border-accent"
         />
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -257,11 +257,11 @@ export function RemindersView({
             <input
               type="datetime-local"
               onChange={(e) => setWhen(new Date(e.target.value).getTime())}
-              className="rounded-[6px] border border-line-strong bg-sunk px-2.5 py-1.5 text-[12.5px] text-ink outline-none focus:border-accent"
+              className="rounded-[var(--r-chip)] border border-line-strong bg-sunk px-2.5 py-1.5 text-[12.5px] text-ink outline-none focus:border-accent"
             />
             <button
               onClick={() => add(when)}
-              className="flex items-center gap-1.5 rounded-[6px] btn-grad px-3 py-1.5 text-[12.5px] font-medium"
+              className="flex items-center gap-1.5 rounded-[var(--r-chip)] btn-grad px-3 py-1.5 text-[12.5px] font-medium"
             >
               <Ico icon={FiPlus} motion="open" size={12} /> Add
             </button>
@@ -277,7 +277,7 @@ export function RemindersView({
 
       {/* list */}
       {pending.length === 0 && complete.length === 0 ? (
-        <div className="mt-6 flex flex-col items-center rounded-[10px] border border-dashed border-line-strong px-6 py-16 text-center">
+        <div className="mt-6 flex flex-col items-center rounded-[var(--r-panel)] border border-dashed border-line-strong px-6 py-16 text-center">
           <Bot size={56} accent="#fbbf24" />
           <p className="mt-4 text-[14px] text-ink-2">Nothing scheduled yet.</p>
         </div>
@@ -289,7 +289,7 @@ export function RemindersView({
               <li
                 key={r.id}
                 className={cn(
-                  "nx-in flex items-center gap-3 rounded-[10px] border px-4 py-3",
+                  "nx-in flex items-center gap-3 rounded-[var(--r-panel)] border px-4 py-3",
                   r.done
                     ? "border-line bg-rail opacity-55"
                     : overdue
@@ -304,7 +304,7 @@ export function RemindersView({
                   }}
                   aria-label={r.done ? "Mark not done" : "Mark done"}
                   className={cn(
-                    "grid h-5 w-5 shrink-0 place-items-center rounded-[5px] border transition-colors",
+                    "grid h-5 w-5 shrink-0 place-items-center rounded-[var(--r-chip)] border transition-colors",
                     r.done
                       ? "border-positive bg-positive text-canvas"
                       : "border-line-strong hover:border-ink-3",
@@ -334,7 +334,7 @@ export function RemindersView({
                     void deleteReminder(r.id);
                   }}
                   aria-label={`Delete ${r.title}`}
-                  className="shrink-0 rounded-[6px] p-1.5 text-ink-4 transition-colors hover:bg-hover hover:text-critical"
+                  className="shrink-0 rounded-[var(--r-chip)] p-1.5 text-ink-4 transition-colors hover:bg-hover hover:text-critical"
                 >
                   <Ico icon={FiTrash2} motion="shake" size={14} />
                 </button>
@@ -349,7 +349,7 @@ export function RemindersView({
         {fired.map((r) => (
           <div
             key={r.id}
-            className="nx-in flex items-start gap-3 rounded-[10px] border border-caution/40 bg-raised px-4 py-3.5 shadow-[0_16px_40px_rgba(0,0,0,0.6)]"
+            className="nx-in flex items-start gap-3 rounded-[var(--r-panel)] border border-caution/40 bg-raised px-4 py-3.5 shadow-[0_16px_40px_rgba(0,0,0,0.6)]"
           >
             <Bot size={32} accent="#fbbf24" state="working" />
             <div className="min-w-0 flex-1">
@@ -361,7 +361,7 @@ export function RemindersView({
             <button
               onClick={() => setFired((f) => f.filter((x) => x.id !== r.id))}
               aria-label="Dismiss"
-              className="shrink-0 rounded-[5px] p-1 text-ink-4 hover:text-ink"
+              className="shrink-0 rounded-[var(--r-chip)] p-1 text-ink-4 hover:text-ink"
             >
               <Ico icon={FiX} motion="shake" size={14} />
             </button>

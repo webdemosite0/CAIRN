@@ -24,7 +24,7 @@ export function StudioBack({
     <Link
       href={href}
       className={cn(
-        "group inline-flex items-center gap-2 rounded-[9px] px-2 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink",
+        "group inline-flex items-center gap-2 rounded-[var(--r-control)] px-2 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink",
         className,
       )}
     >

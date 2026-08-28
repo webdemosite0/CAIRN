@@ -97,7 +97,7 @@ export function PasswordField({
           aria-label={visible ? "Hide password" : "Show password"}
           aria-pressed={visible}
           title={visible ? "Hide password" : "Show password"}
-          className="group absolute right-1.5 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-[7px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+          className="group absolute right-1.5 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
         >
           <Ico icon={visible ? FiEyeOff : FiEye} motion="pop" size={16} />
         </button>

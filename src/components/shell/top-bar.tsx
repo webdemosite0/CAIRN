@@ -29,7 +29,7 @@ export function TopBar({ initial }: { initial?: string }) {
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9 lg:hidden"
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-control)] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9 lg:hidden"
       >
         <Ico icon={FiMenu} motion="menu" size={18} />
       </button>
@@ -37,7 +37,7 @@ export function TopBar({ initial }: { initial?: string }) {
       <button
         onClick={openPalette}
         className={cn(
-          "tap-44 group flex h-9 min-w-0 max-w-[420px] flex-1 items-center gap-2.5 rounded-[8px]",
+          "tap-44 group flex h-9 min-w-0 max-w-[420px] flex-1 items-center gap-2.5 rounded-[var(--r-control)]",
           "border border-line bg-sunk px-3 text-left transition-colors",
           "hover:border-line-strong hover:bg-hover",
         )}
@@ -46,7 +46,7 @@ export function TopBar({ initial }: { initial?: string }) {
         <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink-4">
           Search anything…
         </span>
-        <kbd className="shrink-0 rounded-[4px] border border-line px-1.5 py-0.5 text-[10.5px] tabular-nums text-ink-4">
+        <kbd className="shrink-0 rounded-[var(--r-tight)] border border-line px-1.5 py-0.5 text-[10.5px] tabular-nums text-ink-4">
           ⌘K
         </kbd>
       </button>
@@ -57,7 +57,7 @@ export function TopBar({ initial }: { initial?: string }) {
         href="/reminders"
         aria-label="Reminders"
         title="Reminders"
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9"
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-control)] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9"
       >
         <Ico icon={TbBell} motion="ring" size={18} />
       </Link>
@@ -65,7 +65,7 @@ export function TopBar({ initial }: { initial?: string }) {
         href="/plans"
         aria-label="Plan and usage"
         title="Plan and usage"
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-[8px] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9"
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-control)] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9"
       >
         <Ico icon={TbHelpCircle} motion="pop" size={18} />
       </Link>

@@ -32,7 +32,7 @@ export function SetupNeeded({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-[620px] flex-col justify-center px-5 py-16">
-      <span className="grid h-14 w-14 place-items-center rounded-[12px] bg-caution/15 text-caution">
+      <span className="grid h-14 w-14 place-items-center rounded-[var(--r-panel)] bg-caution/15 text-caution">
         <Ico icon={FiDatabase} motion="stack" size={26} />
       </span>
 
@@ -60,7 +60,7 @@ export function SetupNeeded({
         )}
       </p>
 
-      <pre className="mt-5 overflow-x-auto rounded-[10px] border border-line bg-sunk px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">
+      <pre className="mt-5 overflow-x-auto rounded-[var(--r-panel)] border border-line bg-sunk px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">
         {detail}
       </pre>
 
@@ -68,13 +68,13 @@ export function SetupNeeded({
         On a serverless host, create a free Turso database:
       </p>
 
-      <pre className="mt-3 overflow-x-auto rounded-[10px] border border-line bg-sunk px-4 py-3 font-mono text-[12.5px] leading-[1.9] text-ink-2">
+      <pre className="mt-3 overflow-x-auto rounded-[var(--r-panel)] border border-line bg-sunk px-4 py-3 font-mono text-[12.5px] leading-[1.9] text-ink-2">
         {steps.join("\n")}
       </pre>
 
       <p className="mt-4 text-[14px] leading-relaxed text-ink-3">
-        Add <code className="rounded-[5px] bg-sunk px-1.5 py-0.5 font-mono text-[13px] text-accent">TURSO_DATABASE_URL</code>{" "}
-        and <code className="rounded-[5px] bg-sunk px-1.5 py-0.5 font-mono text-[13px] text-accent">TURSO_AUTH_TOKEN</code>{" "}
+        Add <code className="rounded-[var(--r-chip)] bg-sunk px-1.5 py-0.5 font-mono text-[13px] text-accent">TURSO_DATABASE_URL</code>{" "}
+        and <code className="rounded-[var(--r-chip)] bg-sunk px-1.5 py-0.5 font-mono text-[13px] text-accent">TURSO_AUTH_TOKEN</code>{" "}
         to your environment variables, then redeploy — variables only apply to
         new builds.
       </p>

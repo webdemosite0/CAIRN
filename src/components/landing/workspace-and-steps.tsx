@@ -53,7 +53,7 @@ export function ConnectedWorkspace() {
           {/* A picture of the workspace, drawn from the same tokens as the app */}
           <div
             aria-hidden
-            className="overflow-hidden rounded-[12px] border border-line bg-canvas shadow-[var(--sh-2)]"
+            className="overflow-hidden rounded-[var(--r-panel)] border border-line bg-canvas shadow-[var(--sh-2)]"
           >
             <div className="grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               {/* threads */}
@@ -62,7 +62,7 @@ export function ConnectedWorkspace() {
                 {THREADS.map((t) => (
                   <div
                     key={t.title}
-                    className={`mb-1 rounded-[6px] px-2 py-1.5 ${t.active ? "bg-accent/[0.07]" : ""}`}
+                    className={`mb-1 rounded-[var(--r-chip)] px-2 py-1.5 ${t.active ? "bg-accent/[0.07]" : ""}`}
                   >
                     <div className="flex items-baseline gap-2">
                       <FiMessageSquare
@@ -83,7 +83,7 @@ export function ConnectedWorkspace() {
               <div className="relative p-3">
                 <p className="mb-2 text-[10px] font-medium text-ink-3">Thread</p>
 
-                <div className="mb-2 flex items-center gap-1.5 rounded-[6px] bg-accent/[0.07] px-2 py-1.5">
+                <div className="mb-2 flex items-center gap-1.5 rounded-[var(--r-chip)] bg-accent/[0.07] px-2 py-1.5">
                   <TroveOrb size={11} state="working" />
                   <span className="text-[10px] text-ink-2">Trove is building your website</span>
                 </div>
@@ -163,7 +163,7 @@ export function HowItWorks() {
           {STEPS.map((s, i) => (
             <li key={s.n} className="relative">
               <span
-                className="grid h-11 w-11 place-items-center rounded-[10px]"
+                className="grid h-11 w-11 place-items-center rounded-[var(--r-panel)]"
                 style={{ background: `color-mix(in srgb, ${s.tone} 12%, transparent)` }}
               >
                 <s.icon size={19} style={{ color: s.tone }} />
@@ -244,7 +244,7 @@ export function WhyTrust() {
             {REASONS.map((r) => (
               <li
                 key={r.title}
-                className="rounded-[10px] border border-line bg-canvas p-5 shadow-[var(--sh-1)]"
+                className="rounded-[var(--r-panel)] border border-line bg-canvas p-5 shadow-[var(--sh-1)]"
               >
                 <r.icon size={20} className="text-accent" />
                 <h3 className="mt-3 text-[14.5px] font-medium leading-snug text-ink">

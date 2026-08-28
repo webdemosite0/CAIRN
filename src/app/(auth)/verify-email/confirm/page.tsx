@@ -38,7 +38,7 @@ export default async function ConfirmPage({
     : "That link has already been used, or it expired.";
 
   return (
-    <div className="nx-in w-full max-w-[420px] rounded-[12px] border border-line bg-rail p-6 text-center shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)] sm:p-7">
+    <div className="nx-in w-full max-w-[420px] rounded-[var(--r-panel)] border border-line bg-rail p-6 text-center shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)] sm:p-7">
       <div className="mb-5 flex flex-col items-center">
         <TroveOrb size={40} state="error" />
         <h1 className="mt-4 text-[17px] font-semibold text-ink">
@@ -46,7 +46,7 @@ export default async function ConfirmPage({
         </h1>
       </div>
 
-      <div className="flex items-start gap-2 rounded-[8px] border border-critical/30 bg-critical/10 px-3 py-2.5 text-left">
+      <div className="flex items-start gap-2 rounded-[var(--r-control)] border border-critical/30 bg-critical/10 px-3 py-2.5 text-left">
         <FiAlertCircle size={14} className="mt-0.5 shrink-0 text-critical" />
         <p className="text-[13px] text-critical">{reason}</p>
       </div>
@@ -57,7 +57,7 @@ export default async function ConfirmPage({
 
       <Link
         href="/login"
-        className="mt-5 flex h-11 w-full items-center justify-center rounded-[8px] btn-grad text-[14.5px] font-semibold"
+        className="mt-5 flex h-11 w-full items-center justify-center rounded-[var(--r-control)] btn-grad text-[14.5px] font-semibold"
       >
         Go to sign in
       </Link>

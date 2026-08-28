@@ -45,7 +45,7 @@ export function PlanPanel({
             key={t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              "flex items-center gap-1.5 rounded-[6px] px-2.5 py-1.5 text-[12.5px] transition-colors",
+              "flex items-center gap-1.5 rounded-[var(--r-chip)] px-2.5 py-1.5 text-[12.5px] transition-colors",
               tab === t.id
                 ? "bg-raised text-ink shadow-[var(--elev)]"
                 : "text-ink-3 hover:text-ink-2",
@@ -127,7 +127,7 @@ export function PlanPanel({
                   {plan.style.palette.map((c) => (
                     <div key={c} className="text-center">
                       <span
-                        className="block h-11 w-11 rounded-[8px] border border-line"
+                        className="block h-11 w-11 rounded-[var(--r-control)] border border-line"
                         style={{ background: c }}
                       />
                       <span className="mt-1 block font-mono text-[10.5px] text-ink-4">
@@ -173,7 +173,7 @@ export function PlanPanel({
                 key={o.id}
                 onClick={() => onStorage(o.id)}
                 className={cn(
-                  "block w-full rounded-[8px] border p-3.5 text-left transition-colors",
+                  "block w-full rounded-[var(--r-control)] border p-3.5 text-left transition-colors",
                   storage === o.id
                     ? "border-accent bg-accent/5"
                     : "border-line hover:bg-hover",
@@ -199,7 +199,7 @@ export function PlanPanel({
                   {o.tags.map((t) => (
                     <span
                       key={t}
-                      className="rounded-[5px] bg-sunk px-1.5 py-0.5 text-[11px] text-ink-4"
+                      className="rounded-[var(--r-chip)] bg-sunk px-1.5 py-0.5 text-[11px] text-ink-4"
                     >
                       {t}
                     </span>
@@ -229,7 +229,7 @@ export function PlanPanel({
         <button
           onClick={onGenerate}
           disabled={busy}
-          className="flex w-full items-center justify-center gap-2 rounded-[8px] btn-grad px-4 py-2.5 text-[14px] font-medium transition-[filter,transform] active:scale-[0.99] disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-[var(--r-control)] btn-grad px-4 py-2.5 text-[14px] font-medium transition-[filter,transform] active:scale-[0.99] disabled:opacity-50"
         >
           Generate App
         </button>

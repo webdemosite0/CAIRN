@@ -501,7 +501,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
             once a project exists. */}
         <Link
           href="/chat"
-          className="group absolute left-3 top-3 z-10 flex items-center gap-2 rounded-[9px] px-2 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+          className="group absolute left-3 top-3 z-10 flex items-center gap-2 rounded-[var(--r-control)] px-2 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
         >
           <Ico icon={FiArrowLeft} motion="back" size={15} />
           Trove
@@ -509,7 +509,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
 
         <div className="nx-in mx-auto flex w-full max-w-[720px] flex-1 flex-col justify-center px-5 py-16">
         <div className="mb-7 text-center">
-          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[12px] bg-accent/15 text-accent">
+          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[var(--r-panel)] bg-accent/15 text-accent">
             <Ico icon={TbWorld} motion="spin" size={26} />
           </span>
           <h1 className="text-[27px] font-semibold text-ink">Website Builder</h1>
@@ -537,7 +537,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
               key={t.id}
               onClick={() => setTargetId(t.id)}
               className={cn(
-                "nx-in rounded-[8px] border p-3 text-left transition-colors",
+                "nx-in rounded-[var(--r-control)] border p-3 text-left transition-colors",
                 targetId === t.id
                   ? "border-accent bg-accent/[0.06]"
                   : "border-line hover:bg-hover",
@@ -557,7 +557,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
                 </span>
                 <span className="text-[13.5px] font-medium text-ink">{t.label}</span>
                 {t.previewable ? (
-                  <span className="rounded-[5px] bg-positive/12 px-1.5 py-0.5 text-[10.5px] text-positive">
+                  <span className="rounded-[var(--r-chip)] bg-positive/12 px-1.5 py-0.5 text-[10.5px] text-positive">
                     previews here
                   </span>
                 ) : null}
@@ -580,7 +580,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
               key={m.id}
               onClick={() => setDepth(m.id)}
               className={cn(
-                "flex items-center gap-1.5 rounded-[6px] border px-3 py-1.5 text-[12.5px] transition-colors",
+                "flex items-center gap-1.5 rounded-[var(--r-chip)] border px-3 py-1.5 text-[12.5px] transition-colors",
                 depth === m.id
                   ? "border-accent bg-accent/10 text-ink"
                   : "border-line text-ink-3 hover:bg-hover hover:text-ink-2",
@@ -628,7 +628,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
         <Link
           href="/chat"
           aria-label="Back to Trove"
-          className="group grid size-8 shrink-0 place-items-center rounded-[8px] transition-colors hover:bg-hover"
+          className="group grid size-8 shrink-0 place-items-center rounded-[var(--r-control)] transition-colors hover:bg-hover"
         >
           <TroveOrb size={22} state="idle" />
         </Link>
@@ -646,21 +646,21 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
 
         {/* What the right pane is showing. The segmented control is the
             "Preview" pill from the reference, with the panes that exist. */}
-        <div className="flex items-center gap-0.5 rounded-[9px] border border-line bg-rail p-0.5">
+        <div className="flex items-center gap-0.5 rounded-[var(--r-control)] border border-line bg-rail p-0.5">
           {PANES.map((p) => (
             <button
               key={p.id}
               onClick={() => setPane(p.id)}
               aria-pressed={pane === p.id}
               className={cn(
-                "group flex items-center gap-1.5 rounded-[7px] px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
+                "group flex items-center gap-1.5 rounded-[var(--r-chip)] px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
                 pane === p.id ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
               )}
             >
               <Ico icon={p.icon} motion={p.motion} size={14} active={pane === p.id} />
               <span className="hidden sm:inline">{p.label}</span>
               {p.id === "files" && files.length ? (
-                <span className="rounded-[4px] bg-sunk px-1 text-[10px] tabular-nums text-ink-4">
+                <span className="rounded-[var(--r-tight)] bg-sunk px-1 text-[10px] tabular-nums text-ink-4">
                   {files.length}
                 </span>
               ) : null}
@@ -669,7 +669,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
         </div>
 
         {pane === "preview" ? (
-          <div className="flex items-center gap-0.5 rounded-[9px] border border-line bg-rail p-0.5">
+          <div className="flex items-center gap-0.5 rounded-[var(--r-control)] border border-line bg-rail p-0.5">
             {(Object.keys(DEVICE) as (keyof typeof DEVICE)[]).map((d) => {
               const D = DEVICE[d];
               return (
@@ -679,7 +679,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
                   aria-label={D.label}
                   aria-pressed={device === d}
                   className={cn(
-                    "grid size-7 place-items-center rounded-[7px] transition-colors",
+                    "grid size-7 place-items-center rounded-[var(--r-chip)] transition-colors",
                     device === d ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
                   )}
                 >
@@ -690,7 +690,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
             <button
               onClick={() => setFiles((f) => [...f])}
               aria-label="Reload preview"
-              className="grid size-7 place-items-center rounded-[7px] text-ink-4 transition-colors hover:text-ink-2"
+              className="grid size-7 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:text-ink-2"
             >
               <FiRefreshCw size={13} />
             </button>
@@ -709,7 +709,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
             <select
               value={entry}
               onChange={(e) => setPage(e.target.value)}
-              className="h-8 cursor-pointer appearance-none rounded-[9px] border border-line bg-rail pl-2.5 pr-7 text-[12.5px] font-medium text-ink outline-none transition-colors hover:bg-hover focus:border-accent"
+              className="h-8 cursor-pointer appearance-none rounded-[var(--r-control)] border border-line bg-rail pl-2.5 pr-7 text-[12.5px] font-medium text-ink outline-none transition-colors hover:bg-hover focus:border-accent"
             >
               {pages.map((p) => (
                 <option key={p} value={p}>
@@ -762,7 +762,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
               onClick={() => setHalf(id)}
               aria-pressed={half === id}
               className={cn(
-                "h-9 flex-1 rounded-[10px] text-[13.5px] font-medium transition-colors",
+                "h-9 flex-1 rounded-[var(--r-panel)] text-[13.5px] font-medium transition-colors",
                 half === id
                   ? "rail-item-active"
                   : "text-ink-3 active:bg-hover",
@@ -784,7 +784,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
         >
           <div className="min-h-0 flex-1 space-y-3 overflow-auto p-3.5">
             <div className="flex justify-end">
-              <p className="max-w-[85%] rounded-[10px] bg-raised px-3.5 py-2 text-[13.5px] text-ink">
+              <p className="max-w-[85%] rounded-[var(--r-panel)] bg-raised px-3.5 py-2 text-[13.5px] text-ink">
                 {idea}
               </p>
             </div>
@@ -838,7 +838,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
                     key={q}
                     onClick={() => edit(q)}
                     disabled={busy}
-                    className="rounded-[6px] border border-line px-2.5 py-1 text-[12px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40"
+                    className="rounded-[var(--r-chip)] border border-line px-2.5 py-1 text-[12px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40"
                   >
                     {q}
                   </button>
@@ -847,9 +847,9 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
             ) : null}
 
             {skillsOpen ? (
-              <div className="nx-in mb-2 max-h-[38vh] overflow-auto rounded-[8px] border border-line bg-rail p-2">
+              <div className="nx-in mb-2 max-h-[38vh] overflow-auto rounded-[var(--r-control)] border border-line bg-rail p-2">
                 {SKILL_LIST.map((s) => (
-                  <div key={s.id} className="rounded-[6px] px-2 py-1.5">
+                  <div key={s.id} className="rounded-[var(--r-chip)] px-2 py-1.5">
                     <p className="text-[12.5px] font-medium text-ink-2">{s.label}</p>
                     <p className="text-[11.5px] leading-snug text-ink-4">{s.blurb}</p>
                   </div>
@@ -922,7 +922,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
                     title="Preview"
                     srcDoc={preview}
                     sandbox="allow-scripts allow-forms allow-modals allow-popups"
-                    className="nx-preview-in mx-auto h-full min-h-[560px] rounded-[12px] border border-line bg-white shadow-[0_20px_60px_-24px_rgba(0,0,0,0.7)] transition-[width] duration-300 ease-out"
+                    className="nx-preview-in mx-auto h-full min-h-[560px] rounded-[var(--r-panel)] border border-line bg-white shadow-[0_20px_60px_-24px_rgba(0,0,0,0.7)] transition-[width] duration-300 ease-out"
                     style={{ width: DEVICE[device].w, maxWidth: "100%" }}
                   />
                 </div>
@@ -960,7 +960,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
                           setOpenFile(f.path);
                           setPane("code");
                         }}
-                        className="flex w-full items-center gap-2 rounded-[6px] px-2 py-1.5 text-left text-[13px] text-ink-2 transition-colors hover:bg-hover"
+                        className="flex w-full items-center gap-2 rounded-[var(--r-chip)] px-2 py-1.5 text-left text-[13px] text-ink-2 transition-colors hover:bg-hover"
                       >
                         <FiFile size={13} className="shrink-0 text-ink-4" />
                         <span className="flex-1 truncate">{f.path}</span>
@@ -982,7 +982,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
                       key={f.path}
                       onClick={() => setOpenFile(f.path)}
                       className={cn(
-                        "shrink-0 rounded-[5px] px-2 py-1 font-mono text-[11.5px] transition-colors",
+                        "shrink-0 rounded-[var(--r-chip)] px-2 py-1 font-mono text-[11.5px] transition-colors",
                         openFile === f.path ? "bg-hover text-ink" : "text-ink-4 hover:text-ink-2",
                       )}
                     >
@@ -998,7 +998,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
                       setCopied(true);
                       setTimeout(() => setCopied(false), 1500);
                     }}
-                    className="shrink-0 rounded-[5px] px-2 py-1 text-ink-4 hover:text-ink-2"
+                    className="shrink-0 rounded-[var(--r-chip)] px-2 py-1 text-ink-4 hover:text-ink-2"
                     aria-label="Copy file"
                   >
                     {copied ? <FiCheck size={13} className="text-positive" /> : <FiCopy size={13} />}

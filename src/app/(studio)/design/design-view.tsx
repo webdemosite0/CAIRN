@@ -109,7 +109,7 @@ export function DesignView({ recents = [] }: { recents?: Recent[] }) {
         <StudioBack className="absolute left-3 top-3 z-10" />
         <div className="mx-auto w-full max-w-[720px] flex-1 px-5 py-16">
           <div className="mb-7 flex flex-col items-center text-center">
-            <span className="mb-4 grid size-14 place-items-center rounded-[12px] bg-accent/15 text-accent">
+            <span className="mb-4 grid size-14 place-items-center rounded-[var(--r-panel)] bg-accent/15 text-accent">
               <HiOutlineCube size={26} />
             </span>
             <h1 className="text-[27px] font-semibold text-ink">Design</h1>
@@ -146,7 +146,7 @@ export function DesignView({ recents = [] }: { recents?: Recent[] }) {
         </div>
 
         <div className="flex items-center gap-1.5">
-          <label className="flex items-center gap-2 rounded-[9px] border border-line bg-rail px-2.5 py-1.5">
+          <label className="flex items-center gap-2 rounded-[var(--r-control)] border border-line bg-rail px-2.5 py-1.5">
             <span className="text-[11.5px] text-ink-4">Zoom</span>
             <input
               type="range"
@@ -195,14 +195,14 @@ export function DesignView({ recents = [] }: { recents?: Recent[] }) {
                     <button
                       onClick={() => openScreen(s)}
                       aria-label={`Open ${s.name} in a new tab`}
-                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+                      className="group grid size-6 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
                     >
                       <Ico icon={FiExternalLink} motion="launch" size={12} />
                     </button>
                     <button
                       onClick={() => downloadScreen(s)}
                       aria-label={`Download ${s.name}`}
-                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+                      className="group grid size-6 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
                     >
                       <Ico icon={FiDownload} motion="down" size={12} />
                     </button>
@@ -215,7 +215,7 @@ export function DesignView({ recents = [] }: { recents?: Recent[] }) {
                   into a 270px iframe is a different layout — media queries
                   fire, and the thing on screen is not the thing designed. */}
               <div
-                className="overflow-hidden rounded-[14px] border border-line bg-raised shadow-[0_18px_48px_-24px_rgb(0_0_0/0.45)]"
+                className="overflow-hidden rounded-[var(--r-card)] border border-line bg-raised shadow-[0_18px_48px_-24px_rgb(0_0_0/0.45)]"
                 style={{ width: frame.width * zoom, height: frame.height * zoom }}
               >
                 {s.state === "done" ? (

@@ -141,7 +141,7 @@ function NavRow({
       />
       <span className="truncate">{item.label}</span>
       {item.badge ? (
-        <span className="ml-auto shrink-0 rounded-[5px] bg-accent-soft px-1.5 py-0.5 text-[9.5px] font-medium uppercase tracking-[0.06em] text-accent">
+        <span className="ml-auto shrink-0 rounded-[var(--r-chip)] bg-accent-soft px-1.5 py-0.5 text-[9.5px] font-medium uppercase tracking-[0.06em] text-accent">
           {item.badge}
         </span>
       ) : null}
@@ -180,7 +180,7 @@ function UserMenu({ user, onNavigate }: { user: User; onNavigate?: () => void })
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="group flex w-full items-center gap-2.5 rounded-[6px] px-2 py-1.5 transition-colors hover:bg-hover"
+        className="group flex w-full items-center gap-2.5 rounded-[var(--r-chip)] px-2 py-1.5 transition-colors hover:bg-hover"
       >
         <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-raised text-[11.5px] font-semibold text-ink-2">
           {user.name.slice(0, 1).toUpperCase()}
@@ -203,7 +203,7 @@ function UserMenu({ user, onNavigate }: { user: User; onNavigate?: () => void })
       {open ? (
         <div
           role="menu"
-          className="nx-in absolute bottom-full left-0 z-50 mb-1.5 w-full overflow-hidden rounded-[8px] border border-line bg-raised shadow-[var(--sh-3)]"
+          className="nx-in absolute bottom-full left-0 z-50 mb-1.5 w-full overflow-hidden rounded-[var(--r-control)] border border-line bg-raised shadow-[var(--sh-3)]"
         >
           {links.map((l) => (
             <Link
@@ -265,7 +265,7 @@ function RailBody({
             onClick={onCollapse}
             aria-label="Collapse sidebar"
             title="Toggle sidebar  ⌘B"
-            className="group grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+            className="group grid h-8 w-8 place-items-center rounded-[var(--r-chip)] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
           >
             <Ico icon={FiSidebar} motion="nudge" size={17} />
           </button>
@@ -281,7 +281,7 @@ function RailBody({
         <Link
           href="/chat"
           onClick={onNavigate}
-          className="group flex h-9 items-center gap-2.5 rounded-[8px] border border-line bg-raised px-2.5 text-[13.5px] font-medium text-ink transition-colors hover:bg-hover hover:border-line-strong"
+          className="group flex h-9 items-center gap-2.5 rounded-[var(--r-control)] border border-line bg-raised px-2.5 text-[13.5px] font-medium text-ink transition-colors hover:bg-hover hover:border-line-strong"
         >
           <Ico icon={FiPlus} motion="open" size={15} className="text-accent" />
           New chat
@@ -316,7 +316,7 @@ function RailBody({
           <Link
             href="/login"
             onClick={onNavigate}
-            className="group flex items-center gap-2.5 rounded-[6px] px-2 py-1.5 text-[13.5px] text-ink transition-colors hover:bg-hover"
+            className="group flex items-center gap-2.5 rounded-[var(--r-chip)] px-2 py-1.5 text-[13.5px] text-ink transition-colors hover:bg-hover"
           >
             <span className="grid h-7 w-7 place-items-center rounded-full bg-raised text-ink-3">
               <Ico icon={FiUser} motion="tilt" size={14} />
@@ -337,7 +337,7 @@ function RailBody({
                 href={x.href}
                 onClick={onNavigate}
                 aria-label={x.label}
-                className="grid h-8 w-8 place-items-center rounded-[6px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+                className="grid h-8 w-8 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
               >
                 <x.icon size={16} />
               </Link>
@@ -395,7 +395,7 @@ export function Sidebar({
               onClick={() => setCollapsed(false)}
               aria-label="Expand sidebar"
               title="Toggle sidebar  ⌘B"
-              className="group mb-2 mt-1 grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+              className="group mb-2 mt-1 grid h-8 w-8 place-items-center rounded-[var(--r-chip)] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
             >
               <Ico icon={FiSidebar} motion="nudge" size={17} />
             </button>
@@ -404,7 +404,7 @@ export function Sidebar({
               href="/chat"
               title="New"
               aria-label="New"
-              className="btn-grad grid h-9 w-9 place-items-center rounded-[8px]"
+              className="btn-grad grid h-9 w-9 place-items-center rounded-[var(--r-control)]"
             >
               <FiPlus size={16} />
             </Link>
@@ -420,7 +420,7 @@ export function Sidebar({
                     aria-label={i.label}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group flex w-[52px] shrink-0 flex-col items-center gap-1 rounded-[8px] px-1 py-2 transition-colors",
+                      "group flex w-[52px] shrink-0 flex-col items-center gap-1 rounded-[var(--r-control)] px-1 py-2 transition-colors",
                       active
                         ? "bg-accent-soft text-accent"
                         : "text-ink-4 hover:bg-hover hover:text-ink-2",
@@ -456,7 +456,7 @@ export function Sidebar({
             <button
               onClick={() => setOpen(false)}
               aria-label="Close menu"
-              className="absolute right-2 top-2 z-10 grid h-8 w-8 place-items-center rounded-[6px] text-ink-3 hover:bg-hover hover:text-ink"
+              className="absolute right-2 top-2 z-10 grid h-8 w-8 place-items-center rounded-[var(--r-chip)] text-ink-3 hover:bg-hover hover:text-ink"
             >
               <FiX size={17} />
             </button>

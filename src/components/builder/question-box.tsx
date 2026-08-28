@@ -60,7 +60,7 @@ export function QuestionBox({
               value={answers[q.id] ?? ""}
               onChange={(e) => set(q.id, e.target.value)}
               placeholder={q.options[0] ? `e.g. ${q.options[0]}` : "Your answer"}
-              className="mt-2 w-full rounded-[8px] border border-line bg-sunk px-3 py-2 text-[13.5px] text-ink placeholder:text-ink-4 focus:border-accent focus:outline-none"
+              className="mt-2 w-full rounded-[var(--r-control)] border border-line bg-sunk px-3 py-2 text-[13.5px] text-ink placeholder:text-ink-4 focus:border-accent focus:outline-none"
             />
 
             {q.options.length ? (
@@ -71,7 +71,7 @@ export function QuestionBox({
                     type="button"
                     onClick={() => set(q.id, o)}
                     className={cn(
-                      "rounded-[6px] border px-2.5 py-1 text-[12px] transition-colors",
+                      "rounded-[var(--r-chip)] border px-2.5 py-1 text-[12px] transition-colors",
                       answers[q.id] === o
                         ? "border-accent bg-accent/10 text-ink"
                         : "border-line text-ink-3 hover:bg-hover hover:text-ink-2",
@@ -90,7 +90,7 @@ export function QuestionBox({
         <button
           onClick={onSkip}
           disabled={busy}
-          className="flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40"
+          className="flex items-center gap-1.5 rounded-[var(--r-chip)] px-3 py-2 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-40"
         >
           <FiSkipForward size={13} /> Skip
         </button>
@@ -100,7 +100,7 @@ export function QuestionBox({
         <button
           onClick={() => onSubmit(answers)}
           disabled={busy}
-          className="group flex items-center gap-2 rounded-[8px] btn-grad px-4 py-2 text-[13.5px] font-medium transition-[filter,transform] active:scale-[0.99] disabled:opacity-50"
+          className="group flex items-center gap-2 rounded-[var(--r-control)] btn-grad px-4 py-2 text-[13.5px] font-medium transition-[filter,transform] active:scale-[0.99] disabled:opacity-50"
         >
           Plan it
           <FiArrowRight

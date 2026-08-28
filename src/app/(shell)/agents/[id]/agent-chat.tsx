@@ -143,7 +143,7 @@ export function AgentChat({
           <Link
             href="/agents"
             aria-label="Back to agents"
-            className="group grid h-8 w-8 shrink-0 place-items-center rounded-[6px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+            className="group grid h-8 w-8 shrink-0 place-items-center rounded-[var(--r-chip)] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
           >
             <Ico icon={FiArrowLeft} motion="nudge" size={17} />
           </Link>

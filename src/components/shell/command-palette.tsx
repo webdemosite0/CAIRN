@@ -141,7 +141,7 @@ export function CommandPalette() {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="nx-stage relative w-full max-w-[560px] overflow-hidden rounded-[12px] border border-line bg-raised shadow-[var(--sh-3)]"
+        className="nx-stage relative w-full max-w-[560px] overflow-hidden rounded-[var(--r-panel)] border border-line bg-raised shadow-[var(--sh-3)]"
       >
         <div className="flex items-center gap-2.5 border-b border-line px-4">
           <TbSearch size={17} className="shrink-0 text-ink-4" />
@@ -167,7 +167,7 @@ export function CommandPalette() {
             placeholder="Search Trove…"
             className="w-full bg-transparent py-3.5 text-[14.5px] text-ink outline-none placeholder:text-ink-4"
           />
-          <kbd className="shrink-0 rounded-[4px] border border-line px-1.5 py-0.5 text-[10.5px] text-ink-4">
+          <kbd className="shrink-0 rounded-[var(--r-tight)] border border-line px-1.5 py-0.5 text-[10.5px] text-ink-4">
             ESC
           </kbd>
         </div>
@@ -185,7 +185,7 @@ export function CommandPalette() {
                 onMouseEnter={() => setActive(i)}
                 onClick={() => go(c)}
                 className={cn(
-                  "flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-left transition-colors",
+                  "flex w-full items-center gap-3 rounded-[var(--r-control)] px-3 py-2.5 text-left transition-colors",
                   i === active ? "bg-hover" : "hover:bg-hover/60",
                 )}
               >
@@ -198,7 +198,7 @@ export function CommandPalette() {
                   <span className="block truncate text-[11.5px] text-ink-4">{c.hint}</span>
                 </span>
                 {c.keys ? (
-                  <kbd className="shrink-0 rounded-[4px] bg-sunk px-1.5 py-0.5 text-[10.5px] tabular-nums text-ink-4">
+                  <kbd className="shrink-0 rounded-[var(--r-tight)] bg-sunk px-1.5 py-0.5 text-[10.5px] tabular-nums text-ink-4">
                     {c.keys}
                   </kbd>
                 ) : null}

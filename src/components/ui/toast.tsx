@@ -93,7 +93,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               {items.map((t) => (
                 <div
                   key={t.id}
-                  className="nx-slide-up pointer-events-auto flex items-start gap-2.5 rounded-[10px] border border-line bg-raised px-3.5 py-3 shadow-[var(--elev)]"
+                  className="nx-slide-up pointer-events-auto flex items-start gap-2.5 rounded-[var(--r-panel)] border border-line bg-raised px-3.5 py-3 shadow-[var(--elev)]"
                 >
                   <span className="mt-px shrink-0">{icons[t.tone]}</span>
                   <p className="min-w-0 flex-1 text-[13.5px] leading-snug text-ink-2">
@@ -106,7 +106,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                         t.action?.onClick();
                         dismiss(t.id);
                       }}
-                      className="shrink-0 rounded-[5px] px-1.5 py-0.5 text-[13px] font-medium text-accent transition-colors hover:bg-hover"
+                      className="shrink-0 rounded-[var(--r-chip)] px-1.5 py-0.5 text-[13px] font-medium text-accent transition-colors hover:bg-hover"
                     >
                       {t.action.label}
                     </button>
@@ -115,7 +115,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                     type="button"
                     onClick={() => dismiss(t.id)}
                     aria-label="Dismiss"
-                    className="-mr-1 -mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+                    className="-mr-1 -mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
                   >
                     <Ico icon={FiX} motion="close" size={13} />
                   </button>

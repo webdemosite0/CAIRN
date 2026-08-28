@@ -29,7 +29,7 @@ const CAPS: { icon: IconType; label: string; sub: string; href: string }[] = [
 export function CapabilityStrip() {
   return (
     <section aria-label="What Trove does" className="mx-auto max-w-[1140px] px-5 lg:px-8">
-      <div className="grid items-stretch gap-0 overflow-hidden rounded-[12px] border border-line bg-canvas shadow-[var(--sh-1)] md:grid-cols-[140px_minmax(0,1fr)]">
+      <div className="grid items-stretch gap-0 overflow-hidden rounded-[var(--r-panel)] border border-line bg-canvas shadow-[var(--sh-1)] md:grid-cols-[140px_minmax(0,1fr)]">
         <div className="flex items-center border-b border-line px-5 py-4 md:border-b-0 md:border-r">
           <p className="text-[11px] font-semibold uppercase leading-[1.5] tracking-[0.1em] text-ink-3">
             Built for
@@ -73,10 +73,10 @@ function Plate({ kind }: { kind: string }) {
       <>
         <span className={base}>
           <span className="mb-1 block h-1 w-6 rounded-full bg-white/60" />
-          <span className="mb-1.5 block h-2 w-[62%] rounded-[2px] bg-white/35" />
+          <span className="mb-1.5 block h-2 w-[62%] rounded-[var(--r-tight)] bg-white/35" />
           <span className="flex gap-1">
             {[0, 1, 2].map((i) => (
-              <span key={i} className="h-5 flex-1 rounded-[2px] bg-white/12" />
+              <span key={i} className="h-5 flex-1 rounded-[var(--r-tight)] bg-white/12" />
             ))}
           </span>
         </span>
@@ -89,7 +89,7 @@ function Plate({ kind }: { kind: string }) {
         {[70, 90, 55].map((w, i) => (
           <span key={i} className="mb-1.5 flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white/70" />
-            <span className="block h-1.5 rounded-[2px] bg-white/25" style={{ width: `${w}%` }} />
+            <span className="block h-1.5 rounded-[var(--r-tight)] bg-white/25" style={{ width: `${w}%` }} />
           </span>
         ))}
       </span>
@@ -99,7 +99,7 @@ function Plate({ kind }: { kind: string }) {
     return (
       <span className={`${base} flex items-end gap-1`}>
         {[40, 65, 30, 80, 55, 70].map((h, i) => (
-          <span key={i} className="flex-1 rounded-[1px] bg-white/45" style={{ height: `${h}%` }} />
+          <span key={i} className="flex-1 rounded-[var(--r-tight)] bg-white/45" style={{ height: `${h}%` }} />
         ))}
       </span>
     );
@@ -107,11 +107,11 @@ function Plate({ kind }: { kind: string }) {
   if (kind === "doc") {
     return (
       <span className={base}>
-        <span className="mb-1.5 block h-2 w-[50%] rounded-[2px] bg-white/45" />
+        <span className="mb-1.5 block h-2 w-[50%] rounded-[var(--r-tight)] bg-white/45" />
         {[100, 92, 78, 96].map((w, i) => (
           <span
             key={i}
-            className="mb-1 block h-1 rounded-[2px] bg-white/20"
+            className="mb-1 block h-1 rounded-[var(--r-tight)] bg-white/20"
             style={{ width: `${w}%` }}
           />
         ))}
@@ -175,7 +175,7 @@ export function Outcomes() {
               key={o.name}
               href={o.href}
               className={cn(
-                "group flex flex-col overflow-hidden rounded-[10px] border border-line bg-canvas",
+                "group flex flex-col overflow-hidden rounded-[var(--r-panel)] border border-line bg-canvas",
                 "transition-[transform,border-color,box-shadow] duration-200",
                 "hover:-translate-y-[3px] hover:border-line-strong hover:shadow-[var(--sh-2)]",
               )}

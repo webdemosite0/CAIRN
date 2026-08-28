@@ -56,7 +56,7 @@ export function ConnectDialog({
         <button
           onClick={onClose}
           aria-label="Close"
-          className="group absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-[6px] text-ink-4 hover:bg-hover hover:text-ink"
+          className="group absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-[var(--r-chip)] text-ink-4 hover:bg-hover hover:text-ink"
         >
           <Ico icon={FiX} motion="shake" size={16} />
         </button>
@@ -90,7 +90,7 @@ export function ConnectDialog({
             autoFocus
             required
             placeholder="Paste it here"
-            className="mt-1.5 w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 py-2.5 font-mono text-[13px] text-ink outline-none transition-colors placeholder:font-sans placeholder:text-ink-4 focus:border-accent"
+            className="mt-1.5 w-full rounded-[var(--r-control)] border border-line-strong bg-sunk px-3.5 py-2.5 font-mono text-[13px] text-ink outline-none transition-colors placeholder:font-sans placeholder:text-ink-4 focus:border-accent"
           />
 
           {state.error ? (
@@ -102,7 +102,7 @@ export function ConnectDialog({
 
           <button
             disabled={pending}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-[8px] btn-grad py-2.5 text-[14px] font-medium transition-[filter] disabled:opacity-60"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-[var(--r-control)] btn-grad py-2.5 text-[14px] font-medium transition-[filter] disabled:opacity-60"
           >
             {pending ? (
               <>

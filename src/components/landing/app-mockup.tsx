@@ -78,7 +78,7 @@ export function AppMockup() {
       />
 
       {/* ---- the window ---- */}
-      <div className="overflow-hidden rounded-[12px] border border-line bg-canvas shadow-[var(--sh-3)]">
+      <div className="overflow-hidden rounded-[var(--r-panel)] border border-line bg-canvas shadow-[var(--sh-3)]">
         <div className="flex">
           {/* rail */}
           <div className="hidden w-[128px] shrink-0 flex-col border-r border-line bg-rail p-2.5 sm:flex">
@@ -87,14 +87,14 @@ export function AppMockup() {
               <span className="text-[9px] font-bold tracking-[0.1em] text-ink">TROVE</span>
             </div>
 
-            <div className="btn-grad mb-3 flex items-center justify-center gap-1 rounded-[5px] py-1.5 text-[9px] font-medium">
+            <div className="btn-grad mb-3 flex items-center justify-center gap-1 rounded-[var(--r-chip)] py-1.5 text-[9px] font-medium">
               <TbPlus size={9} /> New
             </div>
 
             {RAIL_MAIN.map((i) => (
               <div
                 key={i.label}
-                className={`mb-0.5 flex items-center gap-1.5 rounded-[4px] px-1.5 py-1 text-[9px] ${
+                className={`mb-0.5 flex items-center gap-1.5 rounded-[var(--r-tight)] px-1.5 py-1 text-[9px] ${
                   i.active ? "bg-accent/10 font-medium text-ink" : "text-ink-4"
                 }`}
               >
@@ -109,14 +109,14 @@ export function AppMockup() {
             {RAIL_BUILD.map((i) => (
               <div
                 key={i.label}
-                className="mb-0.5 flex items-center gap-1.5 rounded-[4px] px-1.5 py-1 text-[9px] text-ink-4"
+                className="mb-0.5 flex items-center gap-1.5 rounded-[var(--r-tight)] px-1.5 py-1 text-[9px] text-ink-4"
               >
                 <i.icon size={10} />
                 {i.label}
               </div>
             ))}
 
-            <div className="mt-auto rounded-[5px] px-1.5 pt-2">
+            <div className="mt-auto rounded-[var(--r-chip)] px-1.5 pt-2">
               <p className="text-[8px] text-ink-3">200 / 500 credits</p>
               <span className="mt-1 block h-[3px] overflow-hidden rounded-full bg-raised">
                 <span className="block h-full w-[40%] rounded-full bg-accent" />
@@ -128,7 +128,7 @@ export function AppMockup() {
           <div className="min-w-0 flex-1">
             {/* top bar */}
             <div className="flex items-center gap-2 border-b border-line px-3 py-2">
-              <div className="flex h-6 flex-1 items-center gap-1.5 rounded-[5px] border border-line bg-sunk px-2">
+              <div className="flex h-6 flex-1 items-center gap-1.5 rounded-[var(--r-chip)] border border-line bg-sunk px-2">
                 <TbSearch size={9} className="text-ink-4" />
                 <span className="text-[8.5px] text-ink-4">Search anything…</span>
                 <span className="ml-auto text-[7.5px] text-ink-4">⌘K</span>
@@ -146,7 +146,7 @@ export function AppMockup() {
               </p>
 
               {/* composer */}
-              <div className="mt-3 rounded-[8px] border border-line bg-rail p-2.5">
+              <div className="mt-3 rounded-[var(--r-control)] border border-line bg-rail p-2.5">
                 <p className="text-[9px] text-ink-4">Describe anything you want Trove to build…</p>
                 <div className="mt-4 flex items-center gap-1.5">
                   {[
@@ -155,13 +155,13 @@ export function AppMockup() {
                   ].map((b) => (
                     <span
                       key={b.label}
-                      className="flex items-center gap-1 rounded-[4px] border border-line px-1.5 py-0.5 text-[8px] text-ink-3"
+                      className="flex items-center gap-1 rounded-[var(--r-tight)] border border-line px-1.5 py-0.5 text-[8px] text-ink-3"
                     >
                       <b.icon size={7} />
                       {b.label}
                     </span>
                   ))}
-                  <span className="flex items-center gap-1 rounded-[4px] border border-line px-1.5 py-0.5 text-[8px] text-ink-3">
+                  <span className="flex items-center gap-1 rounded-[var(--r-tight)] border border-line px-1.5 py-0.5 text-[8px] text-ink-3">
                     <TroveOrb size={7} state="idle" />
                     Trove Intelligence
                   </span>
@@ -191,7 +191,7 @@ export function AppMockup() {
 
               <div className="mt-1.5 grid grid-cols-5 gap-1.5">
                 {CREATIONS.map((c) => (
-                  <div key={c.title} className="overflow-hidden rounded-[5px] border border-line">
+                  <div key={c.title} className="overflow-hidden rounded-[var(--r-chip)] border border-line">
                     <span
                       className="block h-8"
                       style={{
@@ -216,16 +216,16 @@ export function AppMockup() {
       {CHIPS.map((c) => (
         <div
           key={c.ext}
-          className={`nx-float absolute ${c.at} flex items-center gap-1.5 rounded-[7px] border px-2.5 py-1.5 shadow-[var(--sh-2)] ${
+          className={`nx-float absolute ${c.at} flex items-center gap-1.5 rounded-[var(--r-chip)] border px-2.5 py-1.5 shadow-[var(--sh-2)] ${
             c.dark ? "border-transparent bg-[#11141b]" : "border-line bg-canvas"
           }`}
           style={{ animationDelay: c.delay }}
         >
           <span
-            className="grid h-4 w-4 place-items-center rounded-[3px]"
+            className="grid h-4 w-4 place-items-center rounded-[var(--r-tight)]"
             style={{ background: `color-mix(in srgb, ${c.tone} 20%, transparent)` }}
           >
-            <span className="h-1.5 w-1.5 rounded-[1px]" style={{ background: c.tone }} />
+            <span className="h-1.5 w-1.5 rounded-[var(--r-tight)]" style={{ background: c.tone }} />
           </span>
           <span
             className={`text-[11px] font-medium ${c.dark ? "text-white" : "text-ink-2"}`}

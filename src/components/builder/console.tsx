@@ -38,7 +38,7 @@ export function BuildConsole({
         {onClear && lines.length ? (
           <button
             onClick={onClear}
-            className="grid h-6 w-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink-2"
+            className="grid h-6 w-6 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink-2"
             aria-label="Clear console"
           >
             <FiTrash2 size={12} />

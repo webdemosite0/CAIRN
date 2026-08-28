@@ -73,7 +73,7 @@ function Preview({ kind, tone }: { kind: Starter["preview"]; tone: string }) {
         {bar("70%")}
         <span className="mt-0.5 flex gap-1">
           {[0, 1, 2].map((i) => (
-            <span key={i} className="h-3 flex-1 rounded-[2px]" style={{ background: tone, opacity: 0.14 }} />
+            <span key={i} className="h-3 flex-1 rounded-[var(--r-tight)]" style={{ background: tone, opacity: 0.14 }} />
           ))}
         </span>
       </span>
@@ -138,7 +138,7 @@ export function StarterCards({
             type="button"
             onClick={() => onPick(s.prompt)}
             className={cn(
-              "group flex flex-col rounded-[14px] border border-line bg-canvas p-4 text-left",
+              "group flex flex-col rounded-[var(--r-card)] border border-line bg-canvas p-4 text-left",
               "shadow-[var(--sh-1)] transition-[transform,border-color,box-shadow] duration-200",
               "hover:-translate-y-[2px] hover:border-accent/35 hover:shadow-[var(--sh-2)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
@@ -146,7 +146,7 @@ export function StarterCards({
           >
             <span className="flex items-center gap-2.5">
               <span
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-[8px]"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-[var(--r-control)]"
                 style={{ background: `color-mix(in srgb, ${s.tone} 14%, transparent)` }}
               >
                 <s.icon size={16} style={{ color: `color-mix(in srgb, ${s.tone}, #000 var(--tint-darken))` }} />
@@ -164,7 +164,7 @@ export function StarterCards({
               {s.copy}
             </span>
 
-            <span className="mt-3.5 block rounded-[8px] border border-line bg-sunk p-2.5">
+            <span className="mt-3.5 block rounded-[var(--r-control)] border border-line bg-sunk p-2.5">
               <Preview kind={s.preview} tone={s.tone} />
             </span>
           </button>

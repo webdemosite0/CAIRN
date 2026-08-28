@@ -122,7 +122,7 @@ export function MobileShell({
             onClick={() => setOpen(true)}
             aria-label="Open navigation"
             aria-haspopup="dialog"
-            className="press grid h-10 w-10 shrink-0 place-items-center rounded-[10px] text-ink-3 transition-colors active:bg-hover"
+            className="press grid h-10 w-10 shrink-0 place-items-center rounded-[var(--r-panel)] text-ink-3 transition-colors active:bg-hover"
           >
             <Ico icon={TbLayoutSidebar} motion="panel" size={21} />
           </button>
@@ -164,7 +164,7 @@ export function MobileShell({
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close navigation"
-            className="press grid h-9 w-9 place-items-center rounded-[9px] text-ink-3 transition-colors active:bg-hover"
+            className="press grid h-9 w-9 place-items-center rounded-[var(--r-control)] text-ink-3 transition-colors active:bg-hover"
           >
             <Ico icon={TbLayoutSidebar} motion="panel" size={19} />
           </button>
@@ -173,7 +173,7 @@ export function MobileShell({
         <div className="px-3 pt-3">
           <Link
             href="/chat"
-            className="press flex h-12 items-center gap-2.5 rounded-[12px] border border-line bg-raised px-3.5 text-[15px] font-medium text-ink transition-colors active:bg-hover"
+            className="press flex h-12 items-center gap-2.5 rounded-[var(--r-panel)] border border-line bg-raised px-3.5 text-[15px] font-medium text-ink transition-colors active:bg-hover"
           >
             <Ico icon={FiPlus} motion="grow" size={18} className="text-accent" />
             New chat
@@ -195,7 +195,7 @@ export function MobileShell({
                       href={d.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "flex items-center gap-3 rounded-[10px] px-2.5 py-2.5 text-[14.5px] transition-colors duration-150",
+                        "flex items-center gap-3 rounded-[var(--r-panel)] px-2.5 py-2.5 text-[14.5px] transition-colors duration-150",
                         active ? "rail-item-active" : "text-ink-2 active:bg-hover",
                       )}
                     >
@@ -211,7 +211,7 @@ export function MobileShell({
 
         <div className="border-t border-line px-3 py-3">
           {user ? (
-            <div className="mb-2 flex items-center gap-3 rounded-[10px] px-2 py-2">
+            <div className="mb-2 flex items-center gap-3 rounded-[var(--r-panel)] px-2 py-2">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-violet/25 text-[14px] font-semibold text-ink">
                 {user.name.slice(0, 1).toUpperCase()}
               </span>
@@ -225,7 +225,7 @@ export function MobileShell({
                 <button
                   type="submit"
                   aria-label="Sign out"
-                  className="press grid h-9 w-9 place-items-center rounded-[9px] text-ink-4 transition-colors active:bg-hover"
+                  className="press grid h-9 w-9 place-items-center rounded-[var(--r-control)] text-ink-4 transition-colors active:bg-hover"
                 >
                   <Ico icon={TbLogout} motion="exit" size={17} />
                 </button>
@@ -238,7 +238,7 @@ export function MobileShell({
             <Link
               href="/settings"
               aria-label="Settings"
-              className="press grid h-9 w-9 place-items-center rounded-[9px] text-ink-3 transition-colors active:bg-hover"
+              className="press grid h-9 w-9 place-items-center rounded-[var(--r-control)] text-ink-3 transition-colors active:bg-hover"
             >
               <Ico icon={TbSettings} motion="spin" size={19} />
             </Link>

@@ -122,7 +122,7 @@ export function Modal({
           // Column layout with a capped height so a tall body scrolls inside
           // the panel and the title and footer stay put, rather than the whole
           // dialog growing past the viewport.
-          "nx-reveal relative flex max-h-[calc(100vh-2rem)] w-full flex-col rounded-[12px] border border-line bg-raised shadow-[var(--elev)] outline-none",
+          "nx-reveal relative flex max-h-[calc(100vh-2rem)] w-full flex-col rounded-[var(--r-panel)] border border-line bg-raised shadow-[var(--elev)] outline-none",
           width,
         )}
       >
@@ -139,7 +139,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="-mr-1 -mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-[6px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+            className="-mr-1 -mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-[var(--r-chip)] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
           >
             <Ico icon={FiX} motion="close" size={16} />
           </button>

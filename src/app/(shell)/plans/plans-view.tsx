@@ -169,7 +169,7 @@ export function PlansView({
       {/* ---------------- returning from Stripe ---------------- */}
 
       {checkout === "cancelled" ? (
-        <div className="nx-in mb-6 flex items-center gap-2.5 rounded-[10px] border border-line bg-rail px-4 py-3">
+        <div className="nx-in mb-6 flex items-center gap-2.5 rounded-[var(--r-panel)] border border-line bg-rail px-4 py-3">
           <span className="size-1.5 shrink-0 rounded-full bg-ink-4" />
           <p className="text-[13.5px] text-ink-2">
             Checkout was cancelled. Nothing was charged.
@@ -178,7 +178,7 @@ export function PlansView({
       ) : null}
 
       {checkout === "done" && waiting ? (
-        <div className="nx-in mb-6 flex items-center gap-3 rounded-[10px] border border-accent/30 bg-accent-soft px-4 py-3">
+        <div className="nx-in mb-6 flex items-center gap-3 rounded-[var(--r-panel)] border border-accent/30 bg-accent-soft px-4 py-3">
           <Ico
             icon={FiLoader}
             motion="spin"
@@ -199,7 +199,7 @@ export function PlansView({
       ) : null}
 
       {checkout === "done" && paidNow ? (
-        <div className="nx-in mb-6 flex items-center gap-2.5 rounded-[10px] border border-positive/30 bg-positive/10 px-4 py-3">
+        <div className="nx-in mb-6 flex items-center gap-2.5 rounded-[var(--r-panel)] border border-positive/30 bg-positive/10 px-4 py-3">
           <Ico icon={FiCheck} motion="check" size={15} className="shrink-0 text-positive" />
           <p className="text-[13.5px] text-ink-2">
             You are on {plans.find((p) => p.id === currentPlan)?.name ?? "your new plan"}. The
@@ -276,9 +276,9 @@ export function PlansView({
       {/* ---------------- current subscription ---------------- */}
 
       {hasBilling ? (
-        <section className="nx-in mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[10px] border border-line bg-rail px-5 py-4">
+        <section className="nx-in mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[var(--r-panel)] border border-line bg-rail px-5 py-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-[9px] bg-accent/12">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-[var(--r-control)] bg-accent/12">
               <Ico icon={FiCreditCard} motion="tick" size={16} className="text-accent" />
             </span>
             <div>
@@ -307,7 +307,7 @@ export function PlansView({
             type="button"
             onClick={manage}
             disabled={busyId === "portal"}
-            className="group inline-flex h-9 items-center gap-2 rounded-[8px] border border-line-strong bg-raised px-3.5 text-[13px] font-medium text-ink transition-colors hover:bg-hover disabled:opacity-60"
+            className="group inline-flex h-9 items-center gap-2 rounded-[var(--r-control)] border border-line-strong bg-raised px-3.5 text-[13px] font-medium text-ink transition-colors hover:bg-hover disabled:opacity-60"
           >
             {busyId === "portal" ? (
               <Ico icon={FiLoader} motion="spin" size={14} className="animate-spin" />
@@ -332,7 +332,7 @@ export function PlansView({
             <article
               key={t.id}
               className={cn(
-                "nx-in group relative flex flex-col rounded-[12px] border p-6 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1",
+                "nx-in group relative flex flex-col rounded-[var(--r-panel)] border p-6 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1",
                 featured
                   ? "border-accent/45 bg-accent-soft shadow-[0_20px_60px_-30px_var(--color-accent)] hover:shadow-[0_28px_70px_-28px_var(--color-accent)]"
                   : "border-line bg-rail hover:border-line-strong",
@@ -439,7 +439,7 @@ export function PlansView({
 
 function Note({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-[10px] border border-line bg-rail/60 px-4 py-3.5">
+    <div className="rounded-[var(--r-panel)] border border-line bg-rail/60 px-4 py-3.5">
       <p className="text-[13px] font-medium text-ink">{title}</p>
       <p className="mt-1 text-[12.5px] leading-relaxed text-ink-3">{children}</p>
     </div>
@@ -484,7 +484,7 @@ function PlanButton({
   onManage: () => void;
 }) {
   const base =
-    "mt-5 flex h-10 items-center justify-center gap-2 rounded-[8px] text-[13.5px] font-medium transition-colors";
+    "mt-5 flex h-10 items-center justify-center gap-2 rounded-[var(--r-control)] text-[13.5px] font-medium transition-colors";
 
   if (!signedIn) {
     return (

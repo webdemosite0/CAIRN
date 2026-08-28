@@ -32,7 +32,7 @@ export function Testimonials({ quotes = [] }: { quotes?: Quote[] }) {
         {quotes.slice(0, 3).map((q) => (
           <figure
             key={q.name}
-            className="rounded-[12px] border border-line bg-canvas p-6 shadow-[var(--sh-1)]"
+            className="rounded-[var(--r-panel)] border border-line bg-canvas p-6 shadow-[var(--sh-1)]"
           >
             <blockquote className="text-[15.5px] leading-relaxed text-ink-2">
               &ldquo;{q.text}&rdquo;

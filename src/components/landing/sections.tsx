@@ -64,7 +64,7 @@ export function AgentFlow() {
             <li key={f.label} className="flex flex-1 items-center gap-2 md:flex-col md:gap-3">
               <div
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-[8px] border border-line bg-canvas px-3 py-2.5",
+                  "flex w-full items-center gap-2 rounded-[var(--r-control)] border border-line bg-canvas px-3 py-2.5",
                   "shadow-[var(--sh-1)] transition-transform duration-200 hover:-translate-y-[2px]",
                   "md:justify-center",
                 )}
@@ -135,14 +135,14 @@ export function Files() {
             <li
               key={f.ext}
               className={cn(
-                "nx-float rounded-[10px] border border-line bg-canvas p-3.5 shadow-[var(--sh-1)]",
+                "nx-float rounded-[var(--r-panel)] border border-line bg-canvas p-3.5 shadow-[var(--sh-1)]",
                 "transition-[transform,box-shadow] duration-200 hover:shadow-[var(--sh-2)]",
                 i === 4 && "col-span-2 sm:col-span-1",
               )}
               style={{ animationDelay: `${i * -2.4}s` }}
             >
               <span
-                className="grid h-8 w-8 place-items-center rounded-[6px] text-[10px] font-semibold tracking-tight"
+                className="grid h-8 w-8 place-items-center rounded-[var(--r-chip)] text-[10px] font-semibold tracking-tight"
                 /* The label is darkened on light, where a bright tone on a
                    16% tint of itself measured as low as 1.58:1. Mixed in
                    srgb so the result matches what was measured, and
@@ -189,7 +189,7 @@ export function UseCases() {
             <Link
               href={u.href}
               className={cn(
-                "group flex items-center gap-2 rounded-[8px] border border-line bg-canvas px-4 py-2.5",
+                "group flex items-center gap-2 rounded-[var(--r-control)] border border-line bg-canvas px-4 py-2.5",
                 "text-[14px] text-ink-2 transition-[transform,border-color,box-shadow] duration-200",
                 "hover:-translate-y-[2px] hover:border-line-strong hover:text-ink hover:shadow-[var(--sh-2)]",
               )}
@@ -231,7 +231,7 @@ export function PricingPreview({
             <div
               key={p.id}
               className={cn(
-                "relative rounded-[12px] border bg-canvas p-6",
+                "relative rounded-[var(--r-panel)] border bg-canvas p-6",
                 i === 1 ? "border-accent/40 shadow-[var(--sh-2)]" : "border-line",
               )}
             >
@@ -250,7 +250,7 @@ export function PricingPreview({
               <Link
                 href={p.price === 0 ? "/chat" : "/plans"}
                 className={cn(
-                  "mt-6 flex h-11 items-center justify-center rounded-[8px] text-[14px] font-medium",
+                  "mt-6 flex h-11 items-center justify-center rounded-[var(--r-control)] text-[14px] font-medium",
                   i === 1
                     ? "btn-grad"
                     : "border border-line-strong text-ink transition-colors hover:bg-hover",
@@ -302,7 +302,7 @@ export function FinalCta() {
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/chat"
-            className="btn-grad group flex h-[52px] items-center gap-2 rounded-[10px] px-7 text-[15px] font-medium"
+            className="btn-grad group flex h-[52px] items-center gap-2 rounded-[var(--r-panel)] px-7 text-[15px] font-medium"
           >
             Start for free
             <FiArrowRight
@@ -312,7 +312,7 @@ export function FinalCta() {
           </Link>
           <Link
             href="/plans"
-            className="flex h-[52px] items-center rounded-[10px] border border-line-strong px-7 text-[15px] font-medium text-ink transition-colors hover:bg-hover"
+            className="flex h-[52px] items-center rounded-[var(--r-panel)] border border-line-strong px-7 text-[15px] font-medium text-ink transition-colors hover:bg-hover"
           >
             Explore Trove
           </Link>

@@ -97,7 +97,7 @@ export function SystemEditor({ markdown }: { markdown: string }) {
 
   if (empty) {
     return (
-      <p className="rounded-[10px] border border-line bg-rail px-4 py-3 text-[13px] text-ink-3">
+      <p className="rounded-[var(--r-panel)] border border-line bg-rail px-4 py-3 text-[13px] text-ink-3">
         No colours, sizes or spacing were found in this spec, so there is
         nothing to edit here — the written version is below.
       </p>
@@ -123,7 +123,7 @@ export function SystemEditor({ markdown }: { markdown: string }) {
             {system.colours.map((c, i) => (
               <div
                 key={i}
-                className="group flex items-center gap-3 rounded-[10px] border border-line bg-raised p-2.5"
+                className="group flex items-center gap-3 rounded-[var(--r-panel)] border border-line bg-raised p-2.5"
               >
                 {/* The native picker. A hand-rolled one would be a worse
                     version of something every OS already does well. */}
@@ -131,7 +131,7 @@ export function SystemEditor({ markdown }: { markdown: string }) {
                   <span className="sr-only">Colour value for {c.name}</span>
                   <span
                     aria-hidden
-                    className="block size-11 rounded-[8px] border border-line-strong"
+                    className="block size-11 rounded-[var(--r-control)] border border-line-strong"
                     style={{ background: c.hex }}
                   />
                   <input
@@ -173,7 +173,7 @@ export function SystemEditor({ markdown }: { markdown: string }) {
                     }))
                   }
                   aria-label={`Remove ${c.name}`}
-                  className="group/x grid size-7 shrink-0 place-items-center rounded-[6px] text-ink-4 opacity-0 transition hover:bg-critical/10 hover:text-critical focus-visible:opacity-100 group-hover:opacity-100"
+                  className="group/x grid size-7 shrink-0 place-items-center rounded-[var(--r-chip)] text-ink-4 opacity-0 transition hover:bg-critical/10 hover:text-critical focus-visible:opacity-100 group-hover:opacity-100"
                 >
                   <Ico icon={FiTrash2} motion="shake" size={13} />
                 </button>
@@ -191,7 +191,7 @@ export function SystemEditor({ markdown }: { markdown: string }) {
             {system.type.map((t, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-[10px] border border-line bg-raised px-3 py-2.5"
+                className="flex items-center gap-3 rounded-[var(--r-panel)] border border-line bg-raised px-3 py-2.5"
               >
                 <input
                   value={t.name}
@@ -207,14 +207,14 @@ export function SystemEditor({ markdown }: { markdown: string }) {
                   value={t.size}
                   onChange={(e) => patchType(i, { size: Number(e.target.value) || t.size })}
                   aria-label={`Size of ${t.name} in pixels`}
-                  className="w-[62px] shrink-0 rounded-[6px] border border-line bg-sunk px-2 py-1 text-[12.5px] tabular-nums text-ink outline-none focus:border-accent"
+                  className="w-[62px] shrink-0 rounded-[var(--r-chip)] border border-line bg-sunk px-2 py-1 text-[12.5px] tabular-nums text-ink outline-none focus:border-accent"
                 />
 
                 <select
                   value={t.weight}
                   onChange={(e) => patchType(i, { weight: Number(e.target.value) })}
                   aria-label={`Weight of ${t.name}`}
-                  className="shrink-0 cursor-pointer rounded-[6px] border border-line bg-sunk px-2 py-1 text-[12.5px] text-ink outline-none focus:border-accent"
+                  className="shrink-0 cursor-pointer rounded-[var(--r-chip)] border border-line bg-sunk px-2 py-1 text-[12.5px] text-ink outline-none focus:border-accent"
                 >
                   {WEIGHTS.map((w) => (
                     <option key={w} value={w}>
@@ -246,7 +246,7 @@ export function SystemEditor({ markdown }: { markdown: string }) {
               <div key={s.value} className="text-center">
                 <span
                   aria-hidden
-                  className="block rounded-[3px] bg-accent"
+                  className="block rounded-[var(--r-tight)] bg-accent"
                   style={{ width: s.value, height: s.value, minWidth: 2 }}
                 />
                 <span className="mt-1 block text-[11px] tabular-nums text-ink-4">

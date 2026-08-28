@@ -36,7 +36,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "nx-in flex flex-col items-center rounded-[10px] border border-dashed border-line-strong px-6 py-16 text-center",
+        "nx-in flex flex-col items-center rounded-[var(--r-panel)] border border-dashed border-line-strong px-6 py-16 text-center",
         className,
       )}
     >

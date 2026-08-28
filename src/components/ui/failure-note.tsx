@@ -89,7 +89,7 @@ export function FailureNote({
     <div
       role="alert"
       className={cn(
-        "nx-in group rounded-[12px] border bg-rail/60 p-4 backdrop-blur-sm",
+        "nx-in group rounded-[var(--r-panel)] border bg-rail/60 p-4 backdrop-blur-sm",
         face.ring,
         compact ? "p-3.5" : "p-4 sm:p-5",
         className,
@@ -98,7 +98,7 @@ export function FailureNote({
       <div className="flex items-start gap-3">
         <span
           className={cn(
-            "flex shrink-0 items-center justify-center rounded-[9px]",
+            "flex shrink-0 items-center justify-center rounded-[var(--r-control)]",
             face.tint,
             compact ? "size-8" : "size-9",
           )}
@@ -128,7 +128,7 @@ export function FailureNote({
           {/* Which provider failed and why. Only a chain failure has this, and
               when it does it is the most useful thing on the screen. */}
           {attempts.length ? (
-            <ul className="mt-3 space-y-1.5 rounded-[8px] border border-line bg-sunk/70 px-3 py-2.5">
+            <ul className="mt-3 space-y-1.5 rounded-[var(--r-control)] border border-line bg-sunk/70 px-3 py-2.5">
               {attempts.map((a) => (
                 <li key={a.label} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <span className="text-[12.5px] font-medium text-ink-2">{a.label}</span>
@@ -142,7 +142,7 @@ export function FailureNote({
             {f.kind === "credits" ? (
               <Link
                 href="/plans"
-                className="inline-flex h-8 items-center gap-1.5 rounded-[7px] btn-grad px-3 text-[12.5px] font-semibold"
+                className="inline-flex h-8 items-center gap-1.5 rounded-[var(--r-chip)] btn-grad px-3 text-[12.5px] font-semibold"
               >
                 <Ico icon={FiZap} motion="sparkle" size={13} />
                 Get more credits
@@ -152,7 +152,7 @@ export function FailureNote({
             {f.kind === "auth" ? (
               <Link
                 href="/login"
-                className="inline-flex h-8 items-center gap-1.5 rounded-[7px] btn-grad px-3 text-[12.5px] font-semibold"
+                className="inline-flex h-8 items-center gap-1.5 rounded-[var(--r-chip)] btn-grad px-3 text-[12.5px] font-semibold"
               >
                 <Ico icon={FiLock} motion="lock" size={13} />
                 Log in again
@@ -163,7 +163,7 @@ export function FailureNote({
               <button
                 type="button"
                 onClick={onRetry}
-                className="inline-flex h-8 items-center gap-1.5 rounded-[7px] border border-line-strong bg-raised px-3 text-[12.5px] font-medium text-ink transition-colors hover:bg-hover"
+                className="inline-flex h-8 items-center gap-1.5 rounded-[var(--r-chip)] border border-line-strong bg-raised px-3 text-[12.5px] font-medium text-ink transition-colors hover:bg-hover"
               >
                 <Ico icon={FiRefreshCw} motion="spin" size={13} />
                 Try again
@@ -175,7 +175,7 @@ export function FailureNote({
                 type="button"
                 onClick={() => setOpen((v) => !v)}
                 aria-expanded={open}
-                className="inline-flex h-8 items-center gap-1 rounded-[7px] px-2 text-[12.5px] text-ink-3 transition-colors hover:text-ink"
+                className="inline-flex h-8 items-center gap-1 rounded-[var(--r-chip)] px-2 text-[12.5px] text-ink-3 transition-colors hover:text-ink"
               >
                 Details
                 <Ico
@@ -189,7 +189,7 @@ export function FailureNote({
           </div>
 
           {open ? (
-            <p className="mt-2.5 break-words rounded-[8px] border border-line bg-sunk px-3 py-2 font-mono text-[11.5px] leading-relaxed text-ink-3">
+            <p className="mt-2.5 break-words rounded-[var(--r-control)] border border-line bg-sunk px-3 py-2 font-mono text-[11.5px] leading-relaxed text-ink-3">
               {f.raw}
             </p>
           ) : null}

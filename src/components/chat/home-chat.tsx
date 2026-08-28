@@ -119,7 +119,7 @@ export function HomeChat({
           </span>
           <button
             onClick={clear}
-            className="shrink-0 rounded-[6px] px-2.5 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
+            className="shrink-0 rounded-[var(--r-chip)] px-2.5 py-1.5 text-[13px] text-ink-3 transition-colors hover:bg-hover hover:text-ink"
           >
             New Chat
           </button>

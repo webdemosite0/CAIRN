@@ -97,7 +97,7 @@ export function Editable({
         }
       }}
       className={cn(
-        "cursor-text rounded-[4px] outline-none",
+        "cursor-text rounded-[var(--r-tight)] outline-none",
         // The affordance: nothing until you go near it, then just enough to
         // say this is a field. A permanent border would turn a slide into a
         // form, and the point is that it still looks like a slide.

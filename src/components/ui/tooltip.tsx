@@ -75,7 +75,7 @@ export function Tooltip({
         <span
           role="tooltip"
           className={cn(
-            "nx-fade pointer-events-none absolute z-[90] whitespace-nowrap rounded-[6px] border border-line bg-raised px-2 py-1 text-[12px] font-medium text-ink shadow-[var(--elev)]",
+            "nx-fade pointer-events-none absolute z-[90] whitespace-nowrap rounded-[var(--r-chip)] border border-line bg-raised px-2 py-1 text-[12px] font-medium text-ink shadow-[var(--elev)]",
             pos[side],
           )}
         >

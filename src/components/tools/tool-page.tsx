@@ -130,7 +130,7 @@ export function ToolPage({
         <div className="nx-in mx-auto flex w-full max-w-[780px] flex-1 flex-col justify-center px-5 py-16">
         <div className="mb-7 flex flex-col items-center text-center">
           <span
-            className="mb-4 grid h-14 w-14 place-items-center rounded-[12px]"
+            className="mb-4 grid h-14 w-14 place-items-center rounded-[var(--r-panel)]"
             style={{ background: `${accent}1f`, color: accent }}
           >
             <Icon size={26} />
@@ -214,7 +214,7 @@ export function ToolPage({
           and then reflowed the page when the text arrived. This occupies
           roughly the room the answer will take, so nothing jumps. */}
       {busy && !output ? (
-        <div className="rounded-[10px] border border-line bg-rail p-5">
+        <div className="rounded-[var(--r-panel)] border border-line bg-rail p-5">
           <div className="mb-4 flex items-center gap-3.5">
             <Bot size={38} accent={accent} state="working" />
             <span className="nx-dots text-[14px] text-ink-2">Working</span>
@@ -230,13 +230,13 @@ export function ToolPage({
           that boundary. The written version stays below either way: the
           extraction is a convenience, and a spec holds more than colours. */}
       {tool === "design" && output && !busy ? (
-        <div className="mb-4 rounded-[10px] border border-line bg-rail p-5">
+        <div className="mb-4 rounded-[var(--r-panel)] border border-line bg-rail p-5">
           <SystemEditor markdown={output} />
         </div>
       ) : null}
 
       {output ? (
-        <div className="rounded-[10px] border border-line bg-rail p-5">
+        <div className="rounded-[var(--r-panel)] border border-line bg-rail p-5">
           <Message role="model" text={output} pending={busy} />
         </div>
       ) : null}

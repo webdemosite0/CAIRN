@@ -24,7 +24,7 @@ export function VerifyCard({
   const [pending, start] = useTransition();
 
   return (
-    <div className="nx-in w-full max-w-[420px] rounded-[12px] border border-line bg-rail p-6 text-center shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)] sm:p-7">
+    <div className="nx-in w-full max-w-[420px] rounded-[var(--r-panel)] border border-line bg-rail p-6 text-center shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)] sm:p-7">
       <div className="mb-5 flex flex-col items-center">
         <TroveOrb size={40} state="thinking" />
         <h1 className="mt-4 text-[17px] font-semibold text-ink">Confirm your email</h1>
@@ -42,7 +42,7 @@ export function VerifyCard({
       </p>
 
       {!mailerConfigured ? (
-        <div className="mt-5 flex items-start gap-2 rounded-[8px] border border-caution/30 bg-caution/10 px-3 py-2.5 text-left">
+        <div className="mt-5 flex items-start gap-2 rounded-[var(--r-control)] border border-caution/30 bg-caution/10 px-3 py-2.5 text-left">
           <Ico icon={FiAlertCircle} motion="alert" size={14} className="mt-0.5 shrink-0 text-caution" />
           <p className="text-[12.5px] leading-relaxed text-ink-2">
             No mail provider is configured on this deployment, so nothing was
@@ -52,14 +52,14 @@ export function VerifyCard({
       ) : null}
 
       {result?.error ? (
-        <div className="mt-5 flex items-start gap-2 rounded-[8px] border border-critical/30 bg-critical/10 px-3 py-2.5 text-left">
+        <div className="mt-5 flex items-start gap-2 rounded-[var(--r-control)] border border-critical/30 bg-critical/10 px-3 py-2.5 text-left">
           <Ico icon={FiAlertCircle} motion="alert" size={14} className="mt-0.5 shrink-0 text-critical" />
           <p className="text-[13px] text-critical">{result.error}</p>
         </div>
       ) : null}
 
       {result?.notice ? (
-        <div className="mt-5 flex items-start gap-2 rounded-[8px] border border-positive/30 bg-positive/10 px-3 py-2.5 text-left">
+        <div className="mt-5 flex items-start gap-2 rounded-[var(--r-control)] border border-positive/30 bg-positive/10 px-3 py-2.5 text-left">
           <Ico icon={FiCheck} motion="check" size={14} className="mt-0.5 shrink-0 text-positive" />
           <p className="text-[13px] text-ink-2">{result.notice}</p>
         </div>
@@ -73,7 +73,7 @@ export function VerifyCard({
             setResult(await resendVerification());
           })
         }
-        className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border border-line-strong bg-raised text-[14px] font-medium text-ink transition-colors hover:bg-hover disabled:opacity-60"
+        className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-[var(--r-control)] border border-line-strong bg-raised text-[14px] font-medium text-ink transition-colors hover:bg-hover disabled:opacity-60"
       >
         {pending ? (
           <Ico icon={FiLoader} motion="spin" size={15} className="animate-spin" />

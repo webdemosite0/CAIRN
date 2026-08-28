@@ -277,7 +277,7 @@ export function SpreadsheetView({
       <div className="nx-in relative mx-auto flex min-h-screen max-w-[760px] flex-col justify-center px-5 py-16">
         <StudioBack className="absolute left-0 top-6" />
         <div className="mb-7 text-center">
-          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[12px] bg-positive/15 text-positive">
+          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[var(--r-panel)] bg-positive/15 text-positive">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
@@ -468,13 +468,13 @@ export function SpreadsheetView({
 
           <button
             onClick={addRow}
-            className="mt-2.5 flex items-center gap-1.5 rounded-[6px] border border-dashed border-line-strong px-3 py-1.5 text-[12.5px] text-ink-3 hover:text-ink"
+            className="mt-2.5 flex items-center gap-1.5 rounded-[var(--r-chip)] border border-dashed border-line-strong px-3 py-1.5 text-[12.5px] text-ink-3 hover:text-ink"
           >
             <Ico icon={FiPlus} motion="open" size={13} /> Add row
           </button>
 
           {notes ? (
-            <div className="mt-6 max-w-[680px] rounded-[10px] border border-line bg-rail p-4">
+            <div className="mt-6 max-w-[680px] rounded-[var(--r-panel)] border border-line bg-rail p-4">
               <p className="mb-2 text-[11.5px] uppercase tracking-[0.08em] text-ink-4">
                 Formulas & notes
               </p>

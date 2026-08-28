@@ -117,7 +117,7 @@ export function MobileComposer({
   return (
     <div
       className={cn(
-        "composer rounded-[22px] border bg-raised px-1 pb-1 pt-1",
+        "composer rounded-[var(--r-hero)] border bg-raised px-1 pb-1 pt-1",
         disabled && "opacity-70",
       )}
     >

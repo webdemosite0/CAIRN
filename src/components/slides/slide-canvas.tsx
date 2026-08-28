@@ -43,7 +43,7 @@ export function SlideCanvas({
   return (
     <div
       className={cn(
-        "relative aspect-video w-full overflow-hidden rounded-[10px] border border-line bg-raised",
+        "relative aspect-video w-full overflow-hidden rounded-[var(--r-panel)] border border-line bg-raised",
         className,
       )}
       style={{ containerType: "inline-size" }}

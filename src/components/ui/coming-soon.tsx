@@ -28,7 +28,7 @@ export function ComingSoon({
   return (
     <div className="nx-in mx-auto flex min-h-screen max-w-[560px] flex-col items-center justify-center px-5 py-16 text-center">
       <span
-        className="grid h-16 w-16 place-items-center rounded-[12px]"
+        className="grid h-16 w-16 place-items-center rounded-[var(--r-panel)]"
         style={{ background: `color-mix(in oklab, ${hue} 16%, transparent)`, color: hue }}
       >
         <Ico icon={icon} motion={motion} size={30} live />
@@ -57,7 +57,7 @@ export function ComingSoon({
           {points.map((p, i) => (
             <li
               key={p}
-              className="nx-in flex items-center gap-3 rounded-[10px] border border-line bg-rail px-4 py-3 text-[13.5px] text-ink-2"
+              className="nx-in flex items-center gap-3 rounded-[var(--r-panel)] border border-line bg-rail px-4 py-3 text-[13.5px] text-ink-2"
               style={{ animationDelay: `${120 + i * 70}ms`, animationFillMode: "backwards" }}
             >
               <span

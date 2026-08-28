@@ -125,7 +125,7 @@ export function MobileChat({
                 <li key={`${r.kind}-${r.href}-${r.title}`}>
                   <Link
                     href={r.href}
-                    className="block truncate rounded-[10px] px-3 py-2.5 text-[14.5px] text-ink-2 transition-colors active:bg-hover"
+                    className="block truncate rounded-[var(--r-panel)] px-3 py-2.5 text-[14.5px] text-ink-2 transition-colors active:bg-hover"
                   >
                     {r.title}
                   </Link>

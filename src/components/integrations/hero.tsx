@@ -51,7 +51,7 @@ export function IntegrationsHero({
   connected: number;
 }) {
   return (
-    <section className="relative overflow-hidden rounded-[16px] border border-line bg-raised">
+    <section className="relative overflow-hidden rounded-[var(--r-card)] border border-line bg-raised">
       {/* A single soft light from the left, so the panel has a direction. */}
       <div
         aria-hidden
@@ -100,7 +100,7 @@ export function IntegrationsHero({
 
           {/* the hub itself */}
           <span
-            className="absolute grid h-[60px] w-[60px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[16px] border bg-canvas sm:h-[74px] sm:w-[74px]"
+            className="absolute grid h-[60px] w-[60px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[var(--r-card)] border bg-canvas sm:h-[74px] sm:w-[74px]"
             style={{
               left: "50%",
               top: "50%",

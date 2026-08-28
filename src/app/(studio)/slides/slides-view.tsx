@@ -184,7 +184,7 @@ export function SlidesView({
       <div className="nx-in relative mx-auto flex min-h-screen max-w-[760px] flex-col justify-center px-5 py-16">
         <StudioBack className="absolute left-0 top-6" />
         <div className="mb-7 text-center">
-          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[12px] bg-accent/15 text-accent">
+          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[var(--r-panel)] bg-accent/15 text-accent">
             <Ico icon={FiLayout} motion="lift" size={26} />
           </span>
           <h1 className="text-[27px] font-semibold text-ink">Slides</h1>
@@ -230,13 +230,13 @@ export function SlidesView({
           {/* Undo and redo sit before the export actions: they are what you
               reach for while editing, and the exports are what you reach for
               once. */}
-          <div className="mr-1 flex items-center gap-0.5 rounded-[9px] border border-line bg-rail p-0.5">
+          <div className="mr-1 flex items-center gap-0.5 rounded-[var(--r-control)] border border-line bg-rail p-0.5">
             <button
               onClick={deck.undo}
               disabled={!deck.canUndo}
               aria-label="Undo"
               title="Undo"
-              className="group grid size-7 place-items-center rounded-[7px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-30"
+              className="group grid size-7 place-items-center rounded-[var(--r-chip)] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-30"
             >
               <Ico icon={FiCornerUpLeft} motion="back" size={14} />
             </button>
@@ -245,7 +245,7 @@ export function SlidesView({
               disabled={!deck.canRedo}
               aria-label="Redo"
               title="Redo"
-              className="group grid size-7 place-items-center rounded-[7px] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-30"
+              className="group grid size-7 place-items-center rounded-[var(--r-chip)] text-ink-3 transition-colors hover:bg-hover hover:text-ink disabled:opacity-30"
             >
               <Ico icon={FiCornerUpRight} motion="nudge" size={14} />
             </button>
@@ -308,7 +308,7 @@ export function SlidesView({
                     onClick={() => setCurrent(i)}
                     aria-current={i === safeIndex}
                     className={cn(
-                      "group block w-full rounded-[10px] text-left transition",
+                      "group block w-full rounded-[var(--r-panel)] text-left transition",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60",
                     )}
                   >
@@ -337,7 +337,7 @@ export function SlidesView({
                       onClick={() => deck.moveSlide(i, i - 1)}
                       disabled={i === 0}
                       aria-label={`Move slide ${i + 1} earlier`}
-                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink disabled:opacity-25"
+                      className="group grid size-6 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink disabled:opacity-25"
                     >
                       <Ico icon={FiChevronUp} motion="lift" size={13} />
                     </button>
@@ -345,7 +345,7 @@ export function SlidesView({
                       onClick={() => deck.moveSlide(i, i + 1)}
                       disabled={i >= total - 1}
                       aria-label={`Move slide ${i + 1} later`}
-                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink disabled:opacity-25"
+                      className="group grid size-6 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink disabled:opacity-25"
                     >
                       <Ico icon={FiChevronDown} motion="down" size={13} />
                     </button>
@@ -353,7 +353,7 @@ export function SlidesView({
                     <button
                       onClick={() => deck.duplicateSlide(i)}
                       aria-label={`Duplicate slide ${i + 1}`}
-                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+                      className="group grid size-6 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
                     >
                       <Ico icon={FiCopy} motion="copy" size={12} />
                     </button>
@@ -362,7 +362,7 @@ export function SlidesView({
                       disabled={total <= 1}
                       aria-label={`Delete slide ${i + 1}`}
                       title={total <= 1 ? "A deck needs at least one slide" : undefined}
-                      className="group grid size-6 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-critical/10 hover:text-critical disabled:opacity-25"
+                      className="group grid size-6 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-critical/10 hover:text-critical disabled:opacity-25"
                     >
                       <Ico icon={FiTrash2} motion="shake" size={12} />
                     </button>
@@ -373,7 +373,7 @@ export function SlidesView({
               <li className="w-[164px] shrink-0 lg:w-full">
                 <button
                   onClick={() => deck.addSlide(total - 1)}
-                  className="group flex aspect-video w-full items-center justify-center gap-1.5 rounded-[10px] border border-dashed border-line-strong text-[12.5px] text-ink-4 transition-colors hover:border-accent hover:bg-accent/5 hover:text-ink"
+                  className="group flex aspect-video w-full items-center justify-center gap-1.5 rounded-[var(--r-panel)] border border-dashed border-line-strong text-[12.5px] text-ink-4 transition-colors hover:border-accent hover:bg-accent/5 hover:text-ink"
                 >
                   <Ico icon={FiPlus} motion="open" size={14} /> Add slide
                 </button>

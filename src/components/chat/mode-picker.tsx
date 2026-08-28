@@ -68,7 +68,7 @@ export function ModePicker({
         aria-haspopup="menu"
         title="How loosely Trove answers"
         className={cn(
-          "tap-44 group flex items-center gap-1.5 rounded-[7px] text-ink-3 transition-colors",
+          "tap-44 group flex items-center gap-1.5 rounded-[var(--r-chip)] text-ink-3 transition-colors",
           "hover:bg-hover hover:text-ink disabled:opacity-40",
           touch
             ? "h-11 rounded-full px-3.5 text-[13.5px]"
@@ -108,8 +108,8 @@ export function ModePicker({
                 // partway across the composer, so a 264px panel hung off its
                 // left edge ran 17px past the screen at 320px wide. Pinning it
                 // to the bottom always fits and puts the options under a thumb.
-                "fixed inset-x-3 bottom-3 rounded-[16px]"
-              : "absolute bottom-full left-0 mb-2 w-[264px] rounded-[12px]",
+                "fixed inset-x-3 bottom-3 rounded-[var(--r-card)]"
+              : "absolute bottom-full left-0 mb-2 w-[264px] rounded-[var(--r-panel)]",
           )}
         >
           {MODE_LIST.map((m) => (
@@ -126,7 +126,7 @@ export function ModePicker({
             >
               <span
                 className={cn(
-                  "mt-px grid h-6 w-6 shrink-0 place-items-center rounded-[7px]",
+                  "mt-px grid h-6 w-6 shrink-0 place-items-center rounded-[var(--r-chip)]",
                   m.id === value ? "bg-accent-soft text-accent" : "text-ink-3",
                 )}
               >

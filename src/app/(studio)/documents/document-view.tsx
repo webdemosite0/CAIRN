@@ -178,7 +178,7 @@ export function DocumentView({
       <div className="nx-in relative mx-auto flex min-h-screen max-w-[760px] flex-col justify-center px-5 py-16">
         <StudioBack className="absolute left-0 top-6" />
         <div className="mb-7 text-center">
-          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[12px] bg-accent/15 text-accent">
+          <span className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-[var(--r-panel)] bg-accent/15 text-accent">
             <Ico icon={FiFileText} motion="lift" size={26} />
           </span>
           <h1 className="text-[27px] font-semibold text-ink">Documents</h1>

@@ -29,7 +29,7 @@ const TOOLS = [
 ];
 
 const field =
-  "w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 py-2.5 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent sm:text-[14px]";
+  "w-full rounded-[var(--r-control)] border border-line-strong bg-sunk px-3.5 py-2.5 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent sm:text-[14px]";
 
 /* ------------------------------------------------------------------ */
 
@@ -58,7 +58,7 @@ export function AgentsView({
         </p>
         <Link
           href="/login"
-          className="mt-7 rounded-[8px] btn-grad px-5 py-2.5 text-[14px] font-medium transition-transform hover:scale-105"
+          className="mt-7 rounded-[var(--r-control)] btn-grad px-5 py-2.5 text-[14px] font-medium transition-transform hover:scale-105"
         >
           Log in to continue
         </Link>
@@ -79,7 +79,7 @@ export function AgentsView({
         </div>
         <button
           onClick={() => setCreating(true)}
-          className="flex items-center gap-2 rounded-[8px] btn-grad px-4 py-2.5 text-[14px] font-medium transition-transform hover:scale-[1.03]"
+          className="flex items-center gap-2 rounded-[var(--r-control)] btn-grad px-4 py-2.5 text-[14px] font-medium transition-transform hover:scale-[1.03]"
         >
           <Ico icon={FiPlus} motion="open" size={16} /> New agent
         </button>
@@ -93,7 +93,7 @@ export function AgentsView({
           action={
             <button
               onClick={() => setCreating(true)}
-              className="flex items-center gap-2 rounded-[8px] btn-grad px-4 py-2.5 text-[14px] font-medium transition-transform hover:scale-[1.03]"
+              className="flex items-center gap-2 rounded-[var(--r-control)] btn-grad px-4 py-2.5 text-[14px] font-medium transition-transform hover:scale-[1.03]"
             >
               <Ico icon={FiPlus} motion="open" size={16} /> New agent
             </button>
@@ -104,7 +104,7 @@ export function AgentsView({
           {agents.map((a, i) => (
             <article
               key={a.id}
-              className="nx-in group relative flex flex-col rounded-[10px] border border-line bg-rail p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong"
+              className="nx-in group relative flex flex-col rounded-[var(--r-panel)] border border-line bg-rail p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong"
               style={{ animationDelay: `${i * 50}ms`, animationFillMode: "backwards" }}
             >
               {/* Deleting an agent cannot be undone, and the button sits
@@ -113,7 +113,7 @@ export function AgentsView({
                 type="button"
                 onClick={() => setDeletingId(a.id)}
                 aria-label={`Delete ${a.name}`}
-                className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-[6px] text-ink-4 opacity-0 transition-opacity hover:bg-hover hover:text-critical group-hover:opacity-100"
+                className="absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-[var(--r-chip)] text-ink-4 opacity-0 transition-opacity hover:bg-hover hover:text-critical group-hover:opacity-100"
               >
                 <Ico icon={FiTrash2} motion="shake" size={13} />
               </button>
@@ -138,7 +138,7 @@ export function AgentsView({
 
               <Link
                 href={`/agents/${a.id}`}
-                className="mt-4 block w-full rounded-[8px] border border-line-strong py-2 text-center text-[13px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
+                className="mt-4 block w-full rounded-[var(--r-control)] border border-line-strong py-2 text-center text-[13px] text-ink-2 transition-colors hover:bg-hover hover:text-ink"
               >
                 Talk to {a.name.split(" ")[0]}
               </Link>
@@ -158,13 +158,13 @@ export function AgentsView({
             <button
               type="button"
               onClick={() => setDeletingId(null)}
-              className="rounded-[8px] border border-line-strong px-3.5 py-2 text-[13.5px] font-medium text-ink-2 transition-colors hover:bg-hover hover:text-ink"
+              className="rounded-[var(--r-control)] border border-line-strong px-3.5 py-2 text-[13.5px] font-medium text-ink-2 transition-colors hover:bg-hover hover:text-ink"
             >
               Keep it
             </button>
             {deleting ? (
               <form action={deleteAgent.bind(null, deleting.id)}>
-                <button className="rounded-[8px] bg-critical px-3.5 py-2 text-[13.5px] font-medium text-canvas transition-opacity hover:opacity-90">
+                <button className="rounded-[var(--r-control)] bg-critical px-3.5 py-2 text-[13.5px] font-medium text-canvas transition-opacity hover:opacity-90">
                   Delete agent
                 </button>
               </form>
@@ -243,7 +243,7 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
         </div>
 
         {state.error ? (
-          <div className="flex items-start gap-2 rounded-[8px] border border-critical/30 bg-critical/10 px-3 py-2.5">
+          <div className="flex items-start gap-2 rounded-[var(--r-control)] border border-critical/30 bg-critical/10 px-3 py-2.5">
             <Ico icon={FiAlertCircle} motion="pop" size={14} className="mt-0.5 shrink-0 text-critical" />
             <p className="text-[13px] text-critical">{state.error}</p>
           </div>
@@ -253,14 +253,14 @@ function CreateDialog({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-[8px] px-4 py-2.5 text-[14px] text-ink-3 hover:text-ink"
+            className="rounded-[var(--r-control)] px-4 py-2.5 text-[14px] text-ink-3 hover:text-ink"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={pending}
-            className="flex items-center gap-2 rounded-[8px] btn-grad px-4 py-2.5 text-[14px] font-medium disabled:opacity-60"
+            className="flex items-center gap-2 rounded-[var(--r-control)] btn-grad px-4 py-2.5 text-[14px] font-medium disabled:opacity-60"
           >
             {pending ? <Ico icon={FiLoader} motion="spin" size={15} className="animate-spin" /> : null}
             Create agent

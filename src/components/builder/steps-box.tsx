@@ -71,7 +71,7 @@ export function StepsBox({
             <li
               key={s.id}
               className={cn(
-                "rounded-[6px] px-2 py-1.5 transition-colors",
+                "rounded-[var(--r-chip)] px-2 py-1.5 transition-colors",
                 isCurrent && "nx-step-active bg-accent/[0.07]",
               )}
             >
@@ -106,7 +106,7 @@ export function StepsBox({
                 {s.skills.slice(0, 3).map((k) => (
                   <span
                     key={k}
-                    className="shrink-0 rounded-[5px] bg-sunk px-1.5 py-0.5 text-[10.5px] text-ink-4"
+                    className="shrink-0 rounded-[var(--r-chip)] bg-sunk px-1.5 py-0.5 text-[10.5px] text-ink-4"
                   >
                     {skillLabel(k)}
                   </span>

@@ -110,7 +110,7 @@ export function CreditMeter({
       role="dialog"
       aria-label="Credit usage this month"
       className={cn(
-        "nx-reveal absolute z-50 w-[272px] rounded-[10px] border border-line bg-raised p-3.5 shadow-[var(--elev)]",
+        "nx-reveal absolute z-50 w-[272px] rounded-[var(--r-panel)] border border-line bg-raised p-3.5 shadow-[var(--elev)]",
         // Expanded rail: above the meter. Collapsed rail is only 76px wide, so
         // the panel goes beside it instead of hanging off both edges.
         collapsed ? "bottom-0 left-full ml-2" : "bottom-full left-0 mb-2",
@@ -162,7 +162,7 @@ export function CreditMeter({
 
       <Link
         href="/plans"
-        className="mt-3 flex items-center justify-between gap-2 rounded-[6px] px-2 py-1.5 text-[13px] font-medium text-accent transition-colors hover:bg-hover"
+        className="mt-3 flex items-center justify-between gap-2 rounded-[var(--r-chip)] px-2 py-1.5 text-[13px] font-medium text-accent transition-colors hover:bg-hover"
       >
         Credits and plans
         <Ico icon={FiArrowRight} motion="nudge" size={13} />
@@ -180,7 +180,7 @@ export function CreditMeter({
           aria-haspopup="dialog"
           title={title}
           aria-label={title}
-          className="group grid h-8 w-8 place-items-center rounded-[6px] transition-colors hover:bg-hover"
+          className="group grid h-8 w-8 place-items-center rounded-[var(--r-chip)] transition-colors hover:bg-hover"
         >
           <span className={cn("text-[11px] font-semibold tabular-nums", tone)}>
             {remaining > 999 ? `${Math.round(remaining / 1000)}k` : remaining}
@@ -199,7 +199,7 @@ export function CreditMeter({
         aria-expanded={open}
         aria-haspopup="dialog"
         title={title}
-        className="group block w-full rounded-[6px] px-2 py-1.5 text-left transition-colors hover:bg-hover"
+        className="group block w-full rounded-[var(--r-chip)] px-2 py-1.5 text-left transition-colors hover:bg-hover"
       >
         <div className="flex items-baseline gap-1.5">
           <span aria-hidden className="text-[11px] leading-none text-accent">

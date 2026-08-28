@@ -161,7 +161,7 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
             <div
               key={r.id}
               className={cn(
-                "relative flex flex-col items-center gap-2 rounded-[10px] border px-3 py-4 text-center transition-all duration-300",
+                "relative flex flex-col items-center gap-2 rounded-[var(--r-panel)] border px-3 py-4 text-center transition-all duration-300",
                 isWorking
                   ? "border-line-strong bg-raised"
                   : isDone
@@ -200,7 +200,7 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
         {results.map((r, i) => (
           <section
             key={r.id}
-            className="nx-in rounded-[10px] border border-line bg-rail p-5"
+            className="nx-in rounded-[var(--r-panel)] border border-line bg-rail p-5"
             style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
           >
             <div className="mb-3.5 flex items-center gap-2.5">
@@ -213,7 +213,7 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
       </div>
 
       {done ? (
-        <div className="nx-in mt-8 flex items-center justify-between rounded-[10px] border border-positive/25 bg-positive/8 px-5 py-4">
+        <div className="nx-in mt-8 flex items-center justify-between rounded-[var(--r-panel)] border border-positive/25 bg-positive/8 px-5 py-4">
           <span className="flex items-center gap-2.5 text-[14px] text-ink">
             <FiCheck size={16} className="text-positive" />
             All four agents finished.

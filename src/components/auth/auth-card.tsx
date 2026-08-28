@@ -10,7 +10,7 @@ import { Ico } from "@/components/ui/ico";
 import { PasswordField } from "@/components/auth/password-field";
 
 const field =
-  "h-12 w-full rounded-[8px] border border-line-strong bg-sunk px-3.5 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent sm:text-[14.5px]";
+  "h-12 w-full rounded-[var(--r-control)] border border-line-strong bg-sunk px-3.5 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent sm:text-[14.5px]";
 
 /**
  * Codes come back on the URL from the Google callback, which cannot render a
@@ -51,7 +51,7 @@ export function AuthCard({
   const error = state.error ?? urlError;
 
   return (
-    <div className="nx-in w-full max-w-[420px] rounded-[12px] border border-line bg-rail p-6 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)] sm:p-7">
+    <div className="nx-in w-full max-w-[420px] rounded-[var(--r-panel)] border border-line bg-rail p-6 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.85)] sm:p-7">
       <div className="mb-6 flex flex-col items-center">
         <TroveOrb size={40} state="idle" />
         <h1 className="mt-4 text-center text-[17px] font-semibold text-ink">
@@ -60,7 +60,7 @@ export function AuthCard({
       </div>
 
       {justVerified ? (
-        <div className="mb-5 flex items-start gap-2 rounded-[8px] border border-positive/30 bg-positive/10 px-3 py-2.5">
+        <div className="mb-5 flex items-start gap-2 rounded-[var(--r-control)] border border-positive/30 bg-positive/10 px-3 py-2.5">
           <Ico icon={FiCheck} motion="check" size={14} className="mt-0.5 shrink-0 text-positive" />
           <p className="text-[13px] text-ink-2">
             Email confirmed. Sign in to get started.
@@ -73,14 +73,14 @@ export function AuthCard({
         // top-level navigation for Google to show its account chooser.
         <a
           href="/api/auth/google"
-          className="flex h-12 w-full items-center justify-center gap-3 rounded-[8px] border border-line-strong bg-raised text-[14.5px] font-medium text-ink transition-colors hover:bg-hover"
+          className="flex h-12 w-full items-center justify-center gap-3 rounded-[var(--r-control)] border border-line-strong bg-raised text-[14.5px] font-medium text-ink transition-colors hover:bg-hover"
         >
           <FcGoogle size={19} /> Continue with Google
         </a>
       ) : (
         <button
           type="button"
-          className="flex h-12 w-full cursor-not-allowed items-center justify-center gap-3 rounded-[8px] border border-line-strong bg-raised text-[14.5px] font-medium text-ink opacity-60"
+          className="flex h-12 w-full cursor-not-allowed items-center justify-center gap-3 rounded-[var(--r-control)] border border-line-strong bg-raised text-[14.5px] font-medium text-ink opacity-60"
           disabled
           title="Google sign-in is not configured on this deployment"
         >
@@ -127,7 +127,7 @@ export function AuthCard({
         />
 
         {error ? (
-          <div className="flex items-start gap-2 rounded-[8px] border border-critical/30 bg-critical/10 px-3 py-2.5">
+          <div className="flex items-start gap-2 rounded-[var(--r-control)] border border-critical/30 bg-critical/10 px-3 py-2.5">
             <Ico icon={FiAlertCircle} motion="alert" size={14} className="mt-0.5 shrink-0 text-critical" />
             <p className="text-[13px] text-critical">{error}</p>
           </div>
@@ -136,7 +136,7 @@ export function AuthCard({
         <button
           type="submit"
           disabled={pending}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-[8px] btn-grad text-[15px] font-semibold transition-colors disabled:opacity-60"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-[var(--r-control)] btn-grad text-[15px] font-semibold transition-colors disabled:opacity-60"
         >
           {pending ? <Ico icon={FiLoader} motion="spin" size={16} className="animate-spin" /> : null}
           {isLogin ? "Log In" : "Sign Up"}

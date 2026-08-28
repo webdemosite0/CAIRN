@@ -61,6 +61,7 @@
   /* The radius scale. Ten hand-written pixel values were in use; these are
      the five that were actually meant, and the names say what they are for
      rather than how big they are. */
+  --r-tight: 4px;   /* thumbnails and bars, inside a control */
   --r-chip: 6px;    /* tags, kbd, small inline things */
   --r-control: 8px; /* buttons, inputs, rows */
   --r-panel: 12px;  /* popovers, boxes, sheets */
@@ -195,6 +196,7 @@
   /* The radius scale. Ten hand-written pixel values were in use; these are
      the five that were actually meant, and the names say what they are for
      rather than how big they are. */
+  --r-tight: 4px;   /* thumbnails and bars, inside a control */
   --r-chip: 6px;    /* tags, kbd, small inline things */
   --r-control: 8px; /* buttons, inputs, rows */
   --r-panel: 12px;  /* popovers, boxes, sheets */
@@ -429,7 +431,7 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: var(--scrollbar);
-  border-radius: 6px;
+  border-radius: var(--r-chip);
   border: 3px solid transparent;
   background-clip: padding-box;
 }
@@ -441,7 +443,7 @@ body {
 :focus-visible {
   outline: 2px solid var(--focus-line);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: var(--r-chip);
 }
 
 /* Text fields always match :focus-visible, even on a plain click — so the rule
@@ -530,7 +532,7 @@ select:focus-visible,
   display: flex;
   align-items: center;
   gap: 10px;
-  border-radius: 8px;
+  border-radius: var(--r-control);
   padding: 6px 10px;
   min-height: 32px;
   font-size: 13.5px;
@@ -621,7 +623,7 @@ select:focus-visible,
 @utility panel {
   background: var(--color-raised);
   border: 1px solid var(--color-line);
-  border-radius: 10px;
+  border-radius: var(--r-panel);
   /* The bezel: a hairline of light along the top edge inside the border, so a
      panel reads as a raised object catching light rather than a flat cut-out.
      --bezel is a highlight on dark and a soft shadow on light, because the
@@ -1544,7 +1546,7 @@ a[role="button"]:active {
   position: relative;
   background: var(--color-raised);
   border: 1px solid var(--color-line);
-  border-radius: 12px;
+  border-radius: var(--r-panel);
   box-shadow:
     inset 0 1px 0 0 var(--bezel),
     inset 0 -1px 0 0 var(--bezel-under),

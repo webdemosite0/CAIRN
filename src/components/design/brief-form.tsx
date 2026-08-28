@@ -60,7 +60,7 @@ export function BriefForm({
         e.preventDefault();
         onSubmit(brief);
       }}
-      className="nx-in space-y-7 rounded-[14px] border border-line bg-rail p-6"
+      className="nx-in space-y-7 rounded-[var(--r-card)] border border-line bg-rail p-6"
     >
       <header>
         <h2 className="text-[19px] font-semibold text-ink">
@@ -79,7 +79,7 @@ export function BriefForm({
             onChange={(e) => set("what", e.target.value.slice(0, MAX_WHAT))}
             rows={3}
             placeholder="e.g. a plant-care reminder app for apartment renters"
-            className="block w-full resize-y rounded-[10px] border border-line bg-sunk px-3.5 py-3 pb-7 text-[14px] leading-relaxed text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent"
+            className="block w-full resize-y rounded-[var(--r-panel)] border border-line bg-sunk px-3.5 py-3 pb-7 text-[14px] leading-relaxed text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent"
           />
           <span className="pointer-events-none absolute bottom-2.5 right-3 text-[11.5px] tabular-nums text-ink-4">
             {brief.what.length} / {MAX_WHAT}
@@ -111,7 +111,7 @@ export function BriefForm({
                 onClick={() => toggleScreen(s)}
                 aria-pressed={on}
                 className={cn(
-                  "group flex items-center gap-1.5 rounded-[9px] border px-3 py-2 text-[13px] transition-colors",
+                  "group flex items-center gap-1.5 rounded-[var(--r-control)] border px-3 py-2 text-[13px] transition-colors",
                   on
                     ? "border-accent bg-accent/10 text-ink"
                     : "border-line text-ink-3 hover:border-line-strong hover:bg-hover hover:text-ink",
@@ -149,7 +149,7 @@ export function BriefForm({
           value={brief.style}
           onChange={(e) => set("style", e.target.value.slice(0, 300))}
           placeholder="e.g. warm and editorial, or dense like a trading terminal"
-          className="block w-full rounded-[10px] border border-line bg-sunk px-3.5 py-2.5 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent"
+          className="block w-full rounded-[var(--r-panel)] border border-line bg-sunk px-3.5 py-2.5 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-accent"
         />
       </Field>
 
@@ -168,7 +168,7 @@ export function BriefForm({
         <button
           type="submit"
           disabled={busy || !brief.screens.length}
-          className="group flex h-11 items-center gap-2 rounded-[10px] btn-grad px-5 text-[14.5px] font-semibold disabled:opacity-50"
+          className="group flex h-11 items-center gap-2 rounded-[var(--r-panel)] btn-grad px-5 text-[14.5px] font-semibold disabled:opacity-50"
         >
           {busy
             ? "Designing…"
@@ -210,7 +210,7 @@ function Segmented<T extends string>({
   return (
     <div
       role="radiogroup"
-      className="flex rounded-[10px] border border-line bg-sunk p-1"
+      className="flex rounded-[var(--r-panel)] border border-line bg-sunk p-1"
     >
       {options.map((o) => (
         <button
@@ -220,7 +220,7 @@ function Segmented<T extends string>({
           aria-checked={value === o}
           onClick={() => onChange(o)}
           className={cn(
-            "flex-1 rounded-[7px] px-3 py-2 text-[13px] transition-colors",
+            "flex-1 rounded-[var(--r-chip)] px-3 py-2 text-[13px] transition-colors",
             value === o
               ? "bg-raised font-medium text-ink shadow-[var(--elev)]"
               : "text-ink-3 hover:text-ink",

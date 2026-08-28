@@ -25,7 +25,7 @@ export default async function MePage() {
         </p>
         <Link
           href="/login"
-          className="mt-7 rounded-[8px] btn-grad px-5 py-2.5 text-[14px] font-medium transition-transform hover:scale-105"
+          className="mt-7 rounded-[var(--r-control)] btn-grad px-5 py-2.5 text-[14px] font-medium transition-transform hover:scale-105"
         >
           Log in
         </Link>
@@ -72,11 +72,11 @@ export default async function MePage() {
           <Link
             key={c.label}
             href={c.href}
-            className="nx-in group rounded-[10px] border border-line bg-rail p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong"
+            className="nx-in group rounded-[var(--r-panel)] border border-line bg-rail p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong"
             style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
           >
             <span
-              className="grid h-10 w-10 place-items-center rounded-[8px]"
+              className="grid h-10 w-10 place-items-center rounded-[var(--r-control)]"
               style={{ background: `${c.accent}1f`, color: c.accent }}
             >
               <c.icon size={18} />
@@ -93,7 +93,7 @@ export default async function MePage() {
         ))}
       </div>
 
-      <section className="mt-8 rounded-[10px] border border-line bg-rail p-6">
+      <section className="mt-8 rounded-[var(--r-panel)] border border-line bg-rail p-6">
         <h2 className="mb-1.5 text-[15px] font-semibold text-ink">Start something</h2>
         <p className="mb-5 text-[13.5px] text-ink-3">
           Every tool here produces real output you can use.

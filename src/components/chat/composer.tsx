@@ -134,7 +134,7 @@ export function Composer({
       data-focused={focused}
       className={cn(
         "composer border bg-rail",
-        compact ? "rounded-[10px]" : "rounded-[18px] shadow-[var(--sh-2)]",
+        compact ? "rounded-[var(--r-panel)]" : "rounded-[var(--r-hero)] shadow-[var(--sh-2)]",
       )}
     >
       {/* attached files */}
@@ -143,17 +143,17 @@ export function Composer({
           {files.map((a, i) => (
             <div
               key={`${a.name}-${i}`}
-              className="nx-in group relative flex items-center gap-2 rounded-[8px] border border-line bg-raised py-1.5 pl-1.5 pr-7"
+              className="nx-in group relative flex items-center gap-2 rounded-[var(--r-control)] border border-line bg-raised py-1.5 pl-1.5 pr-7"
             >
               {a.preview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={a.preview}
                   alt={a.name}
-                  className="h-8 w-8 rounded-[5px] object-cover"
+                  className="h-8 w-8 rounded-[var(--r-chip)] object-cover"
                 />
               ) : (
-                <span className="grid h-8 w-8 place-items-center rounded-[5px] bg-sunk text-ink-3">
+                <span className="grid h-8 w-8 place-items-center rounded-[var(--r-chip)] bg-sunk text-ink-3">
                   {a.kind === "text" ? <Ico icon={FiFileText} motion="lift" size={14} /> : <Ico icon={FiFile} motion="lift" size={14} />}
                 </span>
               )}
@@ -168,7 +168,7 @@ export function Composer({
               <button
                 onClick={() => remove(i)}
                 aria-label={`Remove ${a.name}`}
-                className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-[5px] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
+                className="absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-[var(--r-chip)] text-ink-4 transition-colors hover:bg-hover hover:text-ink"
               >
                 <Ico icon={FiX} motion="close" size={12} />
               </button>
