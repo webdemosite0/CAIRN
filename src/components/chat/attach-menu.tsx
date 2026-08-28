@@ -79,7 +79,7 @@ export function AttachMenu({
         aria-expanded={open}
         title="Attach a photo, document or file"
         className={cn(
-          "group grid place-items-center rounded-full border border-line text-ink-3 transition-colors hover:border-line-strong hover:bg-hover hover:text-ink disabled:opacity-40",
+          "tap-44 group grid place-items-center rounded-full border border-line text-ink-3 transition-colors hover:border-line-strong hover:bg-hover hover:text-ink disabled:opacity-40",
           compact ? "size-7" : "size-9",
         )}
       >

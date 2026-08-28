@@ -66,7 +66,7 @@ export function BuildStages({
                 className="pointer-events-none absolute inset-y-0 w-1/3"
                 style={{
                   background: `linear-gradient(90deg, transparent, ${s.accent}14, transparent)`,
-                  animation: "nx-sweep 1.9s linear infinite",
+                  animation: "nx-band 1.9s linear infinite",
                 }}
               />
             ) : null}

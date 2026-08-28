@@ -288,7 +288,7 @@ export function Composer({
           aria-pressed={voice.listening}
           title={voice.listening ? "Listening — click to stop" : "Speak your message"}
           className={cn(
-            "group relative grid shrink-0 place-items-center rounded-full transition-colors disabled:opacity-40",
+            "tap-44 group relative grid shrink-0 place-items-center rounded-full transition-colors disabled:opacity-40",
             compact ? "size-7" : "size-9",
             voice.listening
               ? "bg-critical/15 text-critical"
@@ -306,9 +306,16 @@ export function Composer({
           disabled={!ready}
           aria-label="Send message"
           className={cn(
-            "group grid shrink-0 place-items-center rounded-full transition-all duration-200",
-            compact ? "h-8 w-8" : "h-12 w-12",
-            ready ? "btn-grad hover:scale-105" : "bg-raised text-ink-4",
+            "group grid shrink-0 place-items-center rounded-full",
+            "transition-[transform,box-shadow,opacity] duration-[var(--t-tap)] ease-[var(--ease-ui)]",
+            compact ? "size-8" : "size-12",
+            ready
+              ? // Hover lifts the glow rather than the size — growing a round
+                // button under the cursor makes it harder to hit, not easier.
+                // Press scales down, which is the only movement a pointer
+                // reads as "that registered".
+                "btn-grad hover:shadow-[0_6px_20px_-6px_var(--btn-glow)] active:scale-[0.94]"
+              : "bg-raised text-ink-4 opacity-60",
           )}
         >
           {disabled ? (

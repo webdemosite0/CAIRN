@@ -64,7 +64,7 @@ export function ContinuePanel({ items }: { items: Recent[] }) {
       <header className="mb-3 flex items-baseline justify-between">
         <h2 className="text-[14px] font-medium text-ink">Recent creations</h2>
         {items.length > shown.length ? (
-          <Link href="/dashboard" className="text-[12.5px] text-accent hover:underline">
+          <Link href="/dashboard" className="tap-44 text-[12.5px] text-accent hover:underline">
             View all
           </Link>
         ) : null}
@@ -125,7 +125,7 @@ export function ActivityPanel({ items }: { items: Recent[] }) {
       <header className="mb-3 flex items-center justify-between">
         <h2 className="text-[14px] font-medium text-ink">Recent activity</h2>
         {items.length > 6 ? (
-          <Link href="/dashboard" className="text-[12.5px] text-accent hover:underline">
+          <Link href="/dashboard" className="tap-44 text-[12.5px] text-accent hover:underline">
             View all
           </Link>
         ) : null}

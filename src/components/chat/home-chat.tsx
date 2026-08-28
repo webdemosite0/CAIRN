@@ -59,7 +59,7 @@ export function HomeChat({
           <div className="w-full max-w-[820px] text-center">
             <div className="nx-rise">
               <Greeting name={name} />
-              <h1 className="mt-2.5 text-[clamp(2.25rem,1.3rem+2.6vw,3.5rem)] font-semibold leading-[1.03] tracking-[-0.02em] text-ink">
+              <h1 className="mt-2.5 text-[clamp(2.25rem,1.15rem+3vw,3.75rem)] font-semibold leading-[1.03] tracking-[-0.02em] text-ink">
                 What will you build today?
               </h1>
               <p className="mx-auto mt-3.5 max-w-[46ch] text-[16.5px] leading-relaxed text-ink-3">

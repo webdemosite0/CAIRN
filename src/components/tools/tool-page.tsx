@@ -2,6 +2,7 @@
 
 import { Ico } from "@/components/ui/ico";
 import { StudioBack } from "@/components/shell/studio-back";
+import { SkeletonText } from "@/components/ui/skeleton";
 import { SystemEditor } from "@/components/design/system-editor";
 import { localTimeZone } from "@/lib/context";
 import { FailureNote } from "@/components/ui/failure-note";
@@ -208,10 +209,17 @@ export function ToolPage({
         </div>
       </header>
 
+      {/* The wait is shaped like the answer.
+          A bordered box with a spinner in it told you something was happening
+          and then reflowed the page when the text arrived. This occupies
+          roughly the room the answer will take, so nothing jumps. */}
       {busy && !output ? (
-        <div className="flex items-center gap-3.5 rounded-[10px] border border-line bg-rail px-5 py-4">
-          <Bot size={38} accent={accent} state="working" />
-          <span className="nx-dots text-[14px] text-ink-2">Working</span>
+        <div className="rounded-[10px] border border-line bg-rail p-5">
+          <div className="mb-4 flex items-center gap-3.5">
+            <Bot size={38} accent={accent} state="working" />
+            <span className="nx-dots text-[14px] text-ink-2">Working</span>
+          </div>
+          <SkeletonText lines={5} />
         </div>
       ) : null}
 

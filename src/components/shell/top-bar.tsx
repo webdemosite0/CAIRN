@@ -37,7 +37,7 @@ export function TopBar({ initial }: { initial?: string }) {
       <button
         onClick={openPalette}
         className={cn(
-          "group flex h-9 min-w-0 max-w-[420px] flex-1 items-center gap-2.5 rounded-[8px]",
+          "tap-44 group flex h-9 min-w-0 max-w-[420px] flex-1 items-center gap-2.5 rounded-[8px]",
           "border border-line bg-sunk px-3 text-left transition-colors",
           "hover:border-line-strong hover:bg-hover",
         )}
@@ -72,7 +72,7 @@ export function TopBar({ initial }: { initial?: string }) {
       <Link
         href="/settings"
         aria-label="Account"
-        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-soft sm:h-8 sm:w-8 text-[12px] font-semibold text-accent transition-transform duration-150 hover:scale-105"
+        className="tap-44 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-soft sm:h-8 sm:w-8 text-[12px] font-semibold text-accent transition-transform duration-[var(--t-hover)] ease-[var(--ease-ui)] hover:scale-105"
       >
         {(initial ?? "Y").slice(0, 1).toUpperCase()}
       </Link>

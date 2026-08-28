@@ -68,7 +68,7 @@ export function ModePicker({
         aria-haspopup="menu"
         title="How loosely Trove answers"
         className={cn(
-          "group flex items-center gap-1.5 rounded-[7px] text-ink-3 transition-colors",
+          "tap-44 group flex items-center gap-1.5 rounded-[7px] text-ink-3 transition-colors",
           "hover:bg-hover hover:text-ink disabled:opacity-40",
           touch
             ? "h-11 rounded-full px-3.5 text-[13.5px]"

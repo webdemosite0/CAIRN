@@ -46,6 +46,27 @@
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
+  /* One curve for interface motion: quick to leave, slow to arrive, which
+     is what makes a transition feel like a response rather than a delay. */
+  --ease-ui: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Four durations, chosen by how much of the screen moves. Written inline
+     they had drifted to 0.15s, 200ms, 0.22s and 250ms for the same class of
+     interaction, which is not a difference anyone chose. */
+  --t-tap: 120ms;   /* a control acknowledging a press */
+  --t-hover: 180ms; /* a row or button under the cursor */
+  --t-card: 240ms;  /* something with size changing state */
+  --t-panel: 320ms; /* a panel, drawer or rail */
+
+  /* The radius scale. Ten hand-written pixel values were in use; these are
+     the five that were actually meant, and the names say what they are for
+     rather than how big they are. */
+  --r-chip: 6px;    /* tags, kbd, small inline things */
+  --r-control: 8px; /* buttons, inputs, rows */
+  --r-panel: 12px;  /* popovers, boxes, sheets */
+  --r-card: 14px;   /* cards and framed content */
+  --r-hero: 18px;   /* the composer, and anything of that weight */
+
   /* Overshoots slightly and settles. What makes a short movement read as a
      weighted object rather than as a CSS transition — the difference between
      an icon that moves and one that feels moved. */
@@ -158,6 +179,27 @@
   --font-mono: var(--font-mono-code), ui-monospace, monospace;
   --font-display: var(--font-display-face), "Segoe UI", system-ui, sans-serif;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* One curve for interface motion: quick to leave, slow to arrive, which
+     is what makes a transition feel like a response rather than a delay. */
+  --ease-ui: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Four durations, chosen by how much of the screen moves. Written inline
+     they had drifted to 0.15s, 200ms, 0.22s and 250ms for the same class of
+     interaction, which is not a difference anyone chose. */
+  --t-tap: 120ms;   /* a control acknowledging a press */
+  --t-hover: 180ms; /* a row or button under the cursor */
+  --t-card: 240ms;  /* something with size changing state */
+  --t-panel: 320ms; /* a panel, drawer or rail */
+
+  /* The radius scale. Ten hand-written pixel values were in use; these are
+     the five that were actually meant, and the names say what they are for
+     rather than how big they are. */
+  --r-chip: 6px;    /* tags, kbd, small inline things */
+  --r-control: 8px; /* buttons, inputs, rows */
+  --r-panel: 12px;  /* popovers, boxes, sheets */
+  --r-card: 14px;   /* cards and framed content */
+  --r-hero: 18px;   /* the composer, and anything of that weight */
 
   /* Overshoots slightly and settles. What makes a short movement read as a
      weighted object rather than as a CSS transition — the difference between
@@ -420,9 +462,9 @@ select:focus-visible,
 .composer {
   border-color: var(--color-line-strong);
   transition:
-    border-color 0.22s var(--ease-out),
-    box-shadow 0.22s var(--ease-out),
-    background-color 0.22s var(--ease-out);
+    border-color var(--t-card) var(--ease-ui),
+    box-shadow var(--t-card) var(--ease-ui),
+    background-color var(--t-card) var(--ease-ui);
 }
 /* Focus should read as precision, not decoration: a definite border and a
    ring you notice only if you look for it. The previous 16% ring was doing
@@ -495,8 +537,8 @@ select:focus-visible,
   font-weight: 450;
   color: var(--color-ink-3);
   transition:
-    background-color 0.15s var(--ease-out),
-    color 0.15s var(--ease-out);
+    background-color var(--t-hover) var(--ease-ui),
+    color var(--t-hover) var(--ease-ui);
 
   &:hover {
     background: var(--color-hover);
@@ -518,8 +560,21 @@ select:focus-visible,
 @utility rail-item-active {
   position: relative;
   background: var(--color-hover);
-  color: var(--color-ink);
-  font-weight: 550;
+
+  /**
+   * Qualified with .rail-item, which is always alongside it.
+   *
+   * Both utilities are one class, so which one wins is decided by the order
+   * Tailwind happens to emit them in — and it was emitting the base rule last.
+   * The active row was getting its background and its accent marker while
+   * silently keeping ink-3 at weight 450, so the current page read as a tinted
+   * row rather than as the selected one. Two classes settles it regardless of
+   * order.
+   */
+  &.rail-item {
+    color: var(--color-ink);
+    font-weight: 550;
+  }
 
   &::before {
     content: "";
@@ -773,7 +828,7 @@ select:focus-visible,
   animation: nx-rise 420ms var(--ease-out) both;
 }
 
-@keyframes nx-sweep {
+@keyframes nx-band {
   0% {
     left: -35%;
   }
@@ -1783,20 +1838,6 @@ a[role="button"]:active {
 }
 
 /* A console line arriving. */
-@keyframes nx-line-in {
-  from {
-    opacity: 0;
-    transform: translateX(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-.nx-line-in {
-  animation: nx-line-in 0.18s var(--ease-out);
-}
-
 /* The active step in a plan, breathing so the eye can find it. */
 @keyframes nx-step-active {
   0%,
@@ -1809,31 +1850,6 @@ a[role="button"]:active {
 }
 .nx-step-active {
   animation: nx-step-active 2.2s ease-in-out infinite;
-}
-
-/* A progress track that shows work is happening even between increments. */
-@keyframes nx-sweep {
-  from {
-    background-position: -40% 0;
-  }
-  to {
-    background-position: 140% 0;
-  }
-}
-.nx-sweep::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in oklab, var(--color-accent) 55%, transparent),
-    transparent
-  );
-  background-size: 40% 100%;
-  background-repeat: no-repeat;
-  animation: nx-sweep 1.4s linear infinite;
-  pointer-events: none;
 }
 
 /* --- big: things that arrive ------------------------------------------ */
@@ -2004,6 +2020,11 @@ a[role="button"]:active {
     display: none;
   }
 
+  /* Applied through an inline style, so it is switched off by name here. */
+  [style*="nx-band"] {
+    animation: none !important;
+  }
+
   .lift:hover,
   .press:active,
   .lift:active {
@@ -2156,5 +2177,86 @@ a[role="button"]:active {
   .nx-wire {
     background-image: none;
     background-color: var(--color-line);
+  }
+}
+
+/* ============================================================
+   SKELETON
+   ------------------------------------------------------------
+   A placeholder shaped like the thing that is coming.
+
+   The app had none: every wait was either a spinner or an empty
+   region that reflowed the moment content arrived. A spinner says
+   "something is happening"; a skeleton says "something of this
+   shape is happening", and the page stops jumping when it lands.
+
+   Deliberately low contrast. A skeleton that shimmers brightly is
+   competing with the content it is standing in for.
+   ============================================================ */
+
+@utility skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-control);
+  background: var(--color-sunk);
+
+  /* The sweep is a pseudo-element so the base colour stays flat —
+     animating background-position on a gradient repaints the whole
+     box, this only composites a transform. */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--shimmer),
+      transparent
+    );
+    animation: nx-skeleton 1.4s var(--ease-ui) infinite;
+  }
+}
+
+@keyframes nx-skeleton {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* A skeleton is decoration for a wait, not information. Under reduced
+   motion the shape stays and the sweep stops. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+/* A control can look 27px tall and still be comfortable to hit.
+
+   Six controls measured under 40px at 360px wide — the mode picker at 27,
+   the "View all" link at 19, and four 36px round buttons. Growing them
+   visually would wreck the density of the composer row, which is the one
+   place the compactness is doing real work. So the *hit area* grows and
+   the paint does not: a transparent pseudo-element centred on the control,
+   sized to the 44px WCAG 2.2 target.
+
+   Coarse pointers only. On a mouse, 36px is already an easy target, and
+   overlapping invisible boxes between adjacent controls would steal hovers
+   from their neighbours. */
+@utility tap-44 {
+  position: relative;
+  @media (pointer: coarse) {
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      translate: -50% -50%;
+      min-width: 44px;
+      min-height: 44px;
+      width: 100%;
+      height: 100%;
+    }
   }
 }
