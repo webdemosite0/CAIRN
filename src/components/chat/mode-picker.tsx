@@ -43,13 +43,60 @@ export function ModePicker({
 }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const items = useRef<(HTMLButtonElement | null)[]>([]);
+
+  /** Which option to focus once the menu exists. A ref, not state: nothing
+   *  renders from it, and storing it in state would mean setting state from
+   *  the effect that consumes it. */
+  const landOn = useRef<number | null>(null);
+
+  /** Opens with a given option focused, so the keyboard lands somewhere. */
+  function openAt(index: number) {
+    landOn.current = index;
+    setOpen(true);
+  }
+
+  // The menu does not exist on the frame that opens it, so the focus has to
+  // wait for the commit. An effect, not requestAnimationFrame: rAF is tied to
+  // the frame loop, and a throttled or backgrounded tab never runs it — which
+  // would leave the menu open with focus stranded on the trigger, exactly the
+  // state a keyboard user cannot get out of.
+  useEffect(() => {
+    if (!open || landOn.current === null) return;
+    items.current[landOn.current]?.focus();
+    landOn.current = null;
+  }, [open]);
+
+  function close({ restore = true } = {}) {
+    setOpen(false);
+    if (restore) trigger.current?.focus();
+  }
+
+  /** Wraps, so Down from the last option reaches the first. */
+  function step(from: number, delta: number) {
+    const n = MODE_LIST.length;
+    items.current[(from + delta + n) % n]?.focus();
+  }
+
+  const checkedIndex = Math.max(0, MODE_LIST.findIndex((m) => m.id === value));
 
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
+      // A click outside is a dismissal, not a cancellation: pulling focus back
+      // to the trigger would yank the page away from wherever they clicked.
       if (!wrap.current?.contains(e.target as Node)) setOpen(false);
     };
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    // Escape belongs on the document, not on the menu: focus may still be on
+    // the trigger (a mouse user never moved it), and a dismissal that only
+    // works from inside the thing being dismissed is not a dismissal.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        close();
+      }
+    };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
     return () => {
@@ -61,8 +108,20 @@ export function ModePicker({
   return (
     <div ref={wrap} className="relative shrink-0">
       <button
+        ref={trigger}
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (open ? close({ restore: false }) : openAt(checkedIndex))}
+        onKeyDown={(e) => {
+          // Down opens on the first option, Up on the last — the convention
+          // every native select follows, and the reason Up exists at all.
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            openAt(open ? 0 : checkedIndex);
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            openAt(MODE_LIST.length - 1);
+          }
+        }}
         disabled={disabled}
         aria-expanded={open}
         aria-haspopup="menu"
@@ -84,7 +143,10 @@ export function ModePicker({
         <span className={touch ? "" : "hidden sm:inline"}>{MODES[value].label}</span>
         <FiChevronDown
           size={12}
-          className={cn("transition-transform duration-200", open && "rotate-180")}
+          className={cn(
+            "transition-transform duration-[var(--t-hover)] ease-[var(--ease-ui)]",
+            open && "rotate-180",
+          )}
         />
       </button>
 
@@ -101,6 +163,17 @@ export function ModePicker({
       {open ? (
         <div
           role="menu"
+          onKeyDown={(e) => {
+            const i = items.current.indexOf(e.target as HTMLButtonElement);
+            if (e.key === "ArrowDown") { e.preventDefault(); step(i, 1); }
+            else if (e.key === "ArrowUp") { e.preventDefault(); step(i, -1); }
+            else if (e.key === "Home") { e.preventDefault(); items.current[0]?.focus(); }
+            else if (e.key === "End") { e.preventDefault(); items.current[MODE_LIST.length - 1]?.focus(); }
+            // Tab leaves the menu entirely rather than walking its options —
+            // a popup you can Tab out of while it stays open loses its
+            // dismissal, and the next Tab lands somewhere behind it.
+            else if (e.key === "Tab") close({ restore: false });
+          }}
           className={cn(
             "nx-in z-50 overflow-hidden border border-line bg-raised shadow-[var(--sh-3)]",
             touch
@@ -112,15 +185,20 @@ export function ModePicker({
               : "absolute bottom-full left-0 mb-2 w-[264px] rounded-[var(--r-panel)]",
           )}
         >
-          {MODE_LIST.map((m) => (
+          {MODE_LIST.map((m, i) => (
             <button
               key={m.id}
+              ref={(el) => {
+                items.current[i] = el;
+              }}
               type="button"
               role="menuitemradio"
               aria-checked={m.id === value}
+              // One stop for the whole menu: arrows move within it, Tab leaves.
+              tabIndex={m.id === value ? 0 : -1}
               onClick={() => {
                 onChange(m.id);
-                setOpen(false);
+                close();
               }}
               className="flex w-full items-start gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-hover"
             >
