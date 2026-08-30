@@ -24,7 +24,9 @@ export default async function DocsPage({
           ? {
               id: saved.id,
               title: saved.messages.find((m) => m.role === "user")?.text ?? saved.title,
-              output: saved.messages.find((m) => m.role === "model")?.text ?? "",
+              // The whole thread, so a reopened draft can still be revised
+              // with a follow-up rather than only re-read.
+              messages: saved.messages,
             }
           : null
       }

@@ -197,10 +197,40 @@ export function parseMarkdownTable(text: string): string[][] {
     rows.push(
       trimmed
         .slice(1, trimmed.endsWith("|") ? -1 : undefined)
-        .split("|")
-        .map((c) => c.trim().replace(/\*\*/g, "")),
+        // Unescaped pipes only. A cell containing a pipe is written `\|` in
+        // markdown — by toMarkdownTable, and by models often enough — and
+        // splitting on it regardless shifted every later cell in that row one
+        // column to the left.
+        .split(/(?<!\\)\|/)
+        .map((c) => c.trim().replace(/\*\*/g, "").replace(/\\\|/g, "|")),
     );
   }
 
   return rows;
+}
+
+/**
+ * A row matrix back into a markdown table — the inverse of
+ * parseMarkdownTable.
+ *
+ * Needed so a follow-up ("add a column for margin") can be given the grid as
+ * it stands rather than as the model first wrote it; without it, every edit
+ * made since would be silently reverted by the next request.
+ *
+ * Pipes inside a cell are escaped, since an unescaped one would be read back
+ * as a column break and shift the rest of the row along by one.
+ */
+export function toMarkdownTable(rows: string[][]): string {
+  if (!rows.length) return "";
+
+  const width = rows.reduce((m, r) => Math.max(m, r.length), 0);
+  const cell = (v: string | undefined) => (v ?? "").replace(/\|/g, "\\|").trim();
+  const line = (r: string[]) =>
+    `| ${Array.from({ length: width }, (_, i) => cell(r[i])).join(" | ")} |`;
+
+  return [
+    line(rows[0]),
+    `| ${Array.from({ length: width }, () => "---").join(" | ")} |`,
+    ...rows.slice(1).map(line),
+  ].join("\n");
 }

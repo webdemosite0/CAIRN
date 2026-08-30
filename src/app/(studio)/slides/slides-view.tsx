@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { localTimeZone } from "@/lib/context";
 import {
   FiChevronDown,
   FiChevronUp,
@@ -24,14 +23,13 @@ import { Recents } from "@/components/ui/recents";
 import { Ico } from "@/components/ui/ico";
 import { FailureNote } from "@/components/ui/failure-note";
 import { SlideCanvas } from "@/components/slides/slide-canvas";
-import { strip, type Attachment } from "@/lib/attachments";
+import type { Attachment } from "@/lib/attachments";
 import { parseDeck, deckFilename, serialiseDeck } from "@/lib/slides";
 import { useDeck } from "@/lib/use-deck";
 import { downloadPptx } from "@/lib/pptx";
 import { downloadMarkdown } from "@/lib/export";
 import type { Recent } from "@/lib/recents";
-import { useRouter } from "next/navigation";
-import { useSaved } from "@/lib/use-saved";
+import { useDraft } from "@/lib/use-draft";
 import { cn } from "@/lib/utils";
 
 const EXAMPLES = [
@@ -47,14 +45,16 @@ export function SlidesView({
 }: {
   recents?: Recent[];
   recentsLabel?: string;
-  restored?: { id: string; title: string; output: string } | null;
+  restored?: {
+    id: string;
+    title: string;
+    messages: { role: "user" | "model"; text: string }[];
+  } | null;
 }) {
-  const router = useRouter();
-  const { save, reset } = useSaved("slides", restored?.id ?? null);
-  const [prompt, setPrompt] = useState(restored?.title ?? "");
-  const [text, setText] = useState(restored?.output ?? "");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { turns, busy, error, latest: text, prompt, ask, startOver } = useDraft({
+    tool: "slides",
+    restored,
+  });
   const [current, setCurrent] = useState(0);
   const [presenting, setPresenting] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -126,59 +126,22 @@ export function SlidesView({
     }
   }
 
-  async function run(value: string, attachments?: Attachment[]) {
-    if (!value.trim() && !attachments?.length) return;
-    setPrompt(value);
-    setBusy(true);
-    setError(null);
-    setText("");
+  function run(value: string, attachments?: Attachment[]) {
     setCurrent(0);
-
-    try {
-      const res = await fetch("/api/tool", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          timeZone: localTimeZone(),
-          tool: "slides",
-          prompt: value,
-          attachments: strip(attachments),
-        }),
-      });
-      if (!res.ok || !res.body) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error ?? `Failed (${res.status}).`);
-      }
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      for (;;) {
-        const { done, value: chunk } = await reader.read();
-        if (done) break;
-        setText((t) => t + decoder.decode(chunk, { stream: true }));
-      }
-      setText((full) => {
-        void save(
-          [
-            { role: "user", text: value },
-            { role: "model", text: full },
-          ],
-          value,
-        );
-        return full;
-      });
-      router.refresh();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong.");
-    } finally {
-      setBusy(false);
-    }
+    // The deck as it stands on screen, not as the model last wrote it. Slides
+    // are editable, so sending the original would make "add a pricing slide"
+    // quietly revert every edit made since the deck arrived.
+    void ask(value, {
+      attachments,
+      current: slides.length ? serialiseDeck(slides) : undefined,
+    });
   }
 
   const filename = deckFilename(slides, prompt);
 
   /* ---------------- idle ---------------- */
 
-  if (!prompt) {
+  if (turns.length === 0) {
     return (
       <div className="nx-in relative mx-auto flex min-h-screen max-w-[760px] flex-col justify-center px-5 py-16">
         <div className="mb-7 text-center">
@@ -274,11 +237,12 @@ export function SlidesView({
           </button>
           <button
             onClick={() => {
-              setPrompt("");
-              setText("");
-              setError(null);
               setCurrent(0);
-              reset();
+              // Also drops the deck, or "New" would leave the old slides on
+              // screen under a blank prompt.
+              deck.load([]);
+              importedFrom.current = null;
+              startOver();
             }}
             className="chip group !px-3 !py-1.5 !text-[12.5px]"
           >

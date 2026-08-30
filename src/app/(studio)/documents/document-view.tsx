@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { localTimeZone } from "@/lib/context";
 import {
   FiDownload,
   FiRotateCcw,
@@ -13,11 +12,10 @@ import {
 import { Bot } from "@/components/agents/bot";
 import { Message } from "@/components/chat/message";
 import { Composer } from "@/components/chat/composer";
-import { strip, type Attachment } from "@/lib/attachments";
+import type { Attachment } from "@/lib/attachments";
 import { Recents } from "@/components/ui/recents";
 import type { Recent } from "@/lib/recents";
-import { useRouter } from "next/navigation";
-import { useSaved } from "@/lib/use-saved";
+import { useDraft } from "@/lib/use-draft";
 import { downloadDocx, downloadMarkdown } from "@/lib/export";
 import { Ico } from "@/components/ui/ico";
 import { FailureNote } from "@/components/ui/failure-note";
@@ -36,14 +34,18 @@ export function DocumentView({
 }: {
   recents?: Recent[];
   recentsLabel?: string;
-  restored?: { id: string; title: string; output: string } | null;
+  restored?: {
+    id: string;
+    title: string;
+    messages: { role: "user" | "model"; text: string }[];
+  } | null;
 }) {
-  const router = useRouter();
-  const { save, reset } = useSaved("docs", restored?.id ?? null);
-  const [prompt, setPrompt] = useState(restored?.title ?? "");
-  const [text, setText] = useState(restored?.output ?? "");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // The document is the newest answer; the thread behind it is what makes a
+  // follow-up like "make the introduction shorter" mean anything.
+  const { turns, busy, error, latest: text, prompt, ask, startOver } = useDraft({
+    tool: "docs",
+    restored,
+  });
   const [copied, setCopied] = useState(false);
   const articleRef = useRef<HTMLElement>(null);
   const [outline, setOutline] = useState<{ id: string; text: string; level: number }[]>([]);
@@ -116,51 +118,8 @@ export function DocumentView({
     };
   }, [outline]);
 
-  async function run(value: string, attachments?: Attachment[]) {
-    if (!value.trim() && !attachments?.length) return;
-    setPrompt(value);
-    setBusy(true);
-    setError(null);
-    setText("");
-
-    try {
-      const res = await fetch("/api/tool", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          timeZone: localTimeZone(),
-          tool: "docs",
-          prompt: value,
-          attachments: strip(attachments),
-        }),
-      });
-      if (!res.ok || !res.body) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error ?? `Failed (${res.status}).`);
-      }
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      for (;;) {
-        const { done, value: chunk } = await reader.read();
-        if (done) break;
-        setText((t) => t + decoder.decode(chunk, { stream: true }));
-      }
-      setText((full) => {
-        void save(
-          [
-            { role: "user", text: value },
-            { role: "model", text: full },
-          ],
-          value,
-        );
-        return full;
-      });
-      router.refresh();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong.");
-    } finally {
-      setBusy(false);
-    }
+  function run(value: string, attachments?: Attachment[]) {
+    void ask(value, { attachments });
   }
 
   const filename =
@@ -172,7 +131,7 @@ export function DocumentView({
 
   /* ---------------- idle ---------------- */
 
-  if (!prompt) {
+  if (turns.length === 0) {
     return (
       <div className="nx-in relative mx-auto flex min-h-screen max-w-[760px] flex-col justify-center px-5 py-16">
         <div className="mb-7 text-center">
@@ -250,12 +209,7 @@ export function DocumentView({
             {copied ? <Ico icon={FiCheck} motion="check" size={13} className="text-positive" /> : <Ico icon={FiCopy} motion="nudge" size={13} />}
           </button>
           <button
-            onClick={() => {
-              setPrompt("");
-              setText("");
-              setError(null);
-              reset();
-            }}
+            onClick={startOver}
             className="chip group !px-3 !py-1.5 !text-[12.5px]"
           >
             <Ico icon={FiRotateCcw} motion="spin" size={13} /> New

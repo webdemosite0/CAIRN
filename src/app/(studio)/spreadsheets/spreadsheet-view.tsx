@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { localTimeZone } from "@/lib/context";
 import {
   FiDownload,
   FiRotateCcw,
@@ -15,15 +14,15 @@ import {
   downloadCsv,
   downloadXlsx,
   parseMarkdownTable,
+  toMarkdownTable,
 } from "@/lib/export";
 import { Ico } from "@/components/ui/ico";
 import { FailureNote } from "@/components/ui/failure-note";
 import { Composer } from "@/components/chat/composer";
-import { strip, type Attachment } from "@/lib/attachments";
+import type { Attachment } from "@/lib/attachments";
 import { Recents } from "@/components/ui/recents";
 import type { Recent } from "@/lib/recents";
-import { useRouter } from "next/navigation";
-import { useSaved } from "@/lib/use-saved";
+import { useDraft } from "@/lib/use-draft";
 import { Cell } from "@/components/sheets/cell";
 import { cn } from "@/lib/utils";
 
@@ -79,19 +78,44 @@ export function SpreadsheetView({
 }: {
   recents?: Recent[];
   recentsLabel?: string;
-  restored?: { id: string; title: string; output: string } | null;
+  restored?: {
+    id: string;
+    title: string;
+    messages: { role: "user" | "model"; text: string }[];
+  } | null;
 }) {
-  const router = useRouter();
-  const { save, reset } = useSaved("sheets", restored?.id ?? null);
-  const [prompt, setPrompt] = useState(restored?.title ?? "");
-  // The saved artefact is the raw markdown table, re-parsed on open — storing
-  // the grid itself would freeze it in whatever shape the parser had that day.
-  const [rows, setRows] = useState<string[][]>(() =>
-    restored?.output ? parseMarkdownTable(restored.output) : [],
+  const { turns, busy, error, latest, prompt, ask, startOver } = useDraft({
+    tool: "sheets",
+    restored,
+  });
+
+  /**
+   * The grid is derived from the answer until someone edits it.
+   *
+   * The saved artefact is the raw markdown table, re-parsed on open — storing
+   * the grid itself would freeze it in whatever shape the parser had that day.
+   *
+   * Edits are held against the answer they were made to. While the model
+   * streams, `latest` changes on every chunk and the table simply re-derives,
+   * so it fills in as it is written. The moment a cell is edited the grid
+   * belongs to the person, and it keeps belonging to them until a new answer
+   * arrives — at which point `from` no longer matches and the new table wins.
+   *
+   * Deriving rather than syncing in an effect is what keeps this honest: there
+   * is no window in which the state and the answer disagree.
+   */
+  const [edited, setEdited] = useState<{ from: string; rows: string[][] } | null>(
+    null,
   );
-  const [notes, setNotes] = useState(() => notesFrom(restored?.output ?? ""));
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const rows =
+    edited && edited.from === latest ? edited.rows : parseMarkdownTable(latest);
+  const notes = notesFrom(latest);
+
+  function setRows(next: string[][] | ((prev: string[][]) => string[][])) {
+    const value = typeof next === "function" ? next(rows) : next;
+    setEdited({ from: latest, rows: value });
+  }
+
   const [selected, setSelected] = useState<{ r: number; c: number } | null>(null);
   const [sort, setSort] = useState<{ col: number; dir: 1 | -1 } | null>(null);
 
@@ -132,61 +156,15 @@ export function SpreadsheetView({
     return out;
   }, [rows, cols]);
 
-  async function run(text: string, attachments?: Attachment[]) {
-    if (!text.trim()) return;
-    setPrompt(text);
-    setBusy(true);
-    setError(null);
-    setRows([]);
-    setNotes("");
-
-    try {
-      const res = await fetch("/api/tool", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          timeZone: localTimeZone(),
-          tool: "sheets",
-          prompt: text,
-          attachments: strip(attachments),
-        }),
-      });
-      if (!res.ok || !res.body) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error ?? `Failed (${res.status}).`);
-      }
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let acc = "";
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        acc += decoder.decode(value, { stream: true });
-        setRows(parseMarkdownTable(acc));
-      }
-
-      const table = parseMarkdownTable(acc);
-      setRows(table);
-      // Anything after the table is formula/explanation text.
-      setNotes(notesFrom(acc));
-
-      if (table.length === 0) {
-        setError("The model did not return a table. Try rephrasing.");
-      }
-      void save(
-        [
-          { role: "user", text },
-          { role: "model", text: acc },
-        ],
-        text,
-      );
-      router.refresh();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong.");
-    } finally {
-      setBusy(false);
-    }
+  function run(text: string, attachments?: Attachment[]) {
+    // The grid as it stands, not as the model last wrote it. The cells are
+    // editable, so sending the original would make "add a total row" quietly
+    // revert every correction made since the table arrived. Notes go with it,
+    // since they are part of the same answer.
+    const current = rows.length
+      ? [toMarkdownTable(rows), notes].filter(Boolean).join("\n\n")
+      : undefined;
+    void ask(text, { attachments, current });
   }
 
   function edit(r: number, c: number, value: string) {
@@ -271,7 +249,7 @@ export function SpreadsheetView({
 
   /* ---------------- idle ---------------- */
 
-  if (!prompt) {
+  if (turns.length === 0) {
     return (
       <div className="nx-in relative mx-auto flex min-h-screen max-w-[760px] flex-col justify-center px-5 py-16">
         <div className="mb-7 text-center">
@@ -334,11 +312,10 @@ export function SpreadsheetView({
           </button>
           <button
             onClick={() => {
-              setPrompt("");
-              setRows([]);
-              setNotes("");
-              setError(null);
-              reset();
+              // Dropping the edits as well: they belong to the answer being
+              // cleared, and holding them would apply them to the next one.
+              setEdited(null);
+              startOver();
             }}
             className="chip group !px-3 !py-1.5 !text-[12.5px]"
           >
@@ -356,6 +333,16 @@ export function SpreadsheetView({
 
       {error ? (
         <FailureNote error={error} onRetry={() => run(prompt)} className="mx-5 mt-4" />
+      ) : null}
+
+      {/* An answer arrived with no table in it. Read from what is on screen
+          rather than recorded as an error when the answer landed — that way it
+          cannot linger after a later answer that did contain one. */}
+      {!busy && latest && rows.length === 0 ? (
+        <p className="mx-5 mt-4 rounded-[var(--r-panel)] border border-caution/30 bg-caution/8 px-4 py-3 text-[13px] text-ink-2">
+          That answer did not contain a table. Try asking for the data as a
+          table, or rephrase what you need.
+        </p>
       ) : null}
 
       {rows.length > 0 ? (
