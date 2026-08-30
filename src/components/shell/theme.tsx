@@ -74,8 +74,16 @@ const OPTIONS: { value: Theme; label: string; icon: typeof FiSun }[] = [
   { value: "system", label: "System", icon: FiMonitor },
 ];
 
-/** Segmented light / dark / system switch. */
-export function ThemeToggle({ className }: { className?: string }) {
+export const THEME_OPTIONS = OPTIONS;
+
+/**
+ * The current theme, and a way to change it.
+ *
+ * Extracted so the rail toggle and the settings picker read the same store
+ * and write it the same way. Two copies of this would agree right up until one
+ * of them was edited.
+ */
+export function useTheme(): [Theme, (next: Theme) => void] {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const choose = useCallback((next: Theme) => {
@@ -91,6 +99,13 @@ export function ThemeToggle({ className }: { className?: string }) {
     }
     emit();
   }, []);
+
+  return [theme, choose];
+}
+
+/** Segmented light / dark / system switch. */
+export function ThemeToggle({ className }: { className?: string }) {
+  const [theme, choose] = useTheme();
 
   return (
     <div

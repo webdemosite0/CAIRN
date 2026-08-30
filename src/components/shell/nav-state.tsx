@@ -10,10 +10,10 @@ import { createContext, useContext, useMemo, useState } from "react";
  * collapses it the moment a build starts, because at that point the preview is
  * the thing worth looking at and the nav is not.
  *
- * The rail starts collapsed. It is a workspace, and the work is the page; the
- * icon rail still names every destination, so nothing is hidden — it just does
- * not take 248px until asked. Expanding lasts the session: this is React state,
- * so a full page load starts collapsed again.
+ * The rail starts expanded. Every destination reads as a word rather than a
+ * glyph, which is what makes the workspace legible on the first visit; the
+ * icon rail is there for anyone who wants the room back. Collapsing lasts the
+ * session: this is React state, so a full page load starts expanded again.
  */
 const NavContext = createContext<{
   open: boolean;
@@ -23,7 +23,7 @@ const NavContext = createContext<{
 }>({
   open: false,
   setOpen: () => {},
-  collapsed: true,
+  collapsed: false,
   setCollapsed: () => {},
 });
 
@@ -31,7 +31,7 @@ export const useNav = () => useContext(NavContext);
 
 export function NavProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
 
   const value = useMemo(
     () => ({ open, setOpen, collapsed, setCollapsed }),

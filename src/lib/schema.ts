@@ -180,6 +180,11 @@ PRAGMA journal_mode = WAL;
  * its own without taking the rest down.
  */
 export const MIGRATIONS: string[] = [
+  /* A short self-description, shown on the profile screen. Empty by default
+     rather than nullable: every read wants a string, and a NULL here would
+     mean the same thing as "" while costing every caller a check. */
+  `ALTER TABLE users ADD COLUMN bio TEXT NOT NULL DEFAULT ''`,
+
   /* ---------------------------------------------------------------
      Reminders
      ---------------------------------------------------------------

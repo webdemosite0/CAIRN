@@ -231,3 +231,46 @@ export async function usageByKind(userId: string): Promise<UsageRow[]> {
     calls: num(r.calls),
   }));
 }
+
+export interface DayRow {
+  /** YYYY-MM-DD, UTC, matching how periods are cut. */
+  day: string;
+  credits: number;
+}
+
+/**
+ * Credits spent per day over the last `days` days, oldest first.
+ *
+ * Days with no spend are filled in as zero rather than left out. A bar chart
+ * built from only the days that have rows silently rescales its own x-axis —
+ * a quiet week and a busy week draw the same shape, which is the opposite of
+ * what the chart is for.
+ */
+export async function usageByDay(userId: string, days = 14): Promise<DayRow[]> {
+  const since = Date.now() - (days - 1) * 86_400_000;
+
+  const rows = await all(
+    `SELECT strftime('%Y-%m-%d', created_at / 1000, 'unixepoch') AS day,
+            COALESCE(SUM(credits), 0) AS credits
+       FROM credit_spends
+      WHERE user_id = ? AND created_at >= ?
+      GROUP BY day`,
+    [userId, since],
+  );
+
+  const found = new Map<string, number>();
+  for (const r of rows) found.set(String(r.day), num(r.credits));
+
+  const out: DayRow[] = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(since + i * 86_400_000);
+    const day = d.toISOString().slice(0, 10);
+    out.push({ day, credits: found.get(day) ?? 0 });
+  }
+  return out;
+}
+
+/** When the current month's grant is replaced, as a date. */
+export function periodResetsAt(now = new Date()): Date {
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+}

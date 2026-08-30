@@ -3,7 +3,6 @@
 import { useCallback, useRef, useState } from "react";
 import { FiDownload, FiExternalLink, FiLoader, FiRotateCcw } from "react-icons/fi";
 import { HiOutlineCube } from "react-icons/hi2";
-import { StudioBack } from "@/components/shell/studio-back";
 import { BriefForm } from "@/components/design/brief-form";
 import { FailureNote } from "@/components/ui/failure-note";
 import { Ico } from "@/components/ui/ico";
@@ -106,7 +105,6 @@ export function DesignView({ recents = [] }: { recents?: Recent[] }) {
   if (!brief) {
     return (
       <div className="relative flex min-h-screen flex-col">
-        <StudioBack className="absolute left-3 top-3 z-10" />
         <div className="mx-auto w-full max-w-[720px] flex-1 px-5 py-16">
           <div className="mb-7 flex flex-col items-center text-center">
             <span className="mb-4 grid size-14 place-items-center rounded-[var(--r-panel)] bg-accent/15 text-accent">
@@ -134,7 +132,6 @@ export function DesignView({ recents = [] }: { recents?: Recent[] }) {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-20 flex flex-wrap items-center gap-3 border-b border-line bg-canvas/90 px-5 py-3 backdrop-blur-md lg:px-6">
-        <StudioBack className="-ml-2" label="" />
         <div className="min-w-0 flex-1">
           <p className="text-[11.5px] uppercase tracking-[0.08em] text-ink-4">
             Design · {done} of {screens.length}

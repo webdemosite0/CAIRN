@@ -1,7 +1,7 @@
 "use client";
 
 import { Ico } from "@/components/ui/ico";
-import { StudioBack } from "@/components/shell/studio-back";
+import { PageHeader } from "@/components/ui/page-header";
 import { SkeletonText } from "@/components/ui/skeleton";
 import { SystemEditor } from "@/components/design/system-editor";
 import { localTimeZone } from "@/lib/context";
@@ -125,27 +125,29 @@ export function ToolPage({
 
   if (!prompt) {
     return (
-      <div className="relative flex min-h-screen flex-col">
-        <StudioBack className="absolute left-3 top-3 z-10" />
-        <div className="nx-in mx-auto flex w-full max-w-[780px] flex-1 flex-col justify-center px-5 py-16">
-        <div className="mb-7 flex flex-col items-center text-center">
-          <span
-            className="mb-4 grid h-14 w-14 place-items-center rounded-[var(--r-panel)]"
-            style={{ background: `${accent}1f`, color: accent }}
-          >
-            <Icon size={26} />
-          </span>
-          <h1 className="text-[27px] font-semibold text-ink">{title}</h1>
-          <p className="mt-1.5 text-[14.5px] text-ink-3">{tagline}</p>
-        </div>
-
-        <Composer
-          onSend={run}
-          placeholder={placeholder}
-          autoFocus
+      // Left-aligned and topped out, like every other page in the workspace.
+      // Centring this made each tool look like its own product rather than a
+      // room in one — and it only worked while there was no rail beside it.
+      <div className="nx-in mx-auto w-full max-w-[860px] px-5 py-8 lg:px-8">
+        <PageHeader
+          title={title}
+          subtitle={tagline}
+          action={
+            <span
+              aria-hidden
+              className="hidden h-10 w-10 place-items-center rounded-[var(--r-control)] sm:grid"
+              style={{ background: `${accent}1f`, color: accent }}
+            >
+              <Icon size={20} />
+            </span>
+          }
         />
 
-        <div className="mt-6 flex flex-wrap justify-center gap-2.5">
+        <div className="mt-6">
+          <Composer onSend={run} placeholder={placeholder} autoFocus />
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-2.5">
           {examples.map((e, i) => (
             <button
               key={e}
@@ -159,12 +161,11 @@ export function ToolPage({
         </div>
 
         <Recents
-          className="mt-10"
+          className="mt-9"
           label={recentsLabel}
           items={recents}
           onPick={run}
         />
-        </div>
       </div>
     );
   }
@@ -173,7 +174,6 @@ export function ToolPage({
 
   return (
     <div className="mx-auto flex min-h-screen max-w-[820px] flex-col px-5 py-8 lg:px-8">
-      <StudioBack className="-ml-2 mb-3 self-start" />
       <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="mb-1 flex items-center gap-2 text-[12px] uppercase tracking-[0.08em] text-ink-4">
