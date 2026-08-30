@@ -159,7 +159,13 @@ export function DocumentView({
           ))}
         </div>
 
-        <Recents className="mt-10" label={recentsLabel} items={recents} onPick={run} />
+        <Recents
+          className="mt-10"
+          label={recentsLabel}
+          items={recents}
+          onPick={run}
+          manage
+        />
       </div>
     );
   }

@@ -219,6 +219,7 @@ export function ToolPage({
           label={recentsLabel}
           items={recents}
           onPick={send}
+          manage
         />
 
         {error ? (

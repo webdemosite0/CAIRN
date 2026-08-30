@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FiClock, FiCornerUpLeft } from "react-icons/fi";
 import type { Recent } from "@/lib/recents";
+import { SavedMenu } from "@/components/ui/saved-menu";
 import { cn } from "@/lib/utils";
 
 function ago(ts: number) {
@@ -20,16 +21,24 @@ function ago(ts: number) {
  * The strip under a page's composer. Two modes: `onPick` re-runs the prompt in
  * place, `href` navigates. Renders nothing at all when there is no history —
  * an empty "Recents" heading is worse than no heading.
+ *
+ * `manage` adds the rename/delete menu. It is off by default because the same
+ * strip appears in places where the row is a shortcut rather than the item
+ * itself, and offering to delete something from a page that only borrowed it
+ * reads as a different, more alarming action than it is.
  */
 export function Recents({
   label,
   items,
   onPick,
+  manage = false,
   className,
 }: {
   label: string;
   items: Recent[];
   onPick?: (title: string) => void;
+  /** Show the per-row rename and delete menu. */
+  manage?: boolean;
   className?: string;
 }) {
   if (!items.length) return null;
@@ -57,7 +66,7 @@ export function Recents({
           );
 
           const shell = cn(
-            "group flex w-full items-center gap-2.5 rounded-[var(--r-control)] border border-transparent",
+            "flex w-full min-w-0 items-center gap-2.5 rounded-[var(--r-control)] border border-transparent",
             "px-3 py-2 text-left text-[13.5px] text-ink-2 transition-colors duration-[var(--t-hover)]",
             "hover:border-line hover:bg-rail hover:text-ink",
           );
@@ -65,7 +74,10 @@ export function Recents({
           return (
             <li
               key={r.id}
-              className="nx-in"
+              // `group` moved from the link to the row so the menu button,
+              // which sits beside the link rather than inside it, is revealed
+              // by hovering anywhere on the row.
+              className="nx-in group relative flex items-center gap-0.5"
               style={{
                 animationDelay: `${i * 45}ms`,
                 animationFillMode: "backwards",
@@ -84,6 +96,13 @@ export function Recents({
                   {body}
                 </button>
               )}
+
+              {/* Only rows backed by a saved conversation can be renamed or
+                  deleted. Older rows recorded a prompt and nothing else, so
+                  there is no stored item behind them to act on. */}
+              {manage && r.conversationId ? (
+                <SavedMenu id={r.conversationId} title={r.title} />
+              ) : null}
             </li>
           );
         })}

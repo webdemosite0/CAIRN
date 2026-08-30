@@ -17,11 +17,31 @@ export type RecentKind =
   | "site";
 
 export interface Recent {
+  /** The strip row itself. Not the conversation — see `conversationId`. */
   id: string;
   kind: RecentKind;
   title: string;
   href: string;
   createdAt: number;
+  /**
+   * The saved conversation this row points at, when it points at one.
+   *
+   * Read out of the href here rather than in the browser: the two have to
+   * agree about where the id lives, and one place that knows it is better
+   * than every caller re-deriving it from a URL shape that could change.
+   */
+  conversationId: string | null;
+}
+
+/** The `?c=<id>` a saved row carries, or null for rows that predate saving. */
+function conversationIdFrom(href: string): string | null {
+  const m = /[?&]c=([^&#]+)/.exec(href);
+  if (!m) return null;
+  try {
+    return decodeURIComponent(m[1]) || null;
+  } catch {
+    return m[1] || null;
+  }
 }
 
 /** How many we keep per kind, per person. Older rows are pruned on write. */
@@ -126,6 +146,7 @@ export async function listRecents(
       title: str(r.title),
       href: str(r.href),
       createdAt: num(r.created_at),
+      conversationId: conversationIdFrom(str(r.href)),
     }));
   } catch (e) {
     rethrowFrameworkErrors(e);
@@ -161,6 +182,7 @@ export async function listAllRecents(limit = 12): Promise<Recent[]> {
       title: str(r.title),
       href: str(r.href),
       createdAt: num(r.created_at),
+      conversationId: conversationIdFrom(str(r.href)),
     }));
   } catch (e) {
     rethrowFrameworkErrors(e);
