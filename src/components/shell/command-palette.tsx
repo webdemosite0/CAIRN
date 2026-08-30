@@ -20,6 +20,8 @@ import {
   TbCreditCard,
 } from "react-icons/tb";
 import type { IconType } from "react-icons";
+import Link from "next/link";
+import type { Recent } from "@/lib/recents";
 import { cn } from "@/lib/utils";
 
 interface Command {
@@ -66,7 +68,10 @@ function score(cmd: Command, q: string): number {
   return 1;
 }
 
-export function CommandPalette() {
+/** The four openers shown as buttons before anything is typed. */
+const QUICK = ["new", "agent", "website", "doc"] as const;
+
+export function CommandPalette({ recents = [] }: { recents?: Recent[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -172,7 +177,68 @@ export function CommandPalette() {
           </kbd>
         </div>
 
-        <div ref={listRef} className="max-h-[52vh] overflow-y-auto p-1.5">
+        {/* Before anything is typed, the palette is a launcher: the four
+            things most people open, then what they were last doing. Once
+            there is a query it collapses to one ranked list, because two
+            columns of results is a harder thing to arrow through than one. */}
+        {!q ? (
+          <div className="border-b border-line p-3">
+            <p className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-4">
+              Quick actions
+            </p>
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+              {QUICK.map((id) => {
+                const c = COMMANDS.find((x) => x.id === id);
+                if (!c) return null;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => go(c)}
+                    className="group flex flex-col items-start gap-1.5 rounded-[var(--r-control)] border border-line bg-canvas px-2.5 py-2 text-left transition-colors hover:border-line-strong hover:bg-hover"
+                  >
+                    <c.icon size={16} className="text-accent" />
+                    <span className="w-full truncate text-[12px] text-ink">
+                      {c.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        {!q && recents.length ? (
+          <div className="border-b border-line p-3">
+            <p className="mb-1.5 px-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-4">
+              Jump back in
+            </p>
+            <ul>
+              {recents.slice(0, 4).map((r) => (
+                <li key={r.id}>
+                  <Link
+                    href={r.href || "/dashboard"}
+                    onClick={close}
+                    className="flex items-center gap-2.5 rounded-[var(--r-control)] px-2 py-1.5 transition-colors hover:bg-hover"
+                  >
+                    <span className="min-w-0 flex-1 truncate text-[13px] text-ink-2">
+                      {r.title}
+                    </span>
+                    <span className="shrink-0 text-[11px] capitalize text-ink-4">
+                      {r.kind}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        <div ref={listRef} className="max-h-[46vh] overflow-y-auto p-1.5">
+          {!q ? (
+            <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-4">
+              Go to
+            </p>
+          ) : null}
           {results.length === 0 ? (
             <p className="px-3 py-6 text-center text-[13px] text-ink-4">
               Nothing matches “{q}”.
@@ -206,6 +272,14 @@ export function CommandPalette() {
             ))
           )}
         </div>
+
+        <p className="flex items-center gap-1.5 border-t border-line bg-sunk px-4 py-2 text-[11.5px] text-ink-4">
+          <kbd className="rounded-[var(--r-tight)] border border-line px-1 py-px text-[10px]">
+            ⌘K
+          </kbd>
+          opens this from anywhere.
+          <span className="ml-auto hidden sm:inline">↑↓ to move · ↵ to open</span>
+        </p>
       </div>
     </div>
   );

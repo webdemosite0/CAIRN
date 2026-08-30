@@ -8,6 +8,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { MobileShell } from "@/components/mobile/shell";
 import { isMobile } from "@/lib/device";
 import { countDueReminders } from "@/app/actions/reminders";
+import { listAllRecents } from "@/lib/recents";
 
 export default async function ShellLayout({
   children,
@@ -23,7 +24,10 @@ export default async function ShellLayout({
   // One COUNT alongside the two queries the guard already runs. It is on every
   // navigation, so it stays a count — the reminders themselves are fetched by
   // the page that shows them.
-  const due = await countDueReminders();
+  const [due, recents] = await Promise.all([
+    countDueReminders(),
+    listAllRecents(6),
+  ]);
 
   // Two separate UIs, not one that reflows. The phone gets its own chrome —
   // tab bar, sheets, no rail — and never renders the desktop tree, so nothing
@@ -46,7 +50,7 @@ export default async function ShellLayout({
     <NavProvider>
       <ToastProvider>
         <Backdrop />
-        <CommandPalette />
+        <CommandPalette recents={recents} />
         <div className="flex min-h-screen">
           <Sidebar user={user} balance={balance} />
           {/* children are NOT wrapped in a re-keying client component: combined

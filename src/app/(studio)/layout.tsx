@@ -6,6 +6,7 @@ import { TopBar } from "@/components/shell/top-bar";
 import { resolveShell } from "@/components/shell/guard";
 import { ToastProvider } from "@/components/ui/toast";
 import { countDueReminders } from "@/app/actions/reminders";
+import { listAllRecents } from "@/lib/recents";
 import { isMobile } from "@/lib/device";
 import { MobileShell } from "@/components/mobile/shell";
 
@@ -52,13 +53,16 @@ export default async function StudioLayout({
     );
   }
 
-  const due = await countDueReminders();
+  const [due, recents] = await Promise.all([
+    countDueReminders(),
+    listAllRecents(6),
+  ]);
 
   return (
     <NavProvider>
       <ToastProvider>
         <Backdrop />
-        <CommandPalette />
+        <CommandPalette recents={recents} />
         <div className="flex min-h-screen">
           <Sidebar user={user} balance={balance} />
           <main className="flex min-w-0 flex-1 flex-col">
