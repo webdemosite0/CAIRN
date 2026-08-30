@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FailureNote } from "@/components/ui/failure-note";
-import { FiCheck } from "react-icons/fi";
+import { FiCheck, FiCopy, FiRotateCcw, FiSquare } from "react-icons/fi";
 import { Composer } from "@/components/chat/composer";
 import { Recents } from "@/components/ui/recents";
 import type { Recent } from "@/lib/recents";
 import { Bot, OrbitRing } from "@/components/agents/bot";
 import { Message } from "@/components/chat/message";
-import { Wordmark } from "@/components/brand/logo";
+import { Ico } from "@/components/ui/ico";
+import { PageHeader } from "@/components/ui/page-header";
+import { useSaved } from "@/lib/use-saved";
 import { cn } from "@/lib/utils";
 
 const ROLES = [
@@ -31,30 +34,61 @@ interface Result {
   text: string;
 }
 
-export function TeamView({ recents = [] }: { recents?: Recent[] }) {
-  const [task, setTask] = useState("");
-  const [active, setActive] = useState<number>(-1);
-  const [results, setResults] = useState<Result[]>([]);
+export function TeamView({
+  recents = [],
+  restored = null,
+}: {
+  recents?: Recent[];
+  /** A finished run, when the URL carries ?c=<id>. */
+  restored?: { id: string; task: string; results: string[] } | null;
+}) {
+  const router = useRouter();
+  const { save, reset } = useSaved("team", restored?.id ?? null);
+
+  const [task, setTask] = useState(restored?.task ?? "");
+  const [results, setResults] = useState<Result[]>(() =>
+    (restored?.results ?? []).map((text, i) => ({
+      id: ROLES[i]?.id ?? `role-${i}`,
+      name: ROLES[i]?.name ?? "Specialist",
+      accent: ROLES[i]?.accent ?? "#3b82f6",
+      text,
+    })),
+  );
+  const [active, setActive] = useState<number>(
+    restored ? (restored.results?.length ?? 0) : -1,
+  );
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  // A run is four requests one after another, which is a long time to be stuck
+  // watching something you have changed your mind about. Aborting cancels the
+  // request in flight and stops the loop before it starts the next one.
+  const abort = useRef<AbortController | null>(null);
 
   async function run(text: string) {
     setTask(text);
     setRunning(true);
     setResults([]);
     setError(null);
+    reset();
+
+    const controller = new AbortController();
+    abort.current = controller;
 
     const collected: Result[] = [];
 
     try {
       // Sequential on purpose: each agent sees what the previous produced.
       for (let i = 0; i < ROLES.length; i++) {
+        if (controller.signal.aborted) break;
         setActive(i);
         const role = ROLES[i];
 
         const res = await fetch("/api/swarm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
           body: JSON.stringify({
             task: text,
             role: role.id,
@@ -74,12 +108,56 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
         collected.push(result);
         setResults([...collected]);
       }
-      setActive(ROLES.length);
+      setActive(collected.length);
+
+      // Stored as one message per specialist, in the order they ran, so
+      // reopening from Recents reads the way it did live. A stopped run is
+      // saved too: three specialists' work is worth keeping even when the
+      // fourth never started.
+      if (collected.length) {
+        void save(
+          [
+            { role: "user", text },
+            ...collected.map((r) => ({ role: "model" as const, text: r.text })),
+          ],
+          text,
+        );
+        router.refresh();
+      }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong.");
+      // Stopping is a choice, not a failure, and should not raise an error.
+      if (!(e instanceof DOMException && e.name === "AbortError")) {
+        setError(e instanceof Error ? e.message : "Something went wrong.");
+      }
     } finally {
+      abort.current = null;
       setRunning(false);
     }
+  }
+
+  function stop() {
+    abort.current?.abort();
+    abort.current = null;
+  }
+
+  /** Everything the team produced, as one markdown document. */
+  function copyAll() {
+    const doc = [
+      `# ${task}`,
+      ...results.map((r) => `## ${r.name}\n\n${r.text}`),
+    ].join("\n\n");
+    navigator.clipboard?.writeText(doc);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
+  function startOver() {
+    stop();
+    setTask("");
+    setResults([]);
+    setActive(-1);
+    setError(null);
+    reset();
   }
 
   const done = !running && results.length === ROLES.length;
@@ -88,21 +166,26 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
 
   if (!task) {
     return (
-      <div className="nx-in mx-auto flex min-h-screen max-w-[820px] flex-col justify-center px-5 py-16">
-        <Wordmark className="mb-8 text-center" size={54} />
-
-        <Composer
-          onSend={run}
-          placeholder="Assign a task to your AI team…"
-          autoFocus
-          leading={
-            <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-accent-soft px-3 text-[12.5px] font-medium text-accent">
-              Swarm
-            </span>
-          }
+      <div className="nx-in mx-auto w-full max-w-[860px] px-5 py-8 lg:px-8">
+        <PageHeader
+          title="AI Team"
+          subtitle="Four specialists work one task in order, each building on what the last one produced."
         />
 
-        <div className="mt-8">
+        <div className="mt-6">
+          <Composer
+            onSend={run}
+            placeholder="Assign a task to your AI team…"
+            autoFocus
+            leading={
+              <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-accent-soft px-3 text-[12.5px] font-medium text-accent">
+                Swarm
+              </span>
+            }
+          />
+        </div>
+
+        <div className="mt-6">
           <p className="mb-3 text-[13px] text-ink-3">Try a task</p>
           <div className="flex flex-wrap gap-2.5">
             {EXAMPLES.map((e, i) => (
@@ -125,18 +208,37 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
           />
         </div>
 
-        <div className="mt-12 flex justify-center gap-10">
-          {ROLES.map((r, i) => (
-            <div
-              key={r.id}
-              className="nx-in flex flex-col items-center gap-2"
-              style={{ animationDelay: `${200 + i * 70}ms`, animationFillMode: "backwards" }}
-            >
-              <Bot size={46} accent={r.accent} />
-              <span className="text-[11.5px] text-ink-4">{r.name.split(" ")[0]}</span>
-            </div>
-          ))}
+        {/* Who is on the team, and what each of them is for. The order is the
+            order they run in, which is the part worth knowing before you
+            assign anything. */}
+        <div className="mt-10">
+          <h2 className="mb-3 text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-4">
+            The team
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {ROLES.map((r, i) => (
+              <div
+                key={r.id}
+                className="nx-in flex items-center gap-3 rounded-[var(--r-card)] border border-line bg-rail px-3 py-3"
+                style={{ animationDelay: `${200 + i * 70}ms`, animationFillMode: "backwards" }}
+              >
+                <Bot size={38} accent={r.accent} />
+                <span className="min-w-0">
+                  <span className="block truncate text-[13px] font-medium text-ink">
+                    {r.name}
+                  </span>
+                  <span className="block truncate text-[11.5px] text-ink-4">
+                    {r.detail}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {error ? (
+          <FailureNote error={error} onRetry={() => run(task)} className="mt-6" />
+        ) : null}
       </div>
     );
   }
@@ -145,11 +247,49 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
 
   return (
     <div className="mx-auto min-h-screen max-w-[860px] px-5 py-8 lg:px-8">
-      <div className="mb-7">
-        <p className="mb-1 text-[12.5px] uppercase tracking-[0.08em] text-ink-4">
-          Swarm task
-        </p>
-        <h1 className="text-[20px] font-semibold text-ink">{task}</h1>
+      <div className="mb-7 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+        <div className="min-w-0 flex-1">
+          <p className="mb-1 text-[12.5px] uppercase tracking-[0.08em] text-ink-4">
+            {running
+              ? `Working — ${Math.min(active + 1, ROLES.length)} of ${ROLES.length}`
+              : "Swarm task"}
+          </p>
+          <h1 className="text-[20px] font-semibold text-ink">{task}</h1>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1.5">
+          {running ? (
+            <button
+              onClick={stop}
+              className="chip group !px-3 !py-1.5 !text-[12.5px]"
+              title="Stop after the specialist currently working"
+            >
+              <FiSquare size={11} className="fill-current text-critical" /> Stop
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={copyAll}
+                disabled={!results.length}
+                className="chip group !px-3 !py-1.5 !text-[12.5px] disabled:opacity-40"
+                title="Copy every specialist's answer as one document"
+              >
+                {copied ? (
+                  <Ico icon={FiCheck} motion="check" size={13} className="text-positive" />
+                ) : (
+                  <Ico icon={FiCopy} motion="nudge" size={13} />
+                )}
+                {copied ? "Copied" : "Copy all"}
+              </button>
+              <button
+                onClick={startOver}
+                className="chip group !px-3 !py-1.5 !text-[12.5px]"
+              >
+                <Ico icon={FiRotateCcw} motion="spin" size={13} /> New
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* the team */}
@@ -218,12 +358,11 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
             <FiCheck size={16} className="text-positive" />
             All four agents finished.
           </span>
+          {/* startOver rather than clearing the three pieces of state by
+              hand: it also drops the saved-thread id, and without that the
+              next run would be written over the one just finished. */}
           <button
-            onClick={() => {
-              setTask("");
-              setResults([]);
-              setActive(-1);
-            }}
+            onClick={startOver}
             className="text-[13px] text-ink-3 hover:text-ink"
           >
             New task

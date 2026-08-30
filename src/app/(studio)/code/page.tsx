@@ -34,7 +34,10 @@ export default async function CodePage({
           ? {
               id: saved.id,
               title: saved.messages.find((m) => m.role === "user")?.text ?? saved.title,
-              output: saved.messages.find((m) => m.role === "model")?.text ?? "",
+              // The whole thread, so reopening it lands you back in the
+              // conversation rather than staring at an answer with the
+              // question that produced it missing.
+              messages: saved.messages,
             }
           : null
       }

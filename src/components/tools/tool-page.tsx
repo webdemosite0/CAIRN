@@ -6,7 +6,7 @@ import { SkeletonText } from "@/components/ui/skeleton";
 import { SystemEditor } from "@/components/design/system-editor";
 import { localTimeZone } from "@/lib/context";
 import { FailureNote } from "@/components/ui/failure-note";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import {
   FiCopy,
@@ -39,6 +39,12 @@ const ICONS = {
 
 export type ToolId = keyof typeof ICONS;
 
+interface Turn {
+  id: number;
+  role: "user" | "model";
+  text: string;
+}
+
 export function ToolPage({
   tool,
   title,
@@ -58,24 +64,50 @@ export function ToolPage({
   accent?: string;
   recents?: Recent[];
   recentsLabel?: string;
-  /** A saved answer, when the URL carries ?c=<id>. */
-  restored?: { id: string; title: string; output: string } | null;
+  /** A saved thread, when the URL carries ?c=<id>. */
+  restored?: {
+    id: string;
+    title: string;
+    messages: { role: "user" | "model"; text: string }[];
+  } | null;
 }) {
   const router = useRouter();
   const { save, reset } = useSaved(tool, restored?.id ?? null);
   const Icon = ICONS[tool];
-  const [prompt, setPrompt] = useState(restored?.title ?? "");
-  const [output, setOutput] = useState(restored?.output ?? "");
+
+  /**
+   * The whole conversation, not the last answer.
+   *
+   * This page used to hold a single `output` string, and every follow-up threw
+   * it away and started again — so asking research to "go deeper on the second
+   * point" produced an answer about nothing, and reopening a saved piece of
+   * work showed the reply with the question that produced it missing. Both are
+   * the same bug: a tool that answers questions was storing an answer instead
+   * of a conversation.
+   */
+  const [turns, setTurns] = useState<Turn[]>(() =>
+    (restored?.messages ?? []).map((m, i) => ({ id: i, role: m.role, text: m.text })),
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const bottom = useRef<HTMLDivElement>(null);
+  const nextId = useRef(restored?.messages.length ?? 0);
 
-  async function run(text: string, attachments?: Attachment[]) {
-    setPrompt(text || `${attachments?.length ?? 0} attached file(s)`);
+  useEffect(() => {
+    if (turns.length) bottom.current?.scrollIntoView({ block: "end" });
+  }, [turns]);
+
+  /** The newest model reply — what Copy copies and what the design tool reads. */
+  const latest = [...turns].reverse().find((t) => t.role === "model")?.text ?? "";
+  /** The question this page is showing the answer to. */
+  const heading = turns.find((t) => t.role === "user")?.text ?? title;
+
+  async function ask(history: Turn[], attachments?: Attachment[]) {
     setBusy(true);
     setError(null);
-    setOutput("");
+    const replyId = nextId.current++;
+    setTurns([...history, { id: replyId, role: "model", text: "" }]);
 
     try {
       const res = await fetch("/api/tool", {
@@ -83,7 +115,8 @@ export function ToolPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tool,
-          prompt: text,
+          // The thread, so a follow-up can refer to what came before.
+          messages: history.map(({ role, text }) => ({ role, text })),
           attachments: strip(attachments),
           timeZone: localTimeZone(),
         }),
@@ -97,33 +130,54 @@ export function ToolPage({
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
-        setOutput((o) => o + decoder.decode(value, { stream: true }));
-        bottom.current?.scrollIntoView({ block: "end" });
-      }
-      // Persist the finished answer so reopening it from Recents shows this
-      // exact text instead of asking the model again.
-      setOutput((full) => {
-        void save(
-          [
-            { role: "user", text },
-            { role: "model", text: full },
-          ],
-          text,
+        const chunk = decoder.decode(value, { stream: true });
+        setTurns((t) =>
+          t.map((x) => (x.id === replyId ? { ...x, text: x.text + chunk } : x)),
         );
-        return full;
+      }
+      // Read the finished thread out of state rather than closing over a stale
+      // copy — the reply only exists once the stream has drained.
+      setTurns((t) => {
+        void save(
+          t.map(({ role, text }) => ({ role, text })),
+          t.find((x) => x.role === "user")?.text,
+        );
+        return t;
       });
-      // The strip is server-rendered, so pull the new entry down.
+      // The recents strip is server-rendered, so pull the new entry down.
       router.refresh();
     } catch (e) {
+      // Drop the empty reply, keep the question: retrying should not mean
+      // typing it again.
+      setTurns((t) => t.filter((x) => x.id !== replyId));
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
       setBusy(false);
     }
   }
 
+  function send(text: string, attachments?: Attachment[]) {
+    const asked = text.trim() || `${attachments?.length ?? 0} attached file(s)`;
+    void ask(
+      [...turns, { id: nextId.current++, role: "user", text: asked }],
+      attachments,
+    );
+  }
+
+  /** Re-send the thread as it stands, after a failure. */
+  function retry() {
+    void ask(turns);
+  }
+
+  function startOver() {
+    setTurns([]);
+    setError(null);
+    reset();
+  }
+
   /* ---------------- idle ---------------- */
 
-  if (!prompt) {
+  if (turns.length === 0) {
     return (
       // Left-aligned and topped out, like every other page in the workspace.
       // Centring this made each tool look like its own product rather than a
@@ -144,14 +198,14 @@ export function ToolPage({
         />
 
         <div className="mt-6">
-          <Composer onSend={run} placeholder={placeholder} autoFocus />
+          <Composer onSend={send} placeholder={placeholder} autoFocus />
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2.5">
           {examples.map((e, i) => (
             <button
               key={e}
-              onClick={() => run(e)}
+              onClick={() => send(e)}
               className="chip group nx-in"
               style={{ animationDelay: `${80 + i * 50}ms`, animationFillMode: "backwards" }}
             >
@@ -164,44 +218,48 @@ export function ToolPage({
           className="mt-9"
           label={recentsLabel}
           items={recents}
-          onPick={run}
+          onPick={send}
         />
+
+        {error ? (
+          <FailureNote error={error} onRetry={retry} className="mt-5" />
+        ) : null}
       </div>
     );
   }
 
-  /* ---------------- result ---------------- */
+  /* ---------------- conversation ---------------- */
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[820px] flex-col px-5 py-8 lg:px-8">
+    <div className="mx-auto flex min-h-screen w-full max-w-[860px] flex-col px-5 py-8 lg:px-8">
       <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="mb-1 flex items-center gap-2 text-[12px] uppercase tracking-[0.08em] text-ink-4">
             <Icon size={13} style={{ color: accent }} />
             {title}
           </p>
-          <h1 className="text-[18px] font-medium text-ink">{prompt}</h1>
+          <h1 className="text-[18px] font-medium text-ink">{heading}</h1>
         </div>
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => {
-              navigator.clipboard?.writeText(output);
+              navigator.clipboard?.writeText(latest);
               setCopied(true);
               setTimeout(() => setCopied(false), 1500);
             }}
-            disabled={!output}
+            disabled={!latest}
             className="chip group !px-3 !py-1.5 !text-[12.5px] disabled:opacity-40"
+            title="Copy the latest answer"
           >
-            {copied ? <Ico icon={FiCheck} motion="check" size={13} className="text-positive" /> : <Ico icon={FiCopy} motion="nudge" size={13} />}
+            {copied ? (
+              <Ico icon={FiCheck} motion="check" size={13} className="text-positive" />
+            ) : (
+              <Ico icon={FiCopy} motion="nudge" size={13} />
+            )}
             {copied ? "Copied" : "Copy"}
           </button>
           <button
-            onClick={() => {
-              setPrompt("");
-              setOutput("");
-              setError(null);
-              reset();
-            }}
+            onClick={startOver}
             className="chip group !px-3 !py-1.5 !text-[12.5px]"
           >
             <Ico icon={FiRotateCcw} motion="spin" size={13} /> New
@@ -209,50 +267,72 @@ export function ToolPage({
         </div>
       </header>
 
-      {/* The wait is shaped like the answer.
-          A bordered box with a spinner in it told you something was happening
-          and then reflowed the page when the text arrived. This occupies
-          roughly the room the answer will take, so nothing jumps. */}
-      {busy && !output ? (
-        <div className="rounded-[var(--r-panel)] border border-line bg-rail p-5">
-          <div className="mb-4 flex items-center gap-3.5">
-            <Bot size={38} accent={accent} state="working" />
-            <span className="nx-dots text-[14px] text-ink-2">Working</span>
-          </div>
-          <SkeletonText lines={5} />
-        </div>
-      ) : null}
-
-      {/* The design spec becomes editable tokens; every other tool's output
-          is prose, which is the right shape for a document or a piece of
-          research. Decided from `tool` rather than passed in as a render
-          prop — the page is a server component, and a function cannot cross
-          that boundary. The written version stays below either way: the
-          extraction is a convenience, and a spec holds more than colours. */}
-      {tool === "design" && output && !busy ? (
+      {/* The design spec becomes editable tokens; every other tool's output is
+          prose, which is the right shape for a document or a piece of
+          research. Decided from `tool` rather than passed in as a render prop
+          — the page is a server component, and a function cannot cross that
+          boundary. The written version stays below either way: the extraction
+          is a convenience, and a spec holds more than colours. */}
+      {tool === "design" && latest && !busy ? (
         <div className="mb-4 rounded-[var(--r-panel)] border border-line bg-rail p-5">
-          <SystemEditor markdown={output} />
+          <SystemEditor markdown={latest} />
         </div>
       ) : null}
 
-      {output ? (
-        <div className="rounded-[var(--r-panel)] border border-line bg-rail p-5">
-          <Message role="model" text={output} pending={busy} />
-        </div>
-      ) : null}
+      <div className="space-y-5">
+        {turns.map((t) => {
+          // The wait is shaped like the answer. A spinner said something was
+          // happening and then reflowed the page when the text arrived; this
+          // occupies roughly the room the answer will take, so nothing jumps.
+          if (t.role === "model" && !t.text && busy) {
+            return (
+              <div
+                key={t.id}
+                className="rounded-[var(--r-panel)] border border-line bg-rail p-5"
+              >
+                <div className="mb-4 flex items-center gap-3.5">
+                  <Bot size={38} accent={accent} state="working" />
+                  <span className="nx-dots text-[14px] text-ink-2">Working</span>
+                </div>
+                <SkeletonText lines={5} />
+              </div>
+            );
+          }
+
+          if (t.role === "user") {
+            return (
+              <div key={t.id} className="flex justify-end">
+                <p className="max-w-[85%] rounded-[var(--r-card)] bg-raised px-4 py-2.5 text-[14px] leading-relaxed text-ink">
+                  {t.text}
+                </p>
+              </div>
+            );
+          }
+
+          return (
+            <div
+              key={t.id}
+              className="rounded-[var(--r-panel)] border border-line bg-rail p-5"
+            >
+              <Message role="model" text={t.text} pending={busy && !t.text} />
+            </div>
+          );
+        })}
+      </div>
 
       {error ? (
-        <FailureNote error={error} onRetry={() => run(prompt)} className="mt-4" />
+        <FailureNote error={error} onRetry={retry} className="mt-4" />
       ) : null}
 
       <div ref={bottom} />
 
-      {/* Asking again should not mean losing the page you are on. */}
+      {/* Asking again should not mean losing the page you are on — and now it
+          builds on the thread rather than replacing it. */}
       <div className="sticky bottom-0 mt-auto bg-canvas/85 pb-6 pt-6 backdrop-blur-md">
         <Composer
-          onSend={run}
+          onSend={send}
           disabled={busy}
-          placeholder={`Ask ${title.toLowerCase()} for something else…`}
+          placeholder={`Ask a follow-up, or change direction…`}
         />
       </div>
     </div>

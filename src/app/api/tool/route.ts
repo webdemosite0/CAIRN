@@ -3,6 +3,7 @@ import { streamText, type Source } from "@/lib/ai";
 import { toParts, type Attachment } from "@/lib/attachments";
 import { OBEY_FORMAT, safeTimeZone, situation } from "@/lib/context";
 import { requireCredits, spend, OutOfCredits } from "@/lib/credits";
+import { lastUserText, readTurns, type Turn } from "@/lib/thread";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -65,17 +66,26 @@ const SEARCHES = new Set(["research"]);
 export async function POST(req: NextRequest) {
   let tool = "";
   let prompt = "";
+  let messages: Turn[] = [];
   let attachments: Attachment[] = [];
   let timeZone = "UTC";
   try {
     const body = await req.json();
     tool = String(body?.tool ?? "");
     prompt = String(body?.prompt ?? "").trim();
+    messages = readTurns(body);
     attachments = Array.isArray(body?.attachments) ? body.attachments : [];
     timeZone = safeTimeZone(body?.timeZone);
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
+
+  // A caller may send either a whole thread or a single prompt. Older callers
+  // and the example chips still send just a prompt, and one message is a
+  // perfectly good thread.
+  if (!messages.length && prompt) messages = [{ role: "user", text: prompt }];
+  // What the request is *about*, for validation and for the fallback text.
+  prompt = lastUserText(messages) || prompt;
 
   const system = TOOL_PROMPTS[tool];
   if (!system) return Response.json({ error: "Unknown tool." }, { status: 400 });
@@ -117,7 +127,9 @@ export async function POST(req: NextRequest) {
     const stream = await streamText({
       onUsage: (u) =>
         account && spend(account.userId, tool, u.totalTokens),
-      turns: [{ role: "user", text: prompt || "Work from the attached files." }],
+      turns: messages.length
+        ? messages
+        : [{ role: "user", text: "Work from the attached files." }],
       // Every tool gets the date and the format rule; only research gets a
       // search tool, so the knowledge caveat is worded for what it can do.
       system: promptFor(SEARCHES.has(tool)),
