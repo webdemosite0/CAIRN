@@ -280,7 +280,8 @@ export function ToolPage({
       ) : null}
 
       <div className="space-y-5">
-        {turns.map((t) => {
+        {turns.map((t, i) => {
+          const isLast = i === turns.length - 1;
           // The wait is shaped like the answer. A spinner said something was
           // happening and then reflowed the page when the text arrived; this
           // occupies roughly the room the answer will take, so nothing jumps.
@@ -314,7 +315,9 @@ export function ToolPage({
               key={t.id}
               className="rounded-[var(--r-panel)] border border-line bg-rail p-5"
             >
-              <Message role="model" text={t.text} pending={busy && !t.text} />
+              {/* Only the turn being streamed carries the caret. Passing
+                  `busy` to every model turn would put one on each of them. */}
+              <Message role="model" text={t.text} pending={busy && isLast} />
             </div>
           );
         })}
