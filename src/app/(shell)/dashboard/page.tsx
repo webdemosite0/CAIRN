@@ -72,7 +72,7 @@ export default async function MePage() {
           <Link
             key={c.label}
             href={c.href}
-            className="nx-in group rounded-[var(--r-panel)] border border-line bg-rail p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong"
+            className="nx-in group rounded-[var(--r-panel)] border border-line bg-rail p-5 transition-all duration-[var(--t-hover)] hover:-translate-y-0.5 hover:border-line-strong"
             style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
           >
             <span
@@ -86,7 +86,7 @@ export default async function MePage() {
               {c.label}
               <FiArrowRight
                 size={13}
-                className="transition-transform duration-200 group-hover:translate-x-0.5"
+                className="transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
               />
             </p>
           </Link>

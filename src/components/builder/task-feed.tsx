@@ -135,7 +135,7 @@ export function ActivityBox({
         <FiChevronDown
           size={14}
           className={cn(
-            "shrink-0 text-ink-4 transition-transform duration-200",
+            "shrink-0 text-ink-4 transition-transform duration-[var(--t-hover)]",
             open && "rotate-180",
           )}
         />

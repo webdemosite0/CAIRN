@@ -104,7 +104,7 @@ export function AgentsView({
           {agents.map((a, i) => (
             <article
               key={a.id}
-              className="nx-in group relative flex flex-col rounded-[var(--r-panel)] border border-line bg-rail p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong"
+              className="nx-in group relative flex flex-col rounded-[var(--r-panel)] border border-line bg-rail p-5 transition-all duration-[var(--t-hover)] hover:-translate-y-0.5 hover:border-line-strong"
               style={{ animationDelay: `${i * 50}ms`, animationFillMode: "backwards" }}
             >
               {/* Deleting an agent cannot be undone, and the button sits

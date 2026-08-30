@@ -87,7 +87,7 @@ export function AttachMenu({
           icon={FiPlus}
           motion="open"
           size={compact ? 15 : 17}
-          className={cn("transition-transform duration-200", open && "rotate-45")}
+          className={cn("transition-transform duration-[var(--t-hover)]", open && "rotate-45")}
         />
       </button>
 

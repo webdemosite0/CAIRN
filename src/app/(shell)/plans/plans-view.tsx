@@ -332,7 +332,7 @@ export function PlansView({
             <article
               key={t.id}
               className={cn(
-                "nx-in group relative flex flex-col rounded-[var(--r-panel)] border p-6 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1",
+                "nx-in group relative flex flex-col rounded-[var(--r-panel)] border p-6 transition-[transform,box-shadow,border-color] duration-[var(--t-panel)] hover:-translate-y-1",
                 featured
                   ? "border-accent/45 bg-accent-soft shadow-[0_20px_60px_-30px_var(--color-accent)] hover:shadow-[0_28px_70px_-28px_var(--color-accent)]"
                   : "border-line bg-rail hover:border-line-strong",

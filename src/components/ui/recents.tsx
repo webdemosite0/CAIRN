@@ -58,7 +58,7 @@ export function Recents({
 
           const shell = cn(
             "group flex w-full items-center gap-2.5 rounded-[var(--r-control)] border border-transparent",
-            "px-3 py-2 text-left text-[13.5px] text-ink-2 transition-colors duration-150",
+            "px-3 py-2 text-left text-[13.5px] text-ink-2 transition-colors duration-[var(--t-hover)]",
             "hover:border-line hover:bg-rail hover:text-ink",
           );
 

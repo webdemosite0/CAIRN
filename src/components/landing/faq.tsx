@@ -58,7 +58,7 @@ export function Faq() {
               <span className="flex-1">{item.q}</span>
               <FiPlus
                 size={17}
-                className="shrink-0 text-ink-4 transition-transform duration-200 group-open:rotate-45"
+                className="shrink-0 text-ink-4 transition-transform duration-[var(--t-hover)] group-open:rotate-45"
               />
             </summary>
             <p className="pb-5 pr-10 text-[14.5px] leading-relaxed text-ink-3">{item.a}</p>

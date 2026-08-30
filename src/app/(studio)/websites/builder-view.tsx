@@ -922,7 +922,7 @@ export function BuilderView({ mobile = false }: { mobile?: boolean }) {
                     title="Preview"
                     srcDoc={preview}
                     sandbox="allow-scripts allow-forms allow-modals allow-popups"
-                    className="nx-preview-in mx-auto h-full min-h-[560px] rounded-[var(--r-panel)] border border-line bg-white shadow-[0_20px_60px_-24px_rgba(0,0,0,0.7)] transition-[width] duration-300 ease-out"
+                    className="nx-preview-in mx-auto h-full min-h-[560px] rounded-[var(--r-panel)] border border-line bg-white shadow-[0_20px_60px_-24px_rgba(0,0,0,0.7)] transition-[width] duration-[var(--t-panel)] ease-out"
                     style={{ width: DEVICE[device].w, maxWidth: "100%" }}
                   />
                 </div>

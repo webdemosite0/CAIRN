@@ -181,6 +181,28 @@ PRAGMA journal_mode = WAL;
  */
 export const MIGRATIONS: string[] = [
   /* ---------------------------------------------------------------
+     Reminders
+     ---------------------------------------------------------------
+     This table was only ever declared in SCHEMA, and SCHEMA is skipped the
+     moment a database already has tables. Every database created before
+     reminders existed therefore never got it, and the page 500s on the query
+     rather than showing an empty list.
+
+     Repeated verbatim here so an existing database picks it up. The index
+     covers the top bar's due count, which now runs on every navigation. */
+  `CREATE TABLE IF NOT EXISTS reminders (
+      id         TEXT PRIMARY KEY,
+      user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      title      TEXT NOT NULL,
+      note       TEXT NOT NULL DEFAULT '',
+      due_at     INTEGER NOT NULL,
+      done       INTEGER NOT NULL DEFAULT 0,
+      notified   INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL
+    )`,
+  `CREATE INDEX IF NOT EXISTS reminders_by_user_due ON reminders (user_id, done, due_at)`,
+
+  /* ---------------------------------------------------------------
      Billing
      ---------------------------------------------------------------
      Stripe is the source of truth for whether someone is subscribed; these

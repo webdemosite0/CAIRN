@@ -7,6 +7,7 @@ import { resolveShell } from "@/components/shell/guard";
 import { ToastProvider } from "@/components/ui/toast";
 import { MobileShell } from "@/components/mobile/shell";
 import { isMobile } from "@/lib/device";
+import { countDueReminders } from "@/app/actions/reminders";
 
 export default async function ShellLayout({
   children,
@@ -18,6 +19,11 @@ export default async function ShellLayout({
   const gate = await resolveShell();
   if (!gate.ok) return gate.screen;
   const { user, balance } = gate;
+
+  // One COUNT alongside the two queries the guard already runs. It is on every
+  // navigation, so it stays a count — the reminders themselves are fetched by
+  // the page that shows them.
+  const due = await countDueReminders();
 
   // Two separate UIs, not one that reflows. The phone gets its own chrome —
   // tab bar, sheets, no rail — and never renders the desktop tree, so nothing
@@ -47,7 +53,7 @@ export default async function ShellLayout({
               with the loading.tsx Suspense boundary that left page content
               server-rendered but never hydrated, so nothing was clickable. */}
           <main className="flex min-w-0 flex-1 flex-col">
-            <TopBar initial={user?.name?.slice(0, 1)} />
+            <TopBar initial={user?.name?.slice(0, 1)} due={due} />
             {children}
           </main>
         </div>

@@ -118,7 +118,7 @@ export function PasswordField({
                 <span
                   key={step}
                   className={cn(
-                    "h-full flex-1 rounded-full transition-colors duration-300",
+                    "h-full flex-1 rounded-full transition-colors duration-[var(--t-panel)]",
                     strength.score >= step ? BAR[strength.score] : "bg-line",
                   )}
                 />

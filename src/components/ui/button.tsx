@@ -32,7 +32,7 @@ export function Button({
   href?: string;
 }) {
   const cls = cn(
-    "inline-flex select-none items-center justify-center font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-45",
+    "inline-flex select-none items-center justify-center font-medium transition-colors duration-[var(--t-hover)] disabled:pointer-events-none disabled:opacity-45",
     variants[variant],
     sizes[size],
     className,

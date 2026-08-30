@@ -16,7 +16,14 @@ import { Ico } from "@/components/ui/ico";
  * forwarded keystrokes to a different one would be two places to type with one
  * behaviour between them.
  */
-export function TopBar({ initial }: { initial?: string }) {
+export function TopBar({
+  initial,
+  due = 0,
+}: {
+  initial?: string;
+  /** Reminders past their time and not ticked off. Real rows, not a badge. */
+  due?: number;
+}) {
   const { setOpen } = useNav();
 
   const openPalette = () =>
@@ -53,13 +60,22 @@ export function TopBar({ initial }: { initial?: string }) {
 
       <span className="flex-1" />
 
+      {/* A dot, not a number. The count is in the label for anyone who wants
+          it; painting "17" on a bell turns a nudge into a demand, and the
+          exact figure only matters once you are on the page anyway. */}
       <Link
         href="/reminders"
-        aria-label="Reminders"
-        title="Reminders"
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-control)] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9"
+        aria-label={due > 0 ? `Reminders — ${due} due` : "Reminders"}
+        title={due > 0 ? `${due} reminder${due === 1 ? "" : "s"} due` : "Reminders"}
+        className="relative grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-control)] text-ink-3 transition-colors hover:bg-hover hover:text-ink sm:h-9 sm:w-9"
       >
         <Ico icon={TbBell} motion="ring" size={18} />
+        {due > 0 ? (
+          <span
+            aria-hidden
+            className="absolute right-2 top-2 h-[7px] w-[7px] rounded-full bg-critical ring-2 ring-canvas sm:right-1.5 sm:top-1.5"
+          />
+        ) : null}
       </Link>
       <Link
         href="/plans"

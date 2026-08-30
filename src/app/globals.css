@@ -58,6 +58,13 @@
   --t-card: 240ms;  /* something with size changing state */
   --t-panel: 320ms; /* a panel, drawer or rail */
 
+  /* Tailwind's own defaults for every bare `transition-*`. Without these, a
+     class with no duration of its own still ran at 150ms on Tailwind's curve,
+     so the scale above only applied where someone had remembered to ask for
+     it. An explicit ease-* or duration-* class still wins. */
+  --default-transition-duration: var(--t-hover);
+  --default-transition-timing-function: var(--ease-ui);
+
   /* The radius scale. Ten hand-written pixel values were in use; these are
      the five that were actually meant, and the names say what they are for
      rather than how big they are. */
@@ -606,10 +613,10 @@ select:focus-visible,
   font-size: 13px;
   color: var(--color-ink-2);
   transition:
-    border-color 0.18s var(--ease-out),
-    background-color 0.18s var(--ease-out),
-    color 0.18s var(--ease-out),
-    transform 0.18s var(--ease-out);
+    border-color var(--t-hover) var(--ease-ui),
+    background-color var(--t-hover) var(--ease-ui),
+    color var(--t-hover) var(--ease-ui),
+    transform var(--t-hover) var(--ease-ui);
 
   &:hover {
     border-color: var(--chip-hover-line);
@@ -1435,9 +1442,9 @@ a[role="button"]:active {
 /* Panels get a slightly stronger bezel and a lift on hover. */
 @utility panel-hover {
   transition:
-    transform 0.2s var(--ease-out),
-    box-shadow 0.2s var(--ease-out),
-    border-color 0.2s var(--ease-out);
+    transform var(--t-card) var(--ease-ui),
+    box-shadow var(--t-card) var(--ease-ui),
+    border-color var(--t-card) var(--ease-ui);
 
   &:hover {
     transform: translateY(-2px);
@@ -1723,9 +1730,9 @@ a[role="button"]:active {
     0 1px 2px rgb(0 0 0 / 0.10),
     0 6px 16px -8px var(--btn-glow);
   transition:
-    transform 0.15s var(--ease-out),
-    box-shadow 0.2s var(--ease-out),
-    filter 0.15s var(--ease-out);
+    transform var(--t-tap) var(--ease-ui),
+    box-shadow var(--t-hover) var(--ease-ui),
+    filter var(--t-hover) var(--ease-ui);
 
   &:hover {
     filter: brightness(1.05);
@@ -1791,9 +1798,9 @@ a[role="button"]:active {
 /* A card that lifts and deepens as the pointer arrives. */
 @utility lift {
   transition:
-    transform 0.18s var(--ease-out),
-    box-shadow 0.18s var(--ease-out),
-    border-color 0.18s var(--ease-out);
+    transform var(--t-hover) var(--ease-ui),
+    box-shadow var(--t-hover) var(--ease-ui),
+    border-color var(--t-hover) var(--ease-ui);
 
   &:hover {
     transform: translateY(-2px);
@@ -1807,7 +1814,7 @@ a[role="button"]:active {
 
 /* Any pressable thing, without a full restyle. */
 @utility press {
-  transition: transform 0.12s var(--ease-out);
+  transition: transform var(--t-tap) var(--ease-ui);
 
   &:active {
     transform: scale(0.97);
@@ -1816,7 +1823,7 @@ a[role="button"]:active {
 
 /* An icon that leans toward its label on hover of the parent .group. */
 @utility lean {
-  transition: transform 0.2s var(--ease-out);
+  transition: transform var(--t-hover) var(--ease-ui);
 
   .group:hover & {
     transform: translateX(2px);

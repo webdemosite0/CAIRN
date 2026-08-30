@@ -101,7 +101,7 @@ export function Editable({
         // The affordance: nothing until you go near it, then just enough to
         // say this is a field. A permanent border would turn a slide into a
         // form, and the point is that it still looks like a slide.
-        "transition-[background-color,box-shadow] duration-150",
+        "transition-[background-color,box-shadow] duration-[var(--t-hover)]",
         "hover:bg-accent/[0.06]",
         "focus:bg-accent/[0.08] focus:shadow-[0_0_0_2px_var(--color-accent)]",
         "empty:before:pointer-events-none empty:before:text-ink-4 empty:before:content-[attr(data-placeholder)]",

@@ -170,7 +170,7 @@ export function Hero({ freeCredits }: { freeCredits: number }) {
                 type="submit"
                 disabled={!value.trim()}
                 className={cn(
-                  "group flex h-11 items-center gap-2 rounded-[var(--r-panel)] px-5 text-[14.5px] font-semibold transition-all duration-200",
+                  "group flex h-11 items-center gap-2 rounded-[var(--r-panel)] px-5 text-[14.5px] font-semibold transition-all duration-[var(--t-hover)]",
                   value.trim() ? "btn-grad hover:scale-[1.02]" : "bg-sunk text-ink-4",
                 )}
               >

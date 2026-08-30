@@ -127,7 +127,7 @@ export function IntegrationsView({
               <article
                 key={s.id}
                 className={cn(
-                  "nx-in flex flex-col rounded-[var(--r-panel)] border p-4 transition-all duration-200",
+                  "nx-in flex flex-col rounded-[var(--r-panel)] border p-4 transition-all duration-[var(--t-hover)]",
                   on
                     ? "border-positive/30 bg-positive/6"
                     : "border-line bg-rail hover:border-line-strong",

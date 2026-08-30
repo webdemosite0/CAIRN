@@ -164,7 +164,7 @@ export function Outcomes() {
             Explore all capabilities
             <FiArrowRight
               size={14}
-              className="transition-transform duration-200 group-hover:translate-x-0.5"
+              className="transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
             />
           </Link>
         </div>
@@ -176,7 +176,7 @@ export function Outcomes() {
               href={o.href}
               className={cn(
                 "group flex flex-col overflow-hidden rounded-[var(--r-panel)] border border-line bg-canvas",
-                "transition-[transform,border-color,box-shadow] duration-200",
+                "transition-[transform,border-color,box-shadow] duration-[var(--t-hover)]",
                 "hover:-translate-y-[3px] hover:border-line-strong hover:shadow-[var(--sh-2)]",
               )}
             >
@@ -196,7 +196,7 @@ export function Outcomes() {
                 </span>
                 <FiArrowRight
                   size={13}
-                  className="mt-2 self-end text-ink-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                  className="mt-2 self-end text-ink-4 transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
                 />
               </span>
             </Link>

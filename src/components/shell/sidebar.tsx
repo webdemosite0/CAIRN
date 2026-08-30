@@ -137,7 +137,7 @@ function NavRow({
         motion={item.motion}
         active={active}
         size={18}
-        className="shrink-0 transition-colors duration-150"
+        className="shrink-0 transition-colors duration-[var(--t-hover)]"
       />
       <span className="truncate">{item.label}</span>
       {item.badge ? (
@@ -194,7 +194,7 @@ function UserMenu({ user, onNavigate }: { user: User; onNavigate?: () => void })
         <FiChevronRight
           size={14}
           className={cn(
-            "shrink-0 text-ink-4 transition-transform duration-200",
+            "shrink-0 text-ink-4 transition-transform duration-[var(--t-hover)]",
             open && "rotate-90",
           )}
         />
@@ -379,7 +379,7 @@ export function Sidebar({
     <>
       <aside
         className={cn(
-          "nx-no-print fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-line bg-rail transition-[width] duration-200 lg:flex",
+          "nx-no-print fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-line bg-rail transition-[width] duration-[var(--t-hover)] lg:flex",
           collapsed ? "w-[64px]" : "w-[248px]",
         )}
       >
@@ -469,7 +469,7 @@ export function Sidebar({
           too, or printing leaves an empty gutter where the rail was. */}
       <div
         className={cn(
-          "nx-no-print hidden shrink-0 transition-[width] duration-200 lg:block",
+          "nx-no-print hidden shrink-0 transition-[width] duration-[var(--t-hover)] lg:block",
           collapsed ? "w-[64px]" : "w-[248px]",
         )}
       />

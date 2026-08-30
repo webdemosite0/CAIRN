@@ -85,7 +85,7 @@ export function QuickActions({ className }: { className?: string }) {
                   // A fixed height, so every action lines up whatever the label.
                   "group flex h-[50px] items-center gap-2 rounded-[var(--r-panel)] border border-line bg-canvas",
                   "px-3.5 text-[13.5px] text-ink-2",
-                  "transition-[transform,border-color,background-color] duration-150",
+                  "transition-[transform,border-color,background-color] duration-[var(--t-hover)]",
                   "hover:-translate-y-[1px] hover:border-accent/40 hover:bg-accent/[0.04] hover:text-ink",
                 )}
               >

@@ -45,7 +45,7 @@ export function ConnectedWorkspace() {
               See the workspace in action
               <FiArrowRight
                 size={14}
-                className="transition-transform duration-200 group-hover:translate-x-0.5"
+                className="transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
               />
             </Link>
           </div>

@@ -65,7 +65,7 @@ export function AgentFlow() {
               <div
                 className={cn(
                   "flex w-full items-center gap-2 rounded-[var(--r-control)] border border-line bg-canvas px-3 py-2.5",
-                  "shadow-[var(--sh-1)] transition-transform duration-200 hover:-translate-y-[2px]",
+                  "shadow-[var(--sh-1)] transition-transform duration-[var(--t-hover)] hover:-translate-y-[2px]",
                   "md:justify-center",
                 )}
               >
@@ -125,7 +125,7 @@ export function Files() {
             Start building
             <FiArrowRight
               size={15}
-              className="transition-transform duration-200 group-hover:translate-x-0.5"
+              className="transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
             />
           </Link>
         </div>
@@ -136,7 +136,7 @@ export function Files() {
               key={f.ext}
               className={cn(
                 "nx-float rounded-[var(--r-panel)] border border-line bg-canvas p-3.5 shadow-[var(--sh-1)]",
-                "transition-[transform,box-shadow] duration-200 hover:shadow-[var(--sh-2)]",
+                "transition-[transform,box-shadow] duration-[var(--t-hover)] hover:shadow-[var(--sh-2)]",
                 i === 4 && "col-span-2 sm:col-span-1",
               )}
               style={{ animationDelay: `${i * -2.4}s` }}
@@ -190,14 +190,14 @@ export function UseCases() {
               href={u.href}
               className={cn(
                 "group flex items-center gap-2 rounded-[var(--r-control)] border border-line bg-canvas px-4 py-2.5",
-                "text-[14px] text-ink-2 transition-[transform,border-color,box-shadow] duration-200",
+                "text-[14px] text-ink-2 transition-[transform,border-color,box-shadow] duration-[var(--t-hover)]",
                 "hover:-translate-y-[2px] hover:border-line-strong hover:text-ink hover:shadow-[var(--sh-2)]",
               )}
             >
               {u.label}
               <FiArrowRight
                 size={13}
-                className="text-ink-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                className="text-ink-4 transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
               />
             </Link>
           </li>
@@ -307,7 +307,7 @@ export function FinalCta() {
             Start for free
             <FiArrowRight
               size={16}
-              className="transition-transform duration-200 group-hover:translate-x-0.5"
+              className="transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
             />
           </Link>
           <Link

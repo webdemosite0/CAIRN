@@ -111,7 +111,7 @@ export function CreditMeter({
       aria-label="Credit usage this month"
       className={cn(
         "nx-reveal absolute z-50 w-[272px] rounded-[var(--r-panel)] border border-line bg-raised p-3.5 shadow-[var(--elev)]",
-        // Expanded rail: above the meter. Collapsed rail is only 76px wide, so
+        // Expanded rail: above the meter. The collapsed rail is 64px wide, so
         // the panel goes beside it instead of hanging off both edges.
         collapsed ? "bottom-0 left-full ml-2" : "bottom-full left-0 mb-2",
       )}
@@ -219,9 +219,15 @@ export function CreditMeter({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label="Credits used"
+          // "69" on its own says nothing about whether that is a lot. The
+          // sentence is already written for the tooltip; read it out too.
+          aria-valuetext={title}
         >
           <div
-            className={cn("h-full rounded-full transition-[width] duration-500 ease-out", fill)}
+            className={cn(
+              "h-full rounded-full transition-[width] duration-500 ease-[var(--ease-ui)]",
+              fill,
+            )}
             style={{ width: `${pct}%` }}
           />
         </div>

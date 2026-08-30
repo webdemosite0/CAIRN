@@ -95,7 +95,7 @@ export function Drawer({
         className={cn(
           "nx-drawer-in relative flex w-[80%] max-w-[300px] flex-col border-r border-line bg-rail",
           "pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]",
-          drag ? "transition-none" : "transition-transform duration-200",
+          drag ? "transition-none" : "transition-transform duration-[var(--t-hover)]",
         )}
       >
         {children}

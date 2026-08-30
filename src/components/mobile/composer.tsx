@@ -194,7 +194,7 @@ export function MobileComposer({
           disabled={!ready}
           aria-label="Send"
           className={cn(
-            "grid h-11 w-11 shrink-0 place-items-center rounded-full transition-all duration-200",
+            "grid h-11 w-11 shrink-0 place-items-center rounded-full transition-all duration-[var(--t-hover)]",
             ready
               ? "btn-grad shadow-[0_6px_18px_-6px_var(--btn-glow)] active:scale-95"
               : "bg-sunk text-ink-4",

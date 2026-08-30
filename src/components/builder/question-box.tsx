@@ -105,7 +105,7 @@ export function QuestionBox({
           Plan it
           <FiArrowRight
             size={14}
-            className="transition-transform duration-200 group-hover:translate-x-0.5"
+            className="transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
           />
         </button>
       </div>

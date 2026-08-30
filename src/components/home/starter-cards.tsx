@@ -139,7 +139,7 @@ export function StarterCards({
             onClick={() => onPick(s.prompt)}
             className={cn(
               "group flex flex-col rounded-[var(--r-card)] border border-line bg-canvas p-4 text-left",
-              "shadow-[var(--sh-1)] transition-[transform,border-color,box-shadow] duration-200",
+              "shadow-[var(--sh-1)] transition-[transform,border-color,box-shadow] duration-[var(--t-hover)]",
               "hover:-translate-y-[2px] hover:border-accent/35 hover:shadow-[var(--sh-2)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
             )}
@@ -156,7 +156,7 @@ export function StarterCards({
               </span>
               <FiArrowRight
                 size={14}
-                className="shrink-0 text-ink-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                className="shrink-0 text-ink-4 transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
               />
             </span>
 

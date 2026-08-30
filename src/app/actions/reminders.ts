@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { currentUser } from "@/lib/auth";
-import { all, run, uid } from "@/lib/db";
+import { all, one, run, uid } from "@/lib/db";
 
 export interface Reminder {
   id: string;
@@ -32,6 +32,32 @@ export async function listReminders(): Promise<Reminder[]> {
     [user.id],
   )) as unknown as Reminder[];
   return rows.map(toPlain);
+}
+
+/**
+ * How many reminders have come due and are still open.
+ *
+ * Drives the dot on the bell in the top bar. It counts rows, not notifications:
+ * a reminder that has passed its time and has not been ticked off is the only
+ * thing the app can honestly say is waiting. There is no read/unread state to
+ * report, so none is invented.
+ */
+export async function countDueReminders(): Promise<number> {
+  const user = await currentUser();
+  if (!user) return 0;
+  // This runs in the shell layout, so it is on the path of every page in the
+  // app. A dot on a bell is not worth a 500: if the query cannot answer, the
+  // honest answer is "nothing to report".
+  try {
+    const row = await one<{ n: number }>(
+      `SELECT COUNT(*) AS n FROM reminders
+        WHERE user_id = ? AND done = 0 AND due_at <= ?`,
+      [user.id, Date.now()],
+    );
+    return Number(row?.n ?? 0);
+  } catch {
+    return 0;
+  }
 }
 
 export async function createReminder(input: {

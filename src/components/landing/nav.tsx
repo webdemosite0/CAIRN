@@ -46,7 +46,7 @@ export function LandingNav() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 transition-[height,background-color,border-color,backdrop-filter] duration-200",
+        "sticky top-0 z-40 transition-[height,background-color,border-color,backdrop-filter] duration-[var(--t-hover)]",
         scrolled
           ? "border-b border-line bg-canvas/80 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent",
@@ -54,7 +54,7 @@ export function LandingNav() {
     >
       <div
         className={cn(
-          "mx-auto flex max-w-[1140px] items-center gap-3 px-5 transition-[height] duration-200 lg:px-8",
+          "mx-auto flex max-w-[1140px] items-center gap-3 px-5 transition-[height] duration-[var(--t-hover)] lg:px-8",
           scrolled ? "h-14" : "h-16",
         )}
       >
@@ -92,7 +92,7 @@ export function LandingNav() {
             Start building
             <FiArrowRight
               size={14}
-              className="transition-transform duration-200 group-hover:translate-x-0.5"
+              className="transition-transform duration-[var(--t-hover)] group-hover:translate-x-0.5"
             />
           </Link>
         </div>

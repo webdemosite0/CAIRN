@@ -161,7 +161,7 @@ export function TeamView({ recents = [] }: { recents?: Recent[] }) {
             <div
               key={r.id}
               className={cn(
-                "relative flex flex-col items-center gap-2 rounded-[var(--r-panel)] border px-3 py-4 text-center transition-all duration-300",
+                "relative flex flex-col items-center gap-2 rounded-[var(--r-panel)] border px-3 py-4 text-center transition-all duration-[var(--t-panel)]",
                 isWorking
                   ? "border-line-strong bg-raised"
                   : isDone

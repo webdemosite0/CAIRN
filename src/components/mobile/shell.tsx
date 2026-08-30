@@ -195,7 +195,7 @@ export function MobileShell({
                       href={d.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "flex items-center gap-3 rounded-[var(--r-panel)] px-2.5 py-2.5 text-[14.5px] transition-colors duration-150",
+                        "flex items-center gap-3 rounded-[var(--r-panel)] px-2.5 py-2.5 text-[14.5px] transition-colors duration-[var(--t-hover)]",
                         active ? "rail-item-active" : "text-ink-2 active:bg-hover",
                       )}
                     >

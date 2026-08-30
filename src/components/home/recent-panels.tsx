@@ -80,7 +80,7 @@ export function ContinuePanel({ items }: { items: Recent[] }) {
               title={`${r.title || "Untitled"} — edited ${relativeTime(r.createdAt)}`}
               className={cn(
                 "nx-in group min-w-0",
-                "transition-transform duration-200 hover:-translate-y-[2px]",
+                "transition-transform duration-[var(--t-hover)] hover:-translate-y-[2px]",
               )}
               style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
             >
