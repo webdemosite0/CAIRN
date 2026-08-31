@@ -56,7 +56,7 @@ export function HomeChat({
             empty screen, which is what every tool of this kind does and why
             they all feel like they are waiting for you. */}
         <div className="relative flex flex-1 flex-col items-center px-5 pb-14 pt-[8vh] lg:pt-[11vh]">
-          <div className="w-full max-w-[820px] text-center">
+          <div className="w-full max-w-[940px] text-center">
             <div className="nx-rise">
               <Greeting name={name} />
               <h1 className="mt-2.5 text-[clamp(2.25rem,1.15rem+3vw,3.75rem)] font-semibold leading-[1.03] tracking-[-0.02em] text-ink">

@@ -131,7 +131,11 @@ export function StarterCards({
         Start with something
       </h2>
 
-      <div className="nx-stagger grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {/* auto-fit, not a fixed four. The column here is a fixed width, so
+          "four across" meant 196px cards at every viewport and every title
+          clipped — "Build a webs…", "Research so…". Cards never go below
+          220px now; the count follows the space. */}
+      <div className="nx-stagger grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
         {STARTERS.map((s) => (
           <button
             key={s.label}
@@ -151,7 +155,11 @@ export function StarterCards({
               >
                 <s.icon size={16} style={{ color: `color-mix(in srgb, ${s.tone}, #000 var(--tint-darken))` }} />
               </span>
-              <span className="min-w-0 flex-1 truncate text-[14px] font-medium text-ink">
+              {/* Two lines of space whether the title needs them or not, so a
+                  card whose title wraps does not push its description below
+                  its neighbours'. The alternative is copy that may never grow,
+                  which is not a thing a layout should depend on. */}
+              <span className="flex min-h-[2.7em] min-w-0 flex-1 items-center text-[14px] font-medium leading-snug text-ink">
                 {s.label}
               </span>
               <FiArrowRight

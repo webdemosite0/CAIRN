@@ -165,6 +165,7 @@ export function DocumentView({
           items={recents}
           onPick={run}
           manage
+          emptyHint="Nothing saved yet. What you make here is kept, so you can reopen it and keep working."
         />
       </div>
     );

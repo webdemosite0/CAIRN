@@ -32,6 +32,7 @@ export function Recents({
   items,
   onPick,
   manage = false,
+  emptyHint,
   className,
 }: {
   label: string;
@@ -39,9 +40,24 @@ export function Recents({
   onPick?: (title: string) => void;
   /** Show the per-row rename and delete menu. */
   manage?: boolean;
+  /**
+   * What to say when there is nothing here yet. Supplied only by pages where
+   * this strip is the library — elsewhere the strip is a shortcut, and a
+   * shortcut with nothing behind it is better left out than explained.
+   */
+  emptyHint?: string;
   className?: string;
 }) {
-  if (!items.length) return null;
+  if (!items.length) {
+    if (!emptyHint) return null;
+    return (
+      <section className={cn("nx-in", className)} aria-label={label}>
+        <div className="rounded-[var(--r-panel)] border border-dashed border-line-strong px-5 py-7 text-center">
+          <p className="text-[13px] leading-relaxed text-ink-3">{emptyHint}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={cn("nx-in", className)} aria-label={label}>

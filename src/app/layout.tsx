@@ -191,6 +191,13 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme="light"
+      // THEME_SCRIPT rewrites this attribute before the first paint, so on any
+      // machine set to dark the server's "light" and the client's "dark"
+      // disagree by design, and React logged a hydration error on every load
+      // for those people. Suppression is scoped to this element's own
+      // attributes and is exactly what it is for: a value deliberately changed
+      // before hydration. Children are unaffected.
+      suppressHydrationWarning
       className={`${inter.variable} ${display.variable} ${mono.variable}`}
     >
       <head>

@@ -183,19 +183,20 @@ export function ToolPage({
       // Centring this made each tool look like its own product rather than a
       // room in one — and it only worked while there was no rail beside it.
       <div className="nx-in mx-auto w-full max-w-[860px] px-5 py-8 lg:px-8">
-        <PageHeader
-          title={title}
-          subtitle={tagline}
-          action={
-            <span
-              aria-hidden
-              className="hidden h-10 w-10 place-items-center rounded-[var(--r-control)] sm:grid"
-              style={{ background: `${accent}1f`, color: accent }}
-            >
-              <Icon size={20} />
-            </span>
-          }
-        />
+        {/* The icon sits with the title rather than in the action slot on the
+            right. Parked over there it read as a button you could press and
+            did nothing — the one place on the page that promises an action is
+            not where a decoration belongs. */}
+        <div className="flex items-start gap-3">
+          <span
+            aria-hidden
+            className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-[var(--r-control)]"
+            style={{ background: `${accent}1f`, color: accent }}
+          >
+            <Icon size={18} />
+          </span>
+          <PageHeader title={title} subtitle={tagline} className="min-w-0 flex-1" />
+        </div>
 
         <div className="mt-6">
           <Composer onSend={send} placeholder={placeholder} autoFocus />
@@ -220,6 +221,7 @@ export function ToolPage({
           items={recents}
           onPick={send}
           manage
+          emptyHint={`Nothing saved yet. Anything ${title.toLowerCase()} produces is kept here, so you can reopen it and carry on.`}
         />
 
         {error ? (

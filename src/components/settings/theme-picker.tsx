@@ -14,11 +14,47 @@ import { cn } from "@/lib/utils";
  * painted with fixed colours rather than the live tokens — a preview of dark
  * mode that turns light when you are in light mode is not a preview.
  */
-const SWATCH: Record<string, { page: string; bar: string; ink: string }> = {
-  light: { page: "#f7f6f3", bar: "#ffffff", ink: "#101014" },
-  dark: { page: "#0b0b0f", bar: "#16161c", ink: "#f2f2f5" },
-  system: { page: "linear-gradient(135deg,#f7f6f3 50%,#0b0b0f 50%)", bar: "#ffffff", ink: "#101014" },
-};
+interface Paint {
+  page: string;
+  rail: string;
+  line: string;
+  ink: string;
+}
+
+const LIGHT: Paint = { page: "#f7f6f3", rail: "#ffffff", line: "#e4e2dd", ink: "#101014" };
+const DARK: Paint = { page: "#0b0b0f", rail: "#16161c", line: "#2a2a33", ink: "#f2f2f5" };
+
+/** A small drawing of the app: a rail, a header and two lines of content. */
+function Mini({ paint, half }: { paint: Paint; half?: boolean }) {
+  return (
+    <span
+      aria-hidden
+      className="flex h-full w-full overflow-hidden"
+      style={{ background: paint.page }}
+    >
+      <span
+        className="block h-full w-[22%] shrink-0"
+        style={{ background: paint.rail, borderRight: `1px solid ${paint.line}` }}
+      />
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span
+          className="block h-[26%] w-full shrink-0"
+          style={{ background: paint.rail, borderBottom: `1px solid ${paint.line}` }}
+        />
+        <span className="flex flex-1 flex-col justify-center gap-1 px-1.5">
+          <span
+            className="block h-[3px] rounded-full"
+            style={{ background: paint.ink, opacity: 0.5, width: half ? "50%" : "62%" }}
+          />
+          <span
+            className="block h-[3px] rounded-full"
+            style={{ background: paint.ink, opacity: 0.25, width: half ? "70%" : "84%" }}
+          />
+        </span>
+      </span>
+    </span>
+  );
+}
 
 export function ThemePicker() {
   const [theme, choose] = useTheme();
@@ -31,7 +67,6 @@ export function ThemePicker() {
       <div role="radiogroup" aria-label="Colour theme" className="grid gap-3 sm:grid-cols-3">
         {THEME_OPTIONS.map((o) => {
           const active = theme === o.value;
-          const s = SWATCH[o.value];
           return (
             <button
               key={o.value}
@@ -47,29 +82,26 @@ export function ThemePicker() {
                   : "border-line hover:border-line-strong",
               )}
             >
-              {/* A tiny drawing of the app: a bar, a rail and two lines. */}
+              {/* System is drawn as two halves side by side rather than a
+                  diagonal gradient. The gradient version read as a rendering
+                  fault — a black triangle over the corner — instead of as
+                  "whichever your machine is set to". */}
               <span
                 aria-hidden
-                className="block h-[72px] overflow-hidden rounded-[var(--r-control)] border border-line"
-                style={{ background: s.page }}
+                className="flex h-[72px] overflow-hidden rounded-[var(--r-control)] border border-line"
               >
-                <span className="block h-3 w-full" style={{ background: s.bar }} />
-                <span className="flex h-[calc(100%-0.75rem)] gap-1 p-1.5">
-                  <span
-                    className="block w-3 shrink-0 rounded-[var(--r-tight)]"
-                    style={{ background: s.bar }}
-                  />
-                  <span className="flex flex-1 flex-col gap-1 pt-0.5">
-                    <span
-                      className="block h-1 w-3/5 rounded-full"
-                      style={{ background: s.ink, opacity: 0.55 }}
-                    />
-                    <span
-                      className="block h-1 w-4/5 rounded-full"
-                      style={{ background: s.ink, opacity: 0.28 }}
-                    />
-                  </span>
-                </span>
+                {o.value === "system" ? (
+                  <>
+                    <span className="block h-full w-1/2 overflow-hidden">
+                      <Mini paint={LIGHT} half />
+                    </span>
+                    <span className="block h-full w-1/2 overflow-hidden border-l border-line">
+                      <Mini paint={DARK} half />
+                    </span>
+                  </>
+                ) : (
+                  <Mini paint={o.value === "dark" ? DARK : LIGHT} />
+                )}
               </span>
 
               <span className="mt-2 flex items-center gap-1.5 px-0.5 pb-0.5">
