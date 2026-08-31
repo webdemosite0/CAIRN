@@ -159,7 +159,7 @@ export function StarterCards({
                   card whose title wraps does not push its description below
                   its neighbours'. The alternative is copy that may never grow,
                   which is not a thing a layout should depend on. */}
-              <span className="flex min-h-[2.7em] min-w-0 flex-1 items-center text-[14px] font-medium leading-snug text-ink">
+              <span className="flex min-w-0 flex-1 items-center text-[14px] font-medium leading-snug text-ink sm:min-h-[2.7em]">
                 {s.label}
               </span>
               <FiArrowRight
@@ -172,7 +172,11 @@ export function StarterCards({
               {s.copy}
             </span>
 
-            <span className="mt-3.5 block rounded-[var(--r-control)] border border-line bg-sunk p-2.5">
+            {/* Decoration, and on a phone it is decoration that costs a
+                third of the card's height — four of these turned the home
+                screen into a long scroll. The icon and the sentence carry the
+                card at that width. */}
+            <span className="mt-3.5 hidden rounded-[var(--r-control)] border border-line bg-sunk p-2.5 sm:block">
               <Preview kind={s.preview} tone={s.tone} />
             </span>
           </button>

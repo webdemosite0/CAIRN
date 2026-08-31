@@ -20,6 +20,7 @@ import { DEFAULT_MODE, type ModeId } from "@/lib/modes";
 import { useChatThread } from "@/lib/use-chat-thread";
 import type { Recent } from "@/lib/recents";
 import { FailureNote } from "@/components/ui/failure-note";
+import { StarterCards } from "@/components/home/starter-cards";
 
 /**
  * Chat, for a phone.
@@ -67,6 +68,9 @@ export function MobileChat({
   draft?: string;
 }) {
   const [mode, setMode] = React.useState<ModeId>(DEFAULT_MODE);
+  // Filled by a starter card. The composer is keyed on it so picking one
+  // refills an existing box rather than an effect syncing a prop into state.
+  const [draft, setDraft] = React.useState(initialDraft);
   const { turns, busy, error, send, retry, clear, bottom } = useChatThread({
     restored,
     mode,
@@ -92,7 +96,8 @@ export function MobileChat({
             disabled={busy}
             mode={mode}
             onModeChange={setMode}
-            initialValue={initialDraft}
+            key={draft}
+            initialValue={draft}
           />
         </div>
 
@@ -114,6 +119,16 @@ export function MobileChat({
             ))}
           </div>
         </div>
+
+        {/* With nothing saved yet the screen ended at the tool strip and the
+            bottom two-thirds were blank — which is the first thing a new
+            person sees. The starters fill it with the four things worth
+            trying, and tapping one loads the composer rather than navigating
+            away, exactly as on the desktop screen. They give way to Recent
+            once there is real work to come back to. */}
+        {activity.length === 0 ? (
+          <StarterCards className="mt-7" onPick={setDraft} />
+        ) : null}
 
         {activity.length ? (
           <div className="mt-7">
