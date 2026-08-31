@@ -58,6 +58,16 @@
   --t-card: 240ms;  /* something with size changing state */
   --t-panel: 320ms; /* a panel, drawer or rail */
 
+  /* Icon motion, on its own three-step scale. Thirteen durations were in use
+     — 0.40s, 0.42s, 0.45s, 0.46s among them — for what is one interaction:
+     an icon reacting to a pointer. Nobody perceives twenty milliseconds
+     there; it was drift, not intent. Ambient loops (the slow spin on the
+     current page, the hue drift) keep their own timings, because those are
+     not reactions. */
+  --t-ico-quick: 320ms; /* a small gesture: a pop, a nudge */
+  --t-ico: 420ms;       /* the ordinary reaction */
+  --t-ico-long: 620ms;  /* something that travels across the glyph */
+
   /* Tailwind's own defaults for every bare `transition-*`. Without these, a
      class with no duration of its own still ran at 150ms on Tailwind's curve,
      so the scale above only applied where someone had remembered to ask for
@@ -199,6 +209,16 @@
   --t-hover: 180ms; /* a row or button under the cursor */
   --t-card: 240ms;  /* something with size changing state */
   --t-panel: 320ms; /* a panel, drawer or rail */
+
+  /* Icon motion, on its own three-step scale. Thirteen durations were in use
+     — 0.40s, 0.42s, 0.45s, 0.46s among them — for what is one interaction:
+     an icon reacting to a pointer. Nobody perceives twenty milliseconds
+     there; it was drift, not intent. Ambient loops (the slow spin on the
+     current page, the hue drift) keep their own timings, because those are
+     not reactions. */
+  --t-ico-quick: 320ms; /* a small gesture: a pop, a nudge */
+  --t-ico: 420ms;       /* the ordinary reaction */
+  --t-ico-long: 620ms;  /* something that travels across the glyph */
 
   /* The radius scale. Ten hand-written pixel values were in use; these are
      the five that were actually meant, and the names say what they are for
@@ -1119,52 +1139,52 @@ select:focus-visible,
 .group:hover .ico-ring,
 :where(a, button, label, summary, [role="button"]):hover .ico-ring,
 .ico-live.ico-ring {
-  animation: ico-ring 0.62s var(--ease-spring);
+  animation: ico-ring var(--t-ico-long) var(--ease-spring);
 }
 .group:hover .ico-alert,
 :where(a, button, label, summary, [role="button"]):hover .ico-alert,
 .ico-live.ico-alert {
-  animation: ico-alert 0.55s var(--ease-out);
+  animation: ico-alert var(--t-ico-long) var(--ease-out);
 }
 .group:hover .ico-close,
 :where(a, button, label, summary, [role="button"]):hover .ico-close,
 .ico-live.ico-close {
-  animation: ico-close 0.35s var(--ease-out) forwards;
+  animation: ico-close var(--t-ico-quick) var(--ease-out) forwards;
 }
 .group:hover .ico-copy,
 :where(a, button, label, summary, [role="button"]):hover .ico-copy,
 .ico-live.ico-copy {
-  animation: ico-copy 0.5s var(--ease-out);
+  animation: ico-copy var(--t-ico) var(--ease-out);
 }
 .group:hover .ico-panel,
 :where(a, button, label, summary, [role="button"]):hover .ico-panel,
 .ico-live.ico-panel {
-  animation: ico-panel 0.5s var(--ease-out);
+  animation: ico-panel var(--t-ico) var(--ease-out);
 }
 .group:hover .ico-menu,
 :where(a, button, label, summary, [role="button"]):hover .ico-menu,
 .ico-live.ico-menu {
-  animation: ico-menu 0.45s var(--ease-out);
+  animation: ico-menu var(--t-ico) var(--ease-out);
 }
 .group:hover .ico-exit,
 :where(a, button, label, summary, [role="button"]):hover .ico-exit,
 .ico-live.ico-exit {
-  animation: ico-exit 0.6s var(--ease-out);
+  animation: ico-exit var(--t-ico-long) var(--ease-out);
 }
 .group:hover .ico-lock,
 :where(a, button, label, summary, [role="button"]):hover .ico-lock,
 .ico-live.ico-lock {
-  animation: ico-lock 0.5s var(--ease-out);
+  animation: ico-lock var(--t-ico) var(--ease-out);
 }
 .group:hover .ico-send,
 :where(a, button, label, summary, [role="button"]):hover .ico-send,
 .ico-live.ico-send {
-  animation: ico-send 0.55s var(--ease-out);
+  animation: ico-send var(--t-ico-long) var(--ease-out);
 }
 .group:hover .ico-mail,
 :where(a, button, label, summary, [role="button"]):hover .ico-mail,
 .ico-live.ico-mail {
-  animation: ico-mail 0.4s var(--ease-spring);
+  animation: ico-mail var(--t-ico) var(--ease-spring);
 }
 .group:hover .ico-tick,
 :where(a, button, label, summary, [role="button"]):hover .ico-tick,
@@ -1174,52 +1194,52 @@ select:focus-visible,
 .group:hover .ico-stack,
 :where(a, button, label, summary, [role="button"]):hover .ico-stack,
 .ico-live.ico-stack {
-  animation: ico-stack 0.5s var(--ease-out);
+  animation: ico-stack var(--t-ico) var(--ease-out);
 }
 .group:hover .ico-down,
 :where(a, button, label, summary, [role="button"]):hover .ico-down,
 .ico-live.ico-down {
-  animation: ico-down 0.55s var(--ease-out);
+  animation: ico-down var(--t-ico-long) var(--ease-out);
 }
 .group:hover .ico-sparkle,
 :where(a, button, label, summary, [role="button"]):hover .ico-sparkle,
 .ico-live.ico-sparkle {
-  animation: ico-sparkle 0.46s var(--ease-spring);
+  animation: ico-sparkle var(--t-ico) var(--ease-spring);
 }
 .group:hover .ico-back,
 :where(a, button, label, summary, [role="button"]):hover .ico-back,
 .ico-live.ico-back {
-  animation: ico-back 0.5s var(--ease-out);
+  animation: ico-back var(--t-ico) var(--ease-out);
 }
 .group:hover .ico-fit,
 :where(a, button, label, summary, [role="button"]):hover .ico-fit,
 .ico-live.ico-fit {
-  animation: ico-fit 0.5s var(--ease-out);
+  animation: ico-fit var(--t-ico) var(--ease-out);
 }
 .group:hover .ico-tilt,
 :where(a, button, label, summary, [role="button"]):hover .ico-tilt,
 .ico-live.ico-tilt {
-  animation: ico-tilt 0.5s var(--ease-spring);
+  animation: ico-tilt var(--t-ico) var(--ease-spring);
 }
 .group:hover .ico-lift,
 :where(a, button, label, summary, [role="button"]):hover .ico-lift,
 .ico-live.ico-lift {
-  animation: ico-lift 0.42s var(--ease-spring);
+  animation: ico-lift var(--t-ico) var(--ease-spring);
 }
 .group:hover .ico-type,
 :where(a, button, label, summary, [role="button"]):hover .ico-type,
 .ico-live.ico-type {
-  animation: ico-type 0.6s var(--ease-glide) 2;
+  animation: ico-type var(--t-ico-long) var(--ease-glide) 2;
 }
 .group:hover .ico-scan,
 :where(a, button, label, summary, [role="button"]):hover .ico-scan,
 .ico-live.ico-scan {
-  animation: ico-scan 0.8s var(--ease-glide);
+  animation: ico-scan var(--t-ico-long) var(--ease-glide);
 }
 .group:hover .ico-pop,
 :where(a, button, label, summary, [role="button"]):hover .ico-pop,
 .ico-live.ico-pop {
-  animation: ico-pop 0.32s var(--ease-spring);
+  animation: ico-pop var(--t-ico-quick) var(--ease-spring);
 }
 .group:hover .ico-hue,
 :where(a, button, label, summary, [role="button"]):hover .ico-hue,
@@ -1229,36 +1249,43 @@ select:focus-visible,
 .group:hover .ico-open,
 :where(a, button, label, summary, [role="button"]):hover .ico-open,
 .ico-live.ico-open {
-  animation: ico-open 0.35s var(--ease-out) forwards;
+  animation: ico-open var(--t-ico-quick) var(--ease-out) forwards;
 }
 .group:hover .ico-launch,
 :where(a, button, label, summary, [role="button"]):hover .ico-launch,
 .ico-live.ico-launch {
-  animation: ico-launch 0.6s var(--ease-out);
+  animation: ico-launch var(--t-ico-long) var(--ease-out);
 }
 .group:hover .ico-nudge,
 :where(a, button, label, summary, [role="button"]):hover .ico-nudge,
 .ico-live.ico-nudge {
-  animation: ico-nudge 0.34s var(--ease-spring);
+  animation: ico-nudge var(--t-ico-quick) var(--ease-spring);
 }
 .group:hover .ico-shake,
 :where(a, button, label, summary, [role="button"]):hover .ico-shake,
 .ico-live.ico-shake {
-  animation: ico-shake 0.38s var(--ease-spring);
+  animation: ico-shake var(--t-ico-quick) var(--ease-spring);
 }
 /* The one motion with no hover trigger, deliberately. A tick means something
    just succeeded, so it plays when it mounts — waiting for a hover would mean
    the confirmation never animates for anyone who does not point at it. */
 .ico-check {
-  animation: ico-check 0.4s var(--ease-out);
+  animation: ico-check var(--t-ico) var(--ease-out);
 }
 .group:hover .ico-grow,
 :where(a, button, label, summary, [role="button"]):hover .ico-grow,
 .ico-live.ico-grow {
-  animation: ico-grow 0.38s var(--ease-spring);
+  animation: ico-grow var(--t-ico-quick) var(--ease-spring);
 }
 
-/* active nav items keep a gentle loop so the current page reads as live */
+/* The current item acknowledges itself once, then stops.
+
+   This was an infinite 3.2s bob, which meant the sidebar had a permanently
+   moving element on every page for the whole session. The active row is
+   already unmistakable — its own background, a 2px accent marker, darker ink
+   and heavier weight — so the loop was not carrying the state, it was just
+   motion in the corner of the eye that never resolved. Playing once when the
+   item becomes active keeps the moment of life and gives it an end. */
 .ico-active.ico-spin {
   animation: ico-spin 9s linear infinite;
 }
@@ -1269,7 +1296,7 @@ select:focus-visible,
 .ico-active.ico-pop,
 .ico-active.ico-grow,
 .ico-active.ico-type {
-  animation: nx-bob 3.2s ease-in-out infinite;
+  animation: nx-bob var(--t-ico-long) var(--ease-ui);
 }
 
 @keyframes nx-dots {

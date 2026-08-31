@@ -13,6 +13,7 @@ import {
 } from "@/app/actions/agents";
 import { Ico } from "@/components/ui/ico";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 
@@ -51,7 +52,7 @@ export function AgentsView({
     return (
       <div className="nx-in mx-auto flex min-h-screen max-w-[520px] flex-col items-center justify-center px-5 text-center">
         <Bot size={72} state="idle" />
-        <h1 className="mt-6 text-[22px] font-semibold text-ink">Agent Builder</h1>
+        <h1 className="mt-6 text-[22px] font-semibold text-ink">Agents</h1>
         <p className="mt-2 text-[14px] leading-relaxed text-ink-3">
           Build specialist agents with their own role, instructions and tools —
           then put them to work. Log in to create your first one.
@@ -68,22 +69,29 @@ export function AgentsView({
 
   return (
     <div className="mx-auto min-h-screen max-w-[1080px] px-5 py-8 lg:px-8">
-      <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-[24px] font-semibold text-ink">Agent Builder</h1>
-          <p className="mt-1 text-[13.5px] text-ink-3">
-            {agents.length === 0
-              ? "No agents yet."
-              : `${agents.length} agent${agents.length === 1 ? "" : "s"} ready.`}
-          </p>
-        </div>
-        <button
-          onClick={() => setCreating(true)}
-          className="flex items-center gap-2 rounded-[var(--r-control)] btn-grad px-4 py-2.5 text-[14px] font-medium transition-transform hover:scale-[1.03]"
-        >
-          <Ico icon={FiPlus} motion="open" size={16} /> New agent
-        </button>
-      </div>
+      {/* "Agents" — the same word as the nav item and the page title. It read
+          "Agent Builder" here, which is a third name for one place.
+
+          The subtitle says what the page is for rather than how many rows are
+          on it: "No agents yet." is a state, and the empty state below already
+          says it properly and offers the way out of it. */}
+      <PageHeader
+        className="mb-7"
+        title="Agents"
+        subtitle="Specialists with their own brief and instructions, ready to be given work."
+        action={
+          // Only when there is a list to add to. With none, this button sat
+          // directly above an empty state offering the identical button.
+          agents.length > 0 ? (
+            <button
+              onClick={() => setCreating(true)}
+              className="flex items-center gap-2 rounded-[var(--r-control)] btn-grad px-4 py-2.5 text-[14px] font-medium transition-transform duration-[var(--t-hover)] ease-[var(--ease-ui)] hover:scale-[1.03]"
+            >
+              <Ico icon={FiPlus} motion="open" size={16} /> New agent
+            </button>
+          ) : null
+        }
+      />
 
       {agents.length === 0 ? (
         <EmptyState
