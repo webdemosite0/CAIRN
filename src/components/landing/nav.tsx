@@ -18,12 +18,21 @@ import { cn } from "@/lib/utils";
  * Every link points at a section on this page or a route that exists — there
  * is no Solutions or Resources here, because neither exists to link to.
  */
+/**
+ * Anchors point within the landing page; paths are real pages.
+ *
+ * The anchors only resolve on "/", so this nav is rendered on the feature and
+ * pricing pages too — where "#pricing" would scroll to nothing. They are
+ * written as "/#pricing" for that reason: on the landing page the browser
+ * treats it as an in-page jump, and anywhere else it navigates home and then
+ * jumps.
+ */
 const LINKS = [
-  { href: "#capabilities", label: "Product" },
-  { href: "#agents", label: "Agents" },
-  { href: "#files", label: "Files" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#capabilities", label: "Product" },
+  { href: "/features/ai-agents", label: "Agents" },
+  { href: "/features/documents-and-spreadsheets", label: "Files" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 export function LandingNav() {

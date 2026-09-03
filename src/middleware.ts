@@ -16,9 +16,10 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 
 /** Reachable without an account. Everything else needs one. */
-const PUBLIC_PAGES = new Set(["/", "/login", "/signup"]);
+const PUBLIC_PAGES = new Set(["/", "/login", "/signup", "/pricing"]);
 
 const PUBLIC_PREFIXES = [
+  "/features/", // the public capability pages — the only indexable content
   "/verify-email", // opened from an email, in whatever browser
   "/api/auth/", // the sign-in and OAuth callback routes themselves
   "/api/health", // has to answer when the database is down

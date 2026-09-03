@@ -115,6 +115,11 @@ export const site = {
  */
 export const publicRoutes = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" as const },
+  { path: "/pricing", priority: 0.9, changeFrequency: "monthly" as const },
+  // The per-capability pages are appended by app/sitemap.ts, which reads the
+  // same array that builds them. Keeping them out of here leaves site.ts free
+  // of the icon imports features.ts carries — this module is pulled in by
+  // client code, and that is not a dependency it should have.
 ];
 
 /** Routes that must never be indexed. */
