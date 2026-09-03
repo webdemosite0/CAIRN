@@ -52,8 +52,35 @@ function pinUi(req: NextRequest, res: NextResponse): NextResponse {
   return res;
 }
 
+/**
+ * One hostname, permanently.
+ *
+ * www.troveai.site served the whole site as happily as the apex did, with no
+ * redirect between them, so Google indexed both — /team appeared under www and
+ * the landing page under the apex, splitting every ranking signal the domain
+ * has between two addresses it thinks are different sites.
+ *
+ * 308 rather than 302: permanent is the true answer, and it is the only one
+ * that makes Google consolidate the two into one. The method is preserved,
+ * which matters because a POST to a form on www must not silently become a GET.
+ */
+function canonicalHost(req: NextRequest): NextResponse | null {
+  const host = req.headers.get("host");
+  if (!host?.startsWith("www.")) return null;
+
+  const url = req.nextUrl.clone();
+  url.host = host.slice(4);
+  // The port is dropped with the prefix: this only ever fires on the deployed
+  // domain, and carrying a stray :3000 here would send people nowhere.
+  url.port = "";
+  return NextResponse.redirect(url, 308);
+}
+
 export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
+
+  const toApex = canonicalHost(req);
+  if (toApex) return toApex;
 
   if (isPublic(pathname)) {
     const res = pinUi(req, NextResponse.next());

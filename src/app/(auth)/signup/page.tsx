@@ -1,7 +1,11 @@
 import { AuthCard } from "@/components/auth/auth-card";
 import { googleConfigured } from "@/lib/google";
 
-export const metadata = { title: "Sign up" };
+/** Not indexed — see the note in the sign-in page. */
+export const metadata = {
+  title: "Sign up",
+  robots: { index: false, follow: true },
+};
 
 export default async function SignupPage({
   searchParams,

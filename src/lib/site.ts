@@ -99,29 +99,22 @@ export const site = {
   twitter: "@trove",
 } as const;
 
-/** Pages worth indexing, with crawl hints. */
+/**
+ * Pages worth indexing, with crawl hints.
+ *
+ * Only pages a visitor can actually reach. This listed fifteen routes —
+ * /chat, /team, /spreadsheets, /research and the rest — every one of which
+ * sits behind the sign-in wall, so Googlebot followed the sitemap, was
+ * redirected to /login, and indexed each of them as "Sign in · Trove". A
+ * search for the site returned the landing page and then three sign-in pages.
+ *
+ * The middleware is the authority on what is public: "/", "/login" and
+ * "/signup". Of those, only the landing page is worth a search result — a
+ * sign-in form is not something anyone is looking for — so the sitemap now
+ * says so, and login and signup carry noindex instead.
+ */
 export const publicRoutes = [
-  // "/" is now the landing page; the workspace itself lives at /chat.
   { path: "/", priority: 1.0, changeFrequency: "weekly" as const },
-  { path: "/chat", priority: 0.9, changeFrequency: "weekly" as const },
-  // Low on purpose while ENABLED is false in (shell)/websites/page.tsx — that
-  // route currently renders "Coming soon", and advertising a placeholder as a
-  // headline page is both bad ranking and dishonest. Raise to 0.9 when the
-  // builder is switched back on.
-  { path: "/websites", priority: 0.4, changeFrequency: "monthly" as const },
-  { path: "/agents", priority: 0.9, changeFrequency: "weekly" as const },
-  { path: "/team", priority: 0.8, changeFrequency: "weekly" as const },
-  { path: "/code", priority: 0.7, changeFrequency: "monthly" as const },
-  { path: "/documents", priority: 0.7, changeFrequency: "monthly" as const },
-  { path: "/spreadsheets", priority: 0.7, changeFrequency: "monthly" as const },
-  { path: "/slides", priority: 0.6, changeFrequency: "monthly" as const },
-  { path: "/design", priority: 0.6, changeFrequency: "monthly" as const },
-  { path: "/research", priority: 0.6, changeFrequency: "monthly" as const },
-  { path: "/reminders", priority: 0.5, changeFrequency: "monthly" as const },
-  { path: "/integrations", priority: 0.8, changeFrequency: "weekly" as const },
-  { path: "/plans", priority: 0.8, changeFrequency: "monthly" as const },
-  { path: "/login", priority: 0.3, changeFrequency: "yearly" as const },
-  { path: "/signup", priority: 0.4, changeFrequency: "yearly" as const },
 ];
 
 /** Routes that must never be indexed. */

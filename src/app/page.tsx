@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
@@ -32,6 +33,11 @@ import { site } from "@/lib/site";
  * Every section is a component under components/landing, so this file stays a
  * running order rather than two thousand lines of markup.
  */
+/** The landing page is the site's canonical URL; nothing else claims it. */
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
 export default async function Landing() {
   // The middleware hands everyone a guest id, so a session cookie — not the
   // presence of an identity — is what distinguishes a returning user.

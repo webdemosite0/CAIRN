@@ -40,7 +40,11 @@ export const metadata: Metadata = {
   authors: [{ name: site.name }],
   creator: site.name,
   publisher: site.name,
-  alternates: { canonical: "/" },
+  // Deliberately no canonical here. Set on the root layout it is inherited
+  // by every page, so /login, /plans and each app route declared the landing
+  // page as their canonical — which tells Google they are all duplicates of
+  // it. A page that needs one declares its own; anything else self-canonicals
+  // to its own URL, which is the correct default.
   robots: {
     index: true,
     follow: true,
